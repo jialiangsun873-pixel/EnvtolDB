@@ -381,13 +381,19 @@ KIND_EN = {"ddG": "ΔΔG of folding (kcal/mol)", "dTm_protherm": "ΔTm of single
            "Tm_aqueous": "absolute Tm, aqueous control (°C)", "Tm_solvent": "absolute Tm in solvent (°C)"}
 krows = "".join(f"<tr><td><span class='badge'>{esc(r[0])}</span> {KIND_EN.get(r[0],'')}</td>"
                 f"<td>{r[1]:,}</td><td>{r[2] or 0:,}</td><td>{r[3]}</td>"
-                f"<td>{esc(dict(kinds_sources).get(r[0],'—')) if (kinds_sources:={}) else ''}</td></tr>" for r in kinds)
+                f"<td>{esc(KIND_EN.get(r[0], ''))}</td></tr>" for r in kinds)
+des_n = db.execute("SELECT COUNT(*) FROM experiments WHERE kind LIKE 'des_%'").fetchone()[0]
 b = f"""<div class="note">Experimental layer: {stats_all if False else totals['experiments']:,} records from four sources
 (OrganiZymeDB, FireProtDB, ProThermDB-L4, pH–Tm compilation). Linked rows carry a UniProt accession;
 unlinked rows retain the source wild-type hash for provenance.</div>
 <div class="card"><h2>By kind</h2><table><tr><th>kind</th><th>records</th><th>linked</th><th>mean value</th></tr>{krows}</table>
-<p class="muted">Full per-record browsing: download the SQLite database. 539,708 = 533,071 + 2,921 + 1,883 + 1,839
-(FireProtDB + ProTherm-L4 + pH–Tm + OrganiZymeDB).</p></div>"""
+<p class="muted">Full per-record browsing: download the SQLite database. Layer totals:
+533,071 (FireProtDB) + 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,839 (OrganiZymeDB) + 164 (DES literature)
+= 539,708.</p></div>
+<div class="card"><h2>Deep-eutectic-solvent (DES) subset</h2>
+<p style="font-size:13.5px">{des_n} records from 3 dehydrogenases (ADH-A, Lk-ADH, GDH) across 11 ChCl/betaine-based
+DES systems (water 10–50 wt %, 30 °C incubation): <code>des_k_inact</code> (82) and <code>des_t_half</code> (82).
+53 records carry UniProt accessions; the GDH arm is <code>needs_review</code> pending plasmid-level identification.</p></div>"""
 open(f"{OUT}/experiments.html", "w", encoding="utf-8").write(page("Experiments", b, "experiments"))
 
 # ================= methods =================
