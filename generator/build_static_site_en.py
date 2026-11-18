@@ -29,8 +29,8 @@ db.execute("PRAGMA busy_timeout=60000")
 
 POOLS = {p["key"]: p for p in cfg["pools"]}
 POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphilic",
-           "solvent": "Solvent-tolerant", "meso": "Mesophilic controls"}
-POOL_ZH = {"thermo": "嗜热", "salt": "耐盐", "ph": "耐酸碱", "solvent": "耐溶剂", "meso": "中温对照"}
+           "solvent": "Solvent-tolerant", "meso": "Mesophilic controls", "cold": "Cold-adapted"}
+POOL_ZH = {"thermo": "嗜热", "salt": "耐盐", "ph": "耐酸碱", "solvent": "耐溶剂", "meso": "中温对照", "cold": "嗜冷"}
 
 for sub in ("species", "downloads/fasta", "downloads/tsv", ".github/workflows"):
     os.makedirs(os.path.join(OUT, sub), exist_ok=True)
