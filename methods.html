@@ -1,54 +1,149 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>采集方法 · EnvTolDB</title><style>
-body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
-header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
-header a:hover{color:#0c1726}
-main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
-h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
-.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
-.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
-.kpi b{font-size:24px;display:block}
-.kpi span{font-size:12px;color:#5f7086}
-.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
-td{padding:5px 8px;border-bottom:1px solid #e6eef7}
-tr:hover td{background:#f0f6fc}
-.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
-.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
-.muted{color:#5f7086;font-size:12px}
-input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
-textarea{width:100%;min-height:110px;font-family:monospace}
-button{background:#0c1726;color:#fff;border:none;cursor:pointer}
-pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
-code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
-a{color:#1f6fd0}
-footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
-.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+<title>Methods · EnvTolDB</title>
+<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 231 organisms, 668,888 UniProt proteins, 539,708 experimental measurements.">
+<style>
+:root{--ink:#13233b;--soft:#43597a;--faint:#7285a0;--line:#d9e4f0;--bg:#f5f8fc;--card:#fff;
+ --accent:#1668dc;--accent-ink:#0d4bb5;--ok:#17805f;--ok-bg:#e4f4ee;--no:#c4424f;--no-bg:#fdeef0;
+ --radius:8px;--shadow:0 1px 3px rgba(15,40,80,.08)}
+*{box-sizing:border-box}
+body{font-family:Inter,-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--ink)}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:-2px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{padding:5px 11px;border-radius:6px;color:var(--soft);font-size:13.5px}
+nav a:hover{background:#eef3f9;color:var(--ink);text-decoration:none}
+nav a.on{background:#e7f0fb;color:var(--accent-ink);font-weight:600}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.langbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--soft)}
+.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.gh:hover{color:var(--ink)}
+main{max-width:1140px;margin:0 auto;padding:26px 18px 70px}
+.hero{background:linear-gradient(180deg,#eef4fb,#f8fbff);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 26px;margin-bottom:22px}
+.hero h1{font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
+.hero .tag{font-size:15px;color:var(--soft);margin-bottom:16px}
+.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.rel{background:var(--accent);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600}
+.rel2{background:#fff;border:1px solid var(--line);color:var(--soft);font-size:12px;padding:3px 10px;border-radius:12px}
+.srch{display:flex;gap:8px;max-width:560px}
+.srch input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid #b9cbe2;border-radius:8px}
+.srch input:focus{outline:2px solid #9cc3e5;border-color:var(--accent)}
+.srch button{padding:10px 20px;font-size:14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+.hint{font-size:12px;color:var(--faint);margin-top:6px}
+.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:150px}
+.chip b{font-size:21px;display:block}
+.chip span{font-size:11.5px;color:var(--faint)}
+h2.sec{font-size:19px;margin:26px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.pcard b{font-size:15px}.pcard .n{font-size:24px;font-weight:700;display:block;margin:2px 0}
+.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th{background:#eef3f9;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#e2ecf6}
+td{padding:6px 10px;border-bottom:1px solid #ecf2f8}
+tr:hover td{background:#f4f8fd}
+.badge{display:inline-block;padding:1px 9px;border-radius:11px;font-size:11.5px;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.b-grade{background:#e7f0fb;color:var(--accent-ink)}
+.bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle}
+.bar-neg{background:#e58a93}.bar-pos{background:#7bbf9e}
+.muted{color:var(--faint);font-size:12.5px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:9px 14px;border-radius:6px;margin-bottom:16px;font-size:13.5px}
+.err{background:#fdeef0;border:1px solid #f3c6cb;color:#c4424f;padding:8px 14px;border-radius:6px;margin-bottom:14px;font-size:13px}
+code{font-family:ui-monospace,'JetBrains Mono',monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+pre{background:#eef3f9;padding:12px;border-radius:6px;font-size:12.5px;overflow:auto;max-height:360px}
+input,button{font-size:13.5px;padding:7px 11px;border:1px solid #b9cbe2;border-radius:6px;background:#fff;color:var(--ink);font-family:inherit}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+button:hover{background:var(--accent-ink)}
+details{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;background:#fff}
+summary{cursor:pointer;font-weight:600;font-size:13.5px}
+.crumb{font-size:12.5px;color:var(--faint);margin-bottom:14px}
+.crumb a{color:var(--faint)}
+footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
 </style></head><body>
-<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
-<nav><a href="index.html">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
-<main><div class="note">以下为 EnvTolDB 每个环境组的采集协议：物种入选标准、序列检索方式、文献锚定与实验校准覆盖。所有组共用同一检索管线：UniProt taxonomy API 精确学名解析 → 参考蛋白组（缺则全 taxon）→ ≥50aa 过滤 + 去重。注意冗余口径按池不同并如实记录：嗜热组为 30% 聚类代表（36,297/72,559），耐盐/耐酸碱/耐溶剂组为 90% linclust 代表，对照组为精确去重集。</div><div class="card"><h2>嗜热组（87 物种 / 36,297 蛋白 = 30% 聚类代表）</h2>
-<p style="font-size:13px"><b>入选标准</b>：文献 genus 级 OGT 表（Bakelaar et al.; Kernavis et al.）筛选 OGT &gt; 45°C，补充 Pyrococcus、Methanopyrus、Aquifex、Thermotoga、Sulfolobus 等超嗜热模式菌。 序列口径：72,559 条聚类超集的 30% 代表（36,297 条），非全量蛋白组。</p>
-<p style="font-size:13px"><b>文献锚定</b>：不设文献锚定门槛（UniProt 对这批模式菌的热表型注释完备），87 种全部保留。</p>
-<p style="font-size:13px"><b>实验校准</b>：蛋白计数与长度统计来自 organism-level 汇总表。</p></div><div class="card"><h2>耐盐组（86 物种 / 357,067 蛋白）</h2>
-<p style="font-size:13px"><b>入选标准</b>：Halobacteria 纲盐古菌 + 文献记录莫尔级 NaCl 最适的耐盐细菌属（Salinibacter、Halomonas、Chromohalobacter、Gracilibacillus、Halobacillus、Oceanobacillus、Marinobacter、Halorhodospira 等），按文献 NaCl 最适分 extreme / moderate 两级。</p>
-<p style="font-size:13px"><b>文献锚定</b>：Europe PMC 严格共现检索（物种名 × halophilic/halotolerant/salt tolerance/hypersaline，标题或摘要）通过 71/86（83%）。</p>
-<p style="font-size:13px"><b>实验校准</b>：BacDive Halophily 表抓取实测 NaCl 最适（% 与 g/L 统一换算 mol/L），两轮抓取后覆盖 51 条物种记录。分析子组：extreme 200,135 / moderate 122,045 序列。</p></div><div class="card"><h2>耐酸碱组（26 物种 / 76,342 蛋白）</h2>
-<p style="font-size:13px"><b>入选标准</b>：酸嗜极菌 = 最适生长 pH &lt; 3（Acidithiobacillus 三种、Ferroplasma acidiphilum、Leptospirillum ferriphilum、Sulfobacillus、Acidiphilium cryptum、Picrophilus 等，16 种）；碱嗜菌 = 最适 pH &gt; 9（Bacillus pseudofirmus OF4、Alkaliphilus oremlandii、Amphibacillus xylanus、Caldalkalibacillus uzonensis、Desulfonatronovibrio 等，10 种）。两亚池全程分开标记。</p>
-<p style="font-size:13px"><b>文献锚定</b>：共现检索通过 24/26（92%）。</p>
-<p style="font-size:13px"><b>实验校准</b>：BacDive 培养 pH 最适值覆盖 6/16 酸嗜物种。分析集：酸 55,228 / 碱 19,899 序列（≤2000aa）。</p></div><div class="card"><h2>耐溶剂组（14 物种 / 15 株蛋白组 / 96,750 分析序列）</h2>
-<p style="font-size:13px"><b>入选标准</b>：文献记录的有机溶剂耐受模式菌：P. putida KT2440/S12/DOT-T1E/mt-2、P. taiwanensis VLB120、Rhodococcus erythropolis/jostii/opacus、A. baylyi ADP1、B. cepacia/vietnamiensis、S. maltophilia K279a、Marinobacter、Alcanivorax。双路线合并：路线 P = 15 个耐受株参考蛋白组（63,292 条，作耐受适应背景）；路线 A = UniProt 全文 &quot;organic solvent tolerance&quot; 检索 14,575 条，按名称/功能注释清洗为 3,549 条蛋白级正例（如 LptD）。</p>
-<p style="font-size:13px"><b>文献锚定</b>：株表型 ≠ 蛋白级耐受，因此每个物种带人工评级（严格共现 + 二次回填：high 4 / medium 6 / medium-strain-unverified 3 / weak 或 hydrocarbon-only 3）；Comamonas testosteroni 因缺乏直接溶剂耐受文献被排除出主分析。</p>
-<p style="font-size:13px"><b>实验校准</b>：溶剂效应的实验验证来自 OrganiZymeDB（见实验参数层）。</p></div><div class="card"><h2>中温对照组（18 物种 / 22 株条目 / 99,557 蛋白）</h2>
-<p style="font-size:13px"><b>入选标准</b>：四个对照池按系统发育与生活方式匹配处理组：产甲烷古菌匹配盐古菌（Methanosarcina 三种、Methanococcus、Methanocorpusculum、Methanospirillum），中温细菌匹配各细菌池（E. coli K-12 MG1655、B. subtilis 168、Deinococcus radiodurans、Lactococcus lactis、Corynebacterium glutamicum、M. smegmatis、S. aureus、Shewanella oneidensis、Yersinia、Proteus、Serratia、Aeromonas 等）。跨池重复物种只存一份。</p>
-<p style="font-size:13px"><b>文献锚定</b>：对照组不设锚定门槛（作为阴性背景使用）。</p>
-<p style="font-size:13px"><b>实验校准</b>：—</p></div><div class="card"><h2>实验参数层（539,714 条实测）</h2>
-<p style="font-size:13px"><b>入选标准</b>：四个实验来源聚合：① OrganiZymeDB 全量导出清洗（27,945 条溶剂测量；其中 613 条热稳定测量进入 EnvTolDB 实验层，展开为 1,839 行 = 613 dTm_solvent + 613 水相 Tm + 613 溶剂相 Tm），按 UniProt accession 直连；② FireProtDB 全库 533,071 条 ddG，按野生型序列 SHA-256 自动比对挂接（1,410 条命中——该库以常温菌为主，未命中行保留 wt_sha256 可回查）；③ ProTherm-L4 2,921 条单点 ΔTm（202 个 PDB 结构，Shrake-Rupley RSA）；④ 文献 Tm-pH 编译 1,883 条（sha1 前缀比对，294 命中）。</p>
-<p style="font-size:13px"><b>文献锚定</b>：meltome 级预测 Tm 数据集被刻意排除，保证实验层严格只含实验测量。</p>
-<p style="font-size:13px"><b>实验校准</b>：每条记录带 source / source_ref（doi 或源记录号）；人工核验 verified 必须写 evidence。</p></div>
-<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
-<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+<header>
+  <a class="brand" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2.6 20.4 7.4v9.2L12 21.4 3.6 16.6V7.4Z"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M12 5v2.8M12 16.2V19M5.7 8.5l2.4 1.4M15.9 14.1l2.4 1.4M18.3 8.7l-2.4 1.3M8.1 14l-2.4 1.4" opacity=".5"/></svg><span>EnvTolDB<small>Environment-Tolerant Proteome Database</small></span></a>
+  <nav><a href="index.html" class="" data-zh="总览">Overview</a><a href="species/index.html" class="" data-zh="物种">Species</a><a href="solvents.html" class="" data-zh="溶剂统计">Solvents</a><a href="experiments.html" class="" data-zh="实验参数">Experiments</a><a href="methods.html" class="" data-zh="采集方法">Methods</a><a href="downloads.html" class="" data-zh="下载">Downloads</a><a href="api.html" class="" data-zh="API">API</a></nav>
+  <div class="hdr-right"><button class="langbtn" data-l="en" onclick="setLang('en')">EN</button><button class="langbtn" data-l="zh" onclick="setLang('zh')">中文</button><a class="gh" href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub ↗</a></div>
+</header>
+<main>
+
+<div class="note">Collection protocol per group: species curation criteria, sequence retrieval, literature anchoring, and experimental calibration. Shared pipeline: UniProt taxonomy API exact name resolution → reference proteome (else all proteins of the taxon) → ≥50 aa filter + dedup. Redundancy scope is recorded per pool: thermophilic = 30% cluster representatives; halophilic/pH/solvent = 90% linclust representatives; controls = exact dedup.</div><div class='card'><h2>Thermophilic</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Genus-level OGT tables (Bakelaar et al.; Kernavis et al.) with OGT &gt; 45 °C, plus established hyperthermophile models (Pyrococcus, Methanopyrus, Aquifex, Thermotoga, Sulfolobus). Sequences are 30%-identity cluster representatives (36,297 of a 72,559-protein superset).</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — No literature-anchoring gate (thermal phenotype annotation in UniProt is comprehensive for these well-studied organisms); all 87 species retained.</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — Per-species protein counts and length statistics from the organism-level summary table.</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：文献 genus 级 OGT 表（Bakelaar et al.; Kernavis et al.）筛选 OGT &gt; 45°C，补充 Pyrococcus、Methanopyrus、Aquifex、Thermotoga、Sulfolobus 等超嗜热模式菌。 序列口径：72,559 条聚类超集的 30% 代表（36,297 条），非全量蛋白组。</p><p style='font-size:13px'><b>文献锚定</b>：不设文献锚定门槛（UniProt 对这批模式菌的热表型注释完备），87 种全部保留。</p><p style='font-size:13px'><b>实验校准</b>：蛋白计数与长度统计来自 organism-level 汇总表。</p></details></div><div class='card'><h2>Halophilic</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Halobacteria-class haloarchaea plus halophilic bacterial genera with molar-range NaCl optima (Salinibacter, Halomonas, Chromohalobacter, Gracilibacillus, Halobacillus, Oceanobacillus, Marinobacter, Halorhodospira and others); each species graded extreme / moderate by documented NaCl optimum.</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — Europe PMC strict co-occurrence (species × halophilic/halotolerant/salt tolerance/hypersaline in title/abstract): 71/86 species (83%).</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — BacDive &#x27;Halophily&#x27; tables scraped for measured NaCl optima in molarity (two-pass crawl); 51 species records. Analyzed subsets: extreme 200,135 / moderate 122,045 sequences.</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：Halobacteria 纲盐古菌 + 文献记录莫尔级 NaCl 最适的耐盐细菌属（Salinibacter、Halomonas、Chromohalobacter、Gracilibacillus、Halobacillus、Oceanobacillus、Marinobacter、Halorhodospira 等），按文献 NaCl 最适分 extreme / moderate 两级。</p><p style='font-size:13px'><b>文献锚定</b>：Europe PMC 严格共现检索（物种名 × halophilic/halotolerant/salt tolerance/hypersaline，标题或摘要）通过 71/86（83%）。</p><p style='font-size:13px'><b>实验校准</b>：BacDive Halophily 表抓取实测 NaCl 最适（% 与 g/L 统一换算 mol/L），两轮抓取后覆盖 51 条物种记录。分析子组：extreme 200,135 / moderate 122,045 序列。</p></details></div><div class='card'><h2>Acid/Alkaliphilic</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Acidophiles with optimal growth pH &lt; 3 (16 species: Acidithiobacillus, Ferroplasma, Leptospirillum, Sulfobacillus, Acidiphilium, Picrophilus and related) and alkaliphiles with optimal growth pH &gt; 9 (10 species: Bacillus pseudofirmus OF4, Alkaliphilus oremlandii, Amphibacillus xylanus, Caldalkalibacillus uzonensis, Desulfonatronovibrio and related); kept as separate sub-pools throughout.</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — Co-occurrence search passed for 24/26 species (92%).</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — BacDive optimal-pH values available for 6/16 acidophile species. Analyzed sets: 55,228 acidophilic / 19,899 alkaliphilic sequences (≤2,000 aa).</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：酸嗜极菌 = 最适生长 pH &lt; 3（Acidithiobacillus 三种、Ferroplasma acidiphilum、Leptospirillum ferriphilum、Sulfobacillus、Acidiphilium cryptum、Picrophilus 等，16 种）；碱嗜菌 = 最适 pH &gt; 9（Bacillus pseudofirmus OF4、Alkaliphilus oremlandii、Amphibacillus xylanus、Caldalkalibacillus uzonensis、Desulfonatronovibrio 等，10 种）。两亚池全程分开标记。</p><p style='font-size:13px'><b>文献锚定</b>：共现检索通过 24/26（92%）。</p><p style='font-size:13px'><b>实验校准</b>：BacDive 培养 pH 最适值覆盖 6/16 酸嗜物种。分析集：酸 55,228 / 碱 19,899 序列（≤2000aa）。</p></details></div><div class='card'><h2>Solvent-tolerant</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Literature-documented organic-solvent-tolerant organisms: P. putida KT2440/S12/DOT-T1E/mt-2, P. taiwanensis VLB120, Rhodococcus erythropolis/jostii/opacus, A. baylyi ADP1, B. cepacia/vietnamiensis, S. maltophilia K279a, Marinobacter, Alcanivorax. Two routes combined: (P) 15 strain reference proteomes (63,292 sequences, tolerance-adapted background); (A) UniProt full-text &#x27;organic solvent tolerance&#x27; search, 14,575 raw hits cleaned to 3,549 protein-level records (e.g. LptD).</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — Graded evidence levels assigned by manual review of strict co-occurrence results plus a second-pass backfill (high 4 / medium 6 / medium-strain-unverified 3 / weak or hydrocarbon-only 3); Comamonas testosteroni excluded from primary analyses.</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — Solvent effects validated experimentally via OrganiZymeDB (see experiments layer).</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：文献记录的有机溶剂耐受模式菌：P. putida KT2440/S12/DOT-T1E/mt-2、P. taiwanensis VLB120、Rhodococcus erythropolis/jostii/opacus、A. baylyi ADP1、B. cepacia/vietnamiensis、S. maltophilia K279a、Marinobacter、Alcanivorax。双路线合并：路线 P = 15 个耐受株参考蛋白组（63,292 条，作耐受适应背景）；路线 A = UniProt 全文 &quot;organic solvent tolerance&quot; 检索 14,575 条，按名称/功能注释清洗为 3,549 条蛋白级正例（如 LptD）。</p><p style='font-size:13px'><b>文献锚定</b>：株表型 ≠ 蛋白级耐受，因此每个物种带人工评级（严格共现 + 二次回填：high 4 / medium 6 / medium-strain-unverified 3 / weak 或 hydrocarbon-only 3）；Comamonas testosteroni 因缺乏直接溶剂耐受文献被排除出主分析。</p><p style='font-size:13px'><b>实验校准</b>：溶剂效应的实验验证来自 OrganiZymeDB（见实验参数层）。</p></details></div><div class='card'><h2>Mesophilic controls</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Four control pools matched by phylogeny and lifestyle: methanogenic archaea for haloarchaea (Methanosarcina ×3, Methanococcus, Methanocorpusculum, Methanospirillum) and mesophilic bacteria for the bacterial pools (E. coli K-12 MG1655, B. subtilis 168, Deinococcus radiodurans, Lactococcus lactis, Corynebacterium glutamicum, M. smegmatis, S. aureus, Shewanella oneidensis and others); organisms shared across pools stored once.</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — No anchoring gate (negative-control background).</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — —</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：四个对照池按系统发育与生活方式匹配处理组：产甲烷古菌匹配盐古菌（Methanosarcina 三种、Methanococcus、Methanocorpusculum、Methanospirillum），中温细菌匹配各细菌池（E. coli K-12 MG1655、B. subtilis 168、Deinococcus radiodurans、Lactococcus lactis、Corynebacterium glutamicum、M. smegmatis、S. aureus、Shewanella oneidensis、Yersinia、Proteus、Serratia、Aeromonas 等）。跨池重复物种只存一份。</p><p style='font-size:13px'><b>文献锚定</b>：对照组不设锚定门槛（作为阴性背景使用）。</p><p style='font-size:13px'><b>实验校准</b>：—</p></details></div><div class='card'><h2>experiments</h2><p style="font-size:13.5px"><b>Inclusion criteria</b> — Four experimental sources aggregated: (i) OrganiZymeDB (27,945 cleaned measurements; 613 thermal-stability records with computable solvent ΔTm entered the experiments layer as 1,839 rows — 613 dTm_solvent + 613 aqueous-Tm + 613 solvent-Tm), linked by UniProt accession; (ii) FireProtDB, 533,071 ΔΔG records, linked by SHA-256 of the wild-type sequence (1,410 matches — the source database is dominated by mesophilic systems; unmatched rows retain the wild-type hash for provenance); (iii) ProTherm-L4, 2,921 single-site ΔTm mutations on 200 PDB structures with Shrake–Rupley RSA; (iv) a literature Tm-versus-pH compilation (1,883 records, 294 linked by SHA-1 prefix).</p>
+<p style="font-size:13.5px"><b>Literature anchoring</b> — Meltome-scale predicted-Tm datasets were deliberately excluded so the experiments layer contains strictly experimental values.</p>
+<p style="font-size:13.5px"><b>Experimental calibration</b> — Every record carries source and source_ref (DOI or source record id); verified flags require written evidence.</p><details><summary data-zh='中文协议原文'>Chinese protocol (原文)</summary><p style='font-size:13px'><b>入选标准</b>：四个实验来源聚合：① OrganiZymeDB 全量导出清洗（27,945 条溶剂测量；其中 613 条热稳定测量进入 EnvTolDB 实验层，展开为 1,839 行 = 613 dTm_solvent + 613 水相 Tm + 613 溶剂相 Tm），按 UniProt accession 直连；② FireProtDB 全库 533,071 条 ddG，按野生型序列 SHA-256 自动比对挂接（1,410 条命中——该库以常温菌为主，未命中行保留 wt_sha256 可回查）；③ ProTherm-L4 2,921 条单点 ΔTm（202 个 PDB 结构，Shrake-Rupley RSA）；④ 文献 Tm-pH 编译 1,883 条（sha1 前缀比对，294 命中）。</p><p style='font-size:13px'><b>文献锚定</b>：meltome 级预测 Tm 数据集被刻意排除，保证实验层严格只含实验测量。</p><p style='font-size:13px'><b>实验校准</b>：每条记录带 source / source_ref（doi 或源记录号）；人工核验 verified 必须写 evidence。</p></details></div>
+<div class="card"><h2>Shared retrieval pipeline</h2>
+<pre>1. UniProt taxonomy API — exact scientific-name resolution → taxon ID
+2. Reference proteome where available, else all proteins of the taxon (REST, TSV)
+3. Filter ≥50 aa, standard amino acids; MD5 exact dedup
+4. Redundancy scope per pool (recorded): thermo = 30% cluster reps;
+   salt / pH / solvent = 90% linclust reps; controls = exact dedup
+5. Literature anchoring: Europe PMC co-occurrence (species × environment terms, title/abstract)
+6. BacDive calibration: Halophily table (NaCl → M) and optimal culture pH</pre></div>
+<div class="card"><h2 data-zh="中文协议原文（全部组）">Chinese protocol (原文)</h2>
+<details><summary data-zh='展开'>Expand</summary>
+<pre>以下为 EnvTolDB 每个环境组的采集协议：物种入选标准、序列检索方式、文献锚定与实验校准覆盖。所有组共用同一检索管线：UniProt taxonomy API 精确学名解析 → 参考蛋白组（缺则全 taxon）→ ≥50aa 过滤 + 去重。注意冗余口径按池不同并如实记录：嗜热组为 30% 聚类代表（36,297/72,559），耐盐/耐酸碱/耐溶剂组为 90% linclust 代表，对照组为精确去重集。</pre>
+<p style='font-size:13px'><b>嗜热组（87 物种 / 36,297 蛋白 = 30% 聚类代表）</b><br>文献 genus 级 OGT 表（Bakelaar et al.; Kernavis et al.）筛选 OGT &gt; 45°C，补充 Pyrococcus、Methanopyrus、Aquifex、Thermotoga、Sulfolobus 等超嗜热模式菌。 序列口径：72,559 条聚类超集的 30% 代表（36,297 条），非全量蛋白组。</p><p style='font-size:13px'><b>耐盐组（86 物种 / 357,067 蛋白）</b><br>Halobacteria 纲盐古菌 + 文献记录莫尔级 NaCl 最适的耐盐细菌属（Salinibacter、Halomonas、Chromohalobacter、Gracilibacillus、Halobacillus、Oceanobacillus、Marinobacter、Halorhodospira 等），按文献 NaCl 最适分 extreme / moderate 两级。</p><p style='font-size:13px'><b>耐酸碱组（26 物种 / 76,342 蛋白）</b><br>酸嗜极菌 = 最适生长 pH &lt; 3（Acidithiobacillus 三种、Ferroplasma acidiphilum、Leptospirillum ferriphilum、Sulfobacillus、Acidiphilium cryptum、Picrophilus 等，16 种）；碱嗜菌 = 最适 pH &gt; 9（Bacillus pseudofirmus OF4、Alkaliphilus oremlandii、Amphibacillus xylanus、Caldalkalibacillus uzonensis、Desulfonatronovibrio 等，10 种）。两亚池全程分开标记。</p><p style='font-size:13px'><b>耐溶剂组（14 物种 / 15 株蛋白组 / 96,750 分析序列）</b><br>文献记录的有机溶剂耐受模式菌：P. putida KT2440/S12/DOT-T1E/mt-2、P. taiwanensis VLB120、Rhodococcus erythropolis/jostii/opacus、A. baylyi ADP1、B. cepacia/vietnamiensis、S. maltophilia K279a、Marinobacter、Alcanivorax。双路线合并：路线 P = 15 个耐受株参考蛋白组（63,292 条，作耐受适应背景）；路线 A = UniProt 全文 &quot;organic solvent tolerance&quot; 检索 14,575 条，按名称/功能注释清洗为 3,549 条蛋白级正例（如 LptD）。</p><p style='font-size:13px'><b>中温对照组（18 物种 / 22 株条目 / 99,557 蛋白）</b><br>四个对照池按系统发育与生活方式匹配处理组：产甲烷古菌匹配盐古菌（Methanosarcina 三种、Methanococcus、Methanocorpusculum、Methanospirillum），中温细菌匹配各细菌池（E. coli K-12 MG1655、B. subtilis 168、Deinococcus radiodurans、Lactococcus lactis、Corynebacterium glutamicum、M. smegmatis、S. aureus、Shewanella oneidensis、Yersinia、Proteus、Serratia、Aeromonas 等）。跨池重复物种只存一份。</p><p style='font-size:13px'><b>实验参数层（539,714 条实测）</b><br>四个实验来源聚合：① OrganiZymeDB 全量导出清洗（27,945 条溶剂测量；其中 613 条热稳定测量进入 EnvTolDB 实验层，展开为 1,839 行 = 613 dTm_solvent + 613 水相 Tm + 613 溶剂相 Tm），按 UniProt accession 直连；② FireProtDB 全库 533,071 条 ddG，按野生型序列 SHA-256 自动比对挂接（1,410 条命中——该库以常温菌为主，未命中行保留 wt_sha256 可回查）；③ ProTherm-L4 2,921 条单点 ΔTm（202 个 PDB 结构，Shrake-Rupley RSA）；④ 文献 Tm-pH 编译 1,883 条（sha1 前缀比对，294 命中）。</p>
+</details></div>
+</main>
+<footer>
+  <b>EnvTolDB</b> v3.1 · built 2026-11-18 · MIT (code) / CC-BY 4.0 (data) ·
+  <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
+  <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
+</footer>
+<script>
+// ---- language toggle (EN default; 中文 via data-zh) ----
+function setLang(l){
+  document.documentElement.lang = l==='zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    if(l==='zh'){ if(!el.dataset.en) el.dataset.en = el.textContent; el.textContent = el.dataset.zh; }
+    else { if(el.dataset.en) el.textContent = el.dataset.en; }
+  });
+  document.querySelectorAll('.langbtn').forEach(b=>b.style.fontWeight = b.dataset.l===l ? '700':'400');
+  try{ localStorage.setItem('envtoldb_lang', l); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  let l='en'; try{ l = localStorage.getItem('envtoldb_lang')||'en'; }catch(e){}
+  setLang(l);
+});
+// ---- sortable tables ----
+function sortTable(th){
+  const tb = th.closest('table').querySelector('tbody') || th.closest('table');
+  const idx = Array.from(th.parentNode.children).indexOf(th);
+  const dir = th.dataset.dir === 'asc' ? -1 : 1;
+  th.dataset.dir = dir===1 ? 'asc' : 'desc';
+  const rows = Array.from(tb.querySelectorAll('tr')).filter(r=>!r.querySelector('th'));
+  rows.sort((a,b)=>{
+    const A=a.children[idx], B=b.children[idx];
+    if(!A||!B) return 0;
+    const na=parseFloat(A.textContent.replace(/[,%]/g,'')), nb=parseFloat(B.textContent.replace(/[,%]/g,''));
+    const numA=!isNaN(na)&&A.textContent.match(/[\d.]/), numB=!isNaN(nb)&&B.textContent.match(/[\d.]/);
+    let c = (numA&&numB) ? na-nb : A.textContent.localeCompare(B.textContent);
+    return c*dir;
+  });
+  rows.forEach(r=>tb.appendChild(r));
+}
+// ---- live species filter ----
+function filterSpecies(input){
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('[data-sp-row]').forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().indexOf(q)>-1 ? '' : 'none';
+  });
+}
+</script>
 </body></html>
