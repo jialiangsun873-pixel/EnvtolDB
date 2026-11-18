@@ -1,0 +1,39 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>溶剂统计 · EnvTolDB</title><style>
+body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
+header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
+header a:hover{color:#0c1726}
+main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
+.kpi b{font-size:24px;display:block}
+.kpi span{font-size:12px;color:#5f7086}
+.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
+td{padding:5px 8px;border-bottom:1px solid #e6eef7}
+tr:hover td{background:#f0f6fc}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
+.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.muted{color:#5f7086;font-size:12px}
+input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
+textarea{width:100%;min-height:110px;font-family:monospace}
+button{background:#0c1726;color:#fff;border:none;cursor:pointer}
+pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+a{color:#1f6fd0}
+footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+</style></head><body>
+<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
+<nav><a href="index.html">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
+<main><div class="ds-note note">有机溶剂对蛋白热稳定性的影响（OrganiZymeDB 实验测量；负值 = 去稳定）。
+排序按 median ΔTm 升序。条件详情（浓度/pH/温度）与逐条记录请下载 SQLite 本地查询。</div>
+<div class="card"><h2>按溶剂聚合（17 种溶剂）</h2><table>
+<tr><th>溶剂</th><th>n</th><th>median ΔTm (°C)</th><th>范围</th><th>去稳定占比</th></tr><tr><td>tert-Butanol</td><td>10</td><td><b>-22.9</b></td><td>-39.0 ~ -4.7</td><td>10/10</td></tr><tr><td>Ethyl Acetate</td><td>1</td><td><b>-21.3</b></td><td>-21.3 ~ -21.3</td><td>1/1</td></tr><tr><td>Tetrahydrofuran</td><td>8</td><td><b>-18.8</b></td><td>-51.0 ~ -4.7</td><td>8/8</td></tr><tr><td>Dimethylformamide</td><td>12</td><td><b>-14.7</b></td><td>-37.1 ~ -6.6</td><td>12/12</td></tr><tr><td>Isopropanol</td><td>98</td><td><b>-14.2</b></td><td>-39.3 ~ -1.3</td><td>98/98</td></tr><tr><td>Acetonitrile</td><td>41</td><td><b>-14.0</b></td><td>-52.5 ~ -1.8</td><td>41/41</td></tr><tr><td>Acetone</td><td>19</td><td><b>-12.1</b></td><td>-37.5 ~ -2.5</td><td>19/19</td></tr><tr><td>Ethanol</td><td>104</td><td><b>-10.3</b></td><td>-35.7 ~ +12.1</td><td>99/104</td></tr><tr><td>Methanol</td><td>100</td><td><b>-9.2</b></td><td>-37.1 ~ -0.3</td><td>100/100</td></tr><tr><td>Dimethyl Sulfoxide</td><td>111</td><td><b>-4.6</b></td><td>-26.2 ~ +2.7</td><td>108/111</td></tr><tr><td>tert-Butyl Methyl Ether</td><td>1</td><td><b>-4.1</b></td><td>-4.1 ~ -4.1</td><td>1/1</td></tr><tr><td>Diethylene Glycol</td><td>2</td><td><b>-0.8</b></td><td>-1.6 ~ +0.1</td><td>1/2</td></tr><tr><td>Ethylene Glycol</td><td>5</td><td><b>-0.7</b></td><td>-1.5 ~ +0.8</td><td>3/5</td></tr><tr><td>Cyclohexane</td><td>1</td><td><b>-0.6</b></td><td>-0.6 ~ -0.6</td><td>1/1</td></tr><tr><td>Isooctane</td><td>1</td><td><b>-0.3</b></td><td>-0.3 ~ -0.3</td><td>1/1</td></tr><tr><td>Methylcyclohexane</td><td>1</td><td><b>-0.3</b></td><td>-0.3 ~ -0.3</td><td>1/1</td></tr><tr><td>Glycerol</td><td>2</td><td><b>+2.1</b></td><td>+1.5 ~ +2.7</td><td>0/2</td></tr></table></div>
+<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
+<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+</body></html>

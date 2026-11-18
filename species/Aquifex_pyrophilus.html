@@ -1,0 +1,47 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aquifex pyrophilus · EnvTolDB</title><style>
+body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
+header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
+header a:hover{color:#0c1726}
+main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
+.kpi b{font-size:24px;display:block}
+.kpi span{font-size:12px;color:#5f7086}
+.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
+td{padding:5px 8px;border-bottom:1px solid #e6eef7}
+tr:hover td{background:#f0f6fc}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
+.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.muted{color:#5f7086;font-size:12px}
+input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
+textarea{width:100%;min-height:110px;font-family:monospace}
+button{background:#0c1726;color:#fff;border:none;cursor:pointer}
+pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+a{color:#1f6fd0}
+footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+</style></head><body>
+<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
+<nav><a href="index.html">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
+<main><div class="card"><h2>Aquifex pyrophilus</h2>
+<p style="font-size:13px">嗜热 · 分级 thermophilic ·
+入库蛋白 <b>17</b> · 实验记录 1 · <span class="badge b-no">未锚定</span>
+</p>
+<p class="muted">来源核验：<a href='https://europepmc.org/search?query=%22Aquifex_pyrophilus%22' target='_blank' rel='noopener'>Europe PMC 文献</a> ·
+<a href="../downloads/fasta/Aquifex_pyrophilus.fasta.gz">FASTA 下载 (.gz)</a></p>
+<p class="muted"> avg_len=389.8</p></div>
+<div class="card"><h2>蛋白列表（17 条，按长度降序）</h2>
+<input id="q" placeholder="页内过滤：accession / 名称…" onkeyup="flt()" style="width:280px;margin-bottom:8px">
+<table id="t"><tr><th>accession</th><th>蛋白</th><th>长度</th><th>mean pLDDT</th><th>实验记录</th><th>核验</th></tr>
+<tr><td><code>Q9X6Y1</code></td><td>DNA-directed RNA polymerase subunit beta (RNAP subunit beta)</td><td>1469</td><td>87.3</td><td>0</td><td></td></tr><tr><td><code>Q9XDM2</code></td><td>ATP-dependent Clp protease regulatory subunit</td><td>631</td><td>84.2</td><td>0</td><td></td></tr><tr><td><code>Q9X4G3</code></td><td>Subtilisin-like protease (EC 3.4.-.-)</td><td>619</td><td>81.0</td><td>1</td><td></td></tr><tr><td><code>Q8GHE9</code></td><td>DNA polymerase I (EC 2.7.7.7)</td><td>574</td><td>94.2</td><td>0</td><td></td></tr><tr><td><code>P46207</code></td><td>Isoleucine--tRNA ligase (EC 6.1.1.5) (Isoleucyl-tRNA synthet</td><td>529</td><td>95.1</td><td>0</td><td></td></tr><tr><td><code>O50292</code></td><td>ATP synthase subunit beta (EC 7.1.2.2) (ATP synthase F1 sect</td><td>478</td><td>92.7</td><td>0</td><td></td></tr><tr><td><code>Q9RER4</code></td><td>Alanine racemase (EC 5.1.1.1)</td><td>341</td><td>96.8</td><td>0</td><td></td></tr><tr><td><code>Q8GLL2</code></td><td>Hydrogenase small subunit</td><td>280</td><td>92.2</td><td>0</td><td></td></tr><tr><td><code>P46212</code></td><td>Pyridoxine 5&#x27;-phosphate synthase (PNP synthase) (EC 2.6.99.2</td><td>236</td><td>95.0</td><td>0</td><td></td></tr><tr><td><code>Q8GLL0</code></td><td>Phosphatidate cytidylyltransferase (EC 2.7.7.41)</td><td>235</td><td>95.0</td><td>0</td><td></td></tr><tr><td><code>Q8GLK8</code></td><td>Uncharacterized protein</td><td>233</td><td>83.3</td><td>0</td><td></td></tr><tr><td><code>P46209</code></td><td>Protein usf</td><td>231</td><td>97.9</td><td>0</td><td></td></tr><tr><td><code>Q9ZI46</code></td><td>Small ribosomal subunit protein uS19 (30S ribosomal protein </td><td>219</td><td>89.2</td><td>0</td><td></td></tr><tr><td><code>Q9ZI39</code></td><td>Small ribosomal subunit protein uS8 (30S ribosomal protein S</td><td>168</td><td>96.3</td><td>0</td><td></td></tr><tr><td><code>Q8GLL1</code></td><td>Uncharacterized protein</td><td>146</td><td>92.9</td><td>0</td><td></td></tr><tr><td><code>P0A467</code></td><td>Large ribosomal subunit protein bL12 (50S ribosomal protein </td><td>128</td><td>76.2</td><td>0</td><td></td></tr><tr><td><code>Q9XDM1</code></td><td>Large ribosomal subunit protein uL1 (50S ribosomal protein L</td><td>109</td><td>87.5</td><td>0</td><td></td></tr></table>
+<script>function flt(){var q=document.getElementById('q').value.toLowerCase();var trs=document.getElementById('t').getElementsByTagName('tr');for(var i=1;i<trs.length;i++){trs[i].style.display=trs[i].textContent.toLowerCase().indexOf(q)>-1?'':'none';}}</script></div>
+<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
+<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+</body></html>

@@ -1,0 +1,19 @@
+name	taxon_id	pool	subgroup	grade	proteome_id	n_seqs	lit_anchored	evidence_level	bacdive_value	bacdive_unit	notes
+Aeromonas salmonicida	645	meso	solvent_neg	mesophilic_control		5311	1				
+Bacillus subtilis 168		meso	ph_neg;salt_neg_bacteria	mesophilic_control		4295	1				
+Corynebacterium glutamicum	1718	meso	ph_neg	mesophilic_control		3769	1				
+Deinococcus radiodurans	1299	meso	salt_neg_bacteria	mesophilic_control		3104	1				
+Escherichia coli K12 MG1655		meso	ph_neg;salt_neg_bacteria;solvent_neg	mesophilic_control		6146	1				
+Lactococcus lactis	1358	meso	ph_neg;salt_neg_bacteria	mesophilic_control		3575	1				
+Methanococcus maripaludis	39152	meso	salt_neg_archaea	mesophilic_control		2605	1				
+Methanocorpusculum labreanum	83984	meso	salt_neg_archaea	mesophilic_control		1740	1				
+Methanosarcina acetivorans	2214	meso	salt_neg_archaea	mesophilic_control		4492	1				
+Methanosarcina barkeri	2208	meso	salt_neg_archaea	mesophilic_control		7382	1				
+Methanosarcina mazei	2209	meso	salt_neg_archaea	mesophilic_control		3344	1				
+Methanospirillum hungatei	2203	meso	salt_neg_archaea	mesophilic_control		3095	1				
+Mycolicibacterium smegmatis mc2 155		meso	ph_neg	mesophilic_control		6731	1				
+Proteus mirabilis	584	meso	solvent_neg	mesophilic_control		4810	1				
+Serratia marcescens	615	meso	solvent_neg	mesophilic_control		6601	1				
+Shewanella oneidensis	70863	meso	solvent_neg	mesophilic_control		4078	1				
+Staphylococcus aureus		meso	ph_neg	mesophilic_control		18631	1				
+Yersinia enterocolitica	630	meso	solvent_neg	mesophilic_control		9848	1				

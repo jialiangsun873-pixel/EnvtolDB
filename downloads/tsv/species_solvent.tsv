@@ -1,0 +1,15 @@
+name	taxon_id	pool	subgroup	grade	proteome_id	n_seqs	lit_anchored	evidence_level	bacdive_value	bacdive_unit	notes
+Acinetobacter baylyi	62977	solvent		solvent_tolerant		3263	1	high			
+Alcanivorax borkumensis	393595	solvent		solvent_tolerant		2752	1	hydrocarbon-only			
+Burkholderia cepacia	292	solvent		solvent_tolerant		7553	1	medium-strain-unverified			
+Burkholderia vietnamiensis	269482	solvent		solvent_tolerant		7409	1	medium			
+Comamonas testosteroni	285	solvent		solvent_tolerant		9708	0	excluded-no-literature			
+Delftia acidovorans	80866	solvent		solvent_tolerant		6154	1	weak			
+Marinobacter hydrocarbonoclasticus	351348	solvent		solvent_tolerant		4170	1	hydrocarbon-only			
+Pseudomonas fluorescens	294	solvent		solvent_tolerant		20473	1	medium-strain-unverified			
+Pseudomonas putida	160488	solvent		solvent_tolerant		5527	1	high			
+Pseudomonas taiwanensis	470150	solvent		solvent_tolerant		5051	1	high			
+Rhodococcus erythropolis	234621	solvent		solvent_tolerant		6424	1	high			
+Rhodococcus jostii	132919	solvent		solvent_tolerant		8143	1	medium			
+Rhodococcus opacus	37919	solvent		solvent_tolerant		8635	1	medium			
+Stenotrophomonas maltophilia	522373	solvent		solvent_tolerant		4365	1	medium-strain-unverified			

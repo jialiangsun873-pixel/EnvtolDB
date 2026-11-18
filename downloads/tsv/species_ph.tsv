@@ -1,0 +1,27 @@
+name	taxon_id	pool	subgroup	grade	proteome_id	n_seqs	lit_anchored	evidence_level	bacdive_value	bacdive_unit	notes
+Acetobacter aceti	435	ph	acidophile_pool	acidophile_pool		6602	1				
+Acidihalobacter prosperus	160660	ph	acidophile_pool	acidophile_pool		3198	1				
+Acidimicrobium ferrooxidans	53635	ph	acidophile_pool	acidophile_pool		2149	1				
+Acidiphilium cryptum	524	ph	acidophile_pool	acidophile_pool		3523	1				
+Acidithiobacillus caldus	33059	ph	acidophile_pool	acidophile_pool		6010	1				
+Acidithiobacillus ferrivorans	160808	ph	acidophile_pool	acidophile_pool		3819	1				
+Acidithiobacillus ferrooxidans	920	ph	acidophile_pool	acidophile_pool		9295	1				
+Acidithiobacillus thiooxidans	930	ph	acidophile_pool	acidophile_pool		3216	1				
+Acidobacterium capsulatum	33075	ph	acidophile_pool	acidophile_pool		3366	1				
+Alicyclobacillus acidocaldarius	405212	ph	acidophile_pool	acidophile_pool		3097	1				
+Alkaliphilus crotonoxidans		ph	alkaliphile_pool	alkaliphile_pool		0	0				
+Alkaliphilus oremlandii	461876	ph	alkaliphile_pool	alkaliphile_pool		2828	1				
+Amphibacillus xylanus	1449	ph	alkaliphile_pool	alkaliphile_pool		2385	1				
+Anaerobranca gottschalkii	108328	ph	alkaliphile_pool	alkaliphile_pool		2307	1				
+Bacillus alcalophilus		ph	alkaliphile_pool	alkaliphile_pool		0	1				
+Bacillus pseudofirmus		ph	alkaliphile_pool	alkaliphile_pool		0	1				
+Caldalkalibacillus uzonensis	353224	ph	alkaliphile_pool	alkaliphile_pool		3977	0				
+Cuniculiplasma divulgatum	1673428	ph	acidophile_pool	acidophile_pool		1815	1				
+Exiguobacterium aurantiacum	33987	ph	alkaliphile_pool	alkaliphile_pool		3116	1				
+Ferroplasma acidiphilum	74969	ph	acidophile_pool	acidophile_pool		1761	1				
+Ferrovum myxofaciens	416213	ph	acidophile_pool	acidophile_pool		2453	1				
+Leptospirillum ferriphilum	178606	ph	acidophile_pool	acidophile_pool		2272	1				
+Picrophilus torridus		ph	acidophile_pool	acidophile_pool		0	1				
+Sulfobacillus thermosulfidooxidans	28034	ph	acidophile_pool	acidophile_pool		3618	1				
+Thioalkalivibrio versutus	106634	ph	alkaliphile_pool	alkaliphile_pool		2703	1				
+Tindallia californiensis	159292	ph	alkaliphile_pool	alkaliphile_pool		2832	1				

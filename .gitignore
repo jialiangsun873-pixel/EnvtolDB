@@ -1,0 +1,5 @@
+*.log
+*.part
+dataset.db.gz
+dataset.db.gz.*
+envtoldb_site.bundle

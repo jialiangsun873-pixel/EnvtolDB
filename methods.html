@@ -1,0 +1,54 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>采集方法 · EnvTolDB</title><style>
+body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
+header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
+header a:hover{color:#0c1726}
+main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
+.kpi b{font-size:24px;display:block}
+.kpi span{font-size:12px;color:#5f7086}
+.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
+td{padding:5px 8px;border-bottom:1px solid #e6eef7}
+tr:hover td{background:#f0f6fc}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
+.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.muted{color:#5f7086;font-size:12px}
+input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
+textarea{width:100%;min-height:110px;font-family:monospace}
+button{background:#0c1726;color:#fff;border:none;cursor:pointer}
+pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+a{color:#1f6fd0}
+footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+</style></head><body>
+<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
+<nav><a href="index.html">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
+<main><div class="note">以下为 EnvTolDB 每个环境组的采集协议：物种入选标准、序列检索方式、文献锚定与实验校准覆盖。所有组共用同一检索管线：UniProt taxonomy API 精确学名解析 → 参考蛋白组（缺则全 taxon）→ ≥50aa 过滤 + 去重。注意冗余口径按池不同并如实记录：嗜热组为 30% 聚类代表（36,297/72,559），耐盐/耐酸碱/耐溶剂组为 90% linclust 代表，对照组为精确去重集。</div><div class="card"><h2>嗜热组（87 物种 / 36,297 蛋白 = 30% 聚类代表）</h2>
+<p style="font-size:13px"><b>入选标准</b>：文献 genus 级 OGT 表（Bakelaar et al.; Kernavis et al.）筛选 OGT &gt; 45°C，补充 Pyrococcus、Methanopyrus、Aquifex、Thermotoga、Sulfolobus 等超嗜热模式菌。 序列口径：72,559 条聚类超集的 30% 代表（36,297 条），非全量蛋白组。</p>
+<p style="font-size:13px"><b>文献锚定</b>：不设文献锚定门槛（UniProt 对这批模式菌的热表型注释完备），87 种全部保留。</p>
+<p style="font-size:13px"><b>实验校准</b>：蛋白计数与长度统计来自 organism-level 汇总表。</p></div><div class="card"><h2>耐盐组（86 物种 / 357,067 蛋白）</h2>
+<p style="font-size:13px"><b>入选标准</b>：Halobacteria 纲盐古菌 + 文献记录莫尔级 NaCl 最适的耐盐细菌属（Salinibacter、Halomonas、Chromohalobacter、Gracilibacillus、Halobacillus、Oceanobacillus、Marinobacter、Halorhodospira 等），按文献 NaCl 最适分 extreme / moderate 两级。</p>
+<p style="font-size:13px"><b>文献锚定</b>：Europe PMC 严格共现检索（物种名 × halophilic/halotolerant/salt tolerance/hypersaline，标题或摘要）通过 71/86（83%）。</p>
+<p style="font-size:13px"><b>实验校准</b>：BacDive Halophily 表抓取实测 NaCl 最适（% 与 g/L 统一换算 mol/L），两轮抓取后覆盖 51 条物种记录。分析子组：extreme 200,135 / moderate 122,045 序列。</p></div><div class="card"><h2>耐酸碱组（26 物种 / 76,342 蛋白）</h2>
+<p style="font-size:13px"><b>入选标准</b>：酸嗜极菌 = 最适生长 pH &lt; 3（Acidithiobacillus 三种、Ferroplasma acidiphilum、Leptospirillum ferriphilum、Sulfobacillus、Acidiphilium cryptum、Picrophilus 等，16 种）；碱嗜菌 = 最适 pH &gt; 9（Bacillus pseudofirmus OF4、Alkaliphilus oremlandii、Amphibacillus xylanus、Caldalkalibacillus uzonensis、Desulfonatronovibrio 等，10 种）。两亚池全程分开标记。</p>
+<p style="font-size:13px"><b>文献锚定</b>：共现检索通过 24/26（92%）。</p>
+<p style="font-size:13px"><b>实验校准</b>：BacDive 培养 pH 最适值覆盖 6/16 酸嗜物种。分析集：酸 55,228 / 碱 19,899 序列（≤2000aa）。</p></div><div class="card"><h2>耐溶剂组（14 物种 / 15 株蛋白组 / 96,750 分析序列）</h2>
+<p style="font-size:13px"><b>入选标准</b>：文献记录的有机溶剂耐受模式菌：P. putida KT2440/S12/DOT-T1E/mt-2、P. taiwanensis VLB120、Rhodococcus erythropolis/jostii/opacus、A. baylyi ADP1、B. cepacia/vietnamiensis、S. maltophilia K279a、Marinobacter、Alcanivorax。双路线合并：路线 P = 15 个耐受株参考蛋白组（63,292 条，作耐受适应背景）；路线 A = UniProt 全文 &quot;organic solvent tolerance&quot; 检索 14,575 条，按名称/功能注释清洗为 3,549 条蛋白级正例（如 LptD）。</p>
+<p style="font-size:13px"><b>文献锚定</b>：株表型 ≠ 蛋白级耐受，因此每个物种带人工评级（严格共现 + 二次回填：high 4 / medium 6 / medium-strain-unverified 3 / weak 或 hydrocarbon-only 3）；Comamonas testosteroni 因缺乏直接溶剂耐受文献被排除出主分析。</p>
+<p style="font-size:13px"><b>实验校准</b>：溶剂效应的实验验证来自 OrganiZymeDB（见实验参数层）。</p></div><div class="card"><h2>中温对照组（18 物种 / 22 株条目 / 99,557 蛋白）</h2>
+<p style="font-size:13px"><b>入选标准</b>：四个对照池按系统发育与生活方式匹配处理组：产甲烷古菌匹配盐古菌（Methanosarcina 三种、Methanococcus、Methanocorpusculum、Methanospirillum），中温细菌匹配各细菌池（E. coli K-12 MG1655、B. subtilis 168、Deinococcus radiodurans、Lactococcus lactis、Corynebacterium glutamicum、M. smegmatis、S. aureus、Shewanella oneidensis、Yersinia、Proteus、Serratia、Aeromonas 等）。跨池重复物种只存一份。</p>
+<p style="font-size:13px"><b>文献锚定</b>：对照组不设锚定门槛（作为阴性背景使用）。</p>
+<p style="font-size:13px"><b>实验校准</b>：—</p></div><div class="card"><h2>实验参数层（539,714 条实测）</h2>
+<p style="font-size:13px"><b>入选标准</b>：四个实验来源聚合：① OrganiZymeDB 全量导出清洗（27,945 条溶剂测量；其中 613 条热稳定测量进入 EnvTolDB 实验层，展开为 1,839 行 = 613 dTm_solvent + 613 水相 Tm + 613 溶剂相 Tm），按 UniProt accession 直连；② FireProtDB 全库 533,071 条 ddG，按野生型序列 SHA-256 自动比对挂接（1,410 条命中——该库以常温菌为主，未命中行保留 wt_sha256 可回查）；③ ProTherm-L4 2,921 条单点 ΔTm（202 个 PDB 结构，Shrake-Rupley RSA）；④ 文献 Tm-pH 编译 1,883 条（sha1 前缀比对，294 命中）。</p>
+<p style="font-size:13px"><b>文献锚定</b>：meltome 级预测 Tm 数据集被刻意排除，保证实验层严格只含实验测量。</p>
+<p style="font-size:13px"><b>实验校准</b>：每条记录带 source / source_ref（doi 或源记录号）；人工核验 verified 必须写 evidence。</p></div>
+<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
+<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+</body></html>

@@ -1,0 +1,87 @@
+name	taxon_id	pool	subgroup	grade	proteome_id	n_seqs	lit_anchored	evidence_level	bacdive_value	bacdive_unit	notes
+Chromohalobacter canadensis	141389	salt	halophilic_bacteria_pool	moderate	UP001321908	3227	1		1.03	M NaCl	
+Chromohalobacter israelensis	290398	salt	halophilic_bacteria_pool	moderate	UP000000239	3302	1		0.34	M NaCl	
+Chromohalobacter marismortui	42055	salt	halophilic_bacteria_pool	moderate	UP000295380	3261	1				
+Gracilibacillus boraciitolerans JCM 21714	1298598	salt	halophilic_bacteria_pool	moderate	UP000019102	4450	1				
+Gracilibacillus oryzae	1672701	salt	halophilic_bacteria_pool	moderate	UP000480246	4349	0				
+Gracilibacillus salitolerans	2663022	salt	halophilic_bacteria_pool	moderate	UP000339690	4544	1				
+Haladaptatus litoreus	553468	salt	haloarchaea_pool	extreme	UP000186914	4885	1		3.37	M NaCl	
+Haladaptatus paucihalophilus DX253	797209	salt	haloarchaea_pool	extreme	UP000184203	4339	1				
+Halalkalicoccus paucihalophilus	1008153	salt	haloarchaea_pool	extreme	UP000075321	4161	1				
+Halapricum salinum	1457250	salt	haloarchaea_pool			3306	1				
+Halarchaeum acidiphilum	489138	salt	haloarchaea_pool			2706	1				
+Haloarcula amylolytica JCM 13557	1227452	salt	haloarchaea_pool	extreme	UP000011623	4156	1				
+Haloarcula hispanica N601	1417673	salt	haloarchaea_pool	extreme	UP000018572	3926	1				
+Haloarcula japonica	1227453	salt	haloarchaea_pool	extreme	UP000011524	4235	1				
+Haloarcula marismortui	272569	salt	haloarchaea_pool	extreme	UP000001169	4251	0				
+Haloarcula vallismortis ATCC 29715	662477	salt	haloarchaea_pool	extreme	UP000011534	3961	1				
+Halobacillus aidingensis	240303	salt	halophilic_bacteria_pool	moderate	UP000198860	4227	1		1.75	M NaCl	
+Halobacillus rhizosphaerae	3064889	salt	halophilic_bacteria_pool	moderate	UP001686813	4257	1		1.71	M NaCl	
+Halobacillus shinanisalinarum	2932258	salt	halophilic_bacteria_pool	moderate	UP000831880	4460	0				
+Halobellus limi	699433	salt	haloarchaea_pool			3637	1				
+Halococcus salifodinae DSM 8989	1227456	salt	haloarchaea_pool	extreme	UP000011625	4078	1				
+Halococcus thailandensis JCM 13552	1227457	salt	haloarchaea_pool	extreme	UP000011680	4030	1				
+Haloferax gibbonsii	1227459	salt	haloarchaea_pool	extreme	UP000011571	3945	1				
+Haloferax massiliensis	1476858	salt	haloarchaea_pool	extreme	UP000198902	3877	1				
+Haloferax mediterranei	523841	salt	haloarchaea_pool	extreme	UP000011603	7655	1				
+Haloferax prahovense	1227461	salt	haloarchaea_pool	extreme	UP000011559	3913	1				
+Haloferax volcanii	309800	salt	haloarchaea_pool	extreme	UP000008243	3925	1		1.03	M NaCl	
+Halogeometricum borinquense	469382	salt	haloarchaea_pool	extreme	UP000006663	3911	1				
+Halogeometricum pallidum JCM 14848	1227487	salt	haloarchaea_pool	extreme	UP000011513	4246	0		3.08	M NaCl	
+Halogeometricum rufum	553469	salt	haloarchaea_pool	extreme	UP000198531	4156	1		3.59	M NaCl	
+Halogranum rubrum	553466	salt	haloarchaea_pool			4517	1				
+Halolamina pelagica	699431	salt	haloarchaea_pool			6681	1				
+Halomicrobium zhouii	767519	salt	haloarchaea_pool	extreme	UP000199062	4091	1		3.23	M NaCl	
+Halomonas kalidii	3043293	salt	halophilic_bacteria_pool	moderate	UP001244242	4429	1				
+Halomonas organivorans	257772	salt	halophilic_bacteria_pool	moderate	UP000525987	4457	1		1.37	M NaCl	
+Halomonas salipaludis	2032625	salt	halophilic_bacteria_pool	moderate	UP000217771	4937	0				
+Halopiger xanaduensis	797210	salt	haloarchaea_pool	extreme	UP000006794	4221	1				
+Haloprofundus marisrubri	1514971	salt	haloarchaea_pool			3761	1				
+Halopseudomonas oceani	1708783	salt	halophilic_bacteria_pool	moderate	UP000243451	3738	0		0.86	M NaCl	
+Halopseudomonas pelagia	553151	salt	halophilic_bacteria_pool	moderate	UP000344571	4018	0		0.73	M NaCl	
+Halorhodospira halochloris	1052	salt	halophilic_bacteria_pool	extreme	UP000218890	2575	1				
+Halorhodospira halophila	349124	salt	halophilic_bacteria_pool	extreme	UP000000647	2411	1				
+Halorhodospira neutriphila	168379	salt	halophilic_bacteria_pool	extreme	UP000738126	2334	1				
+Halorientalis persicus	1367881	salt	haloarchaea_pool	extreme	UP000198775	5137	1				
+Halorussus rarus	660515	salt	haloarchaea_pool			1	1				
+Halosimplex carlsbadense 2-9-1	797114	salt	haloarchaea_pool	extreme	UP000011626	4458	0		1.03	M NaCl	
+Halostagnicola larsenii XH-48	797299	salt	haloarchaea_pool	extreme	UP000019024	4086	1		3.85	M NaCl	
+Haloterrigena salina JCM 13891	1227488	salt	haloarchaea_pool	extreme	UP000011657	4563	1		3.72	M NaCl	
+Haloterrigena turkmenica	543526	salt	haloarchaea_pool	extreme	UP000001903	5113	1				
+Halothermothrix orenii	373903	salt	halophilic_bacteria_pool	moderate	UP000000719	2324	1				
+Marinobacter azerbaijanicus	3050455	salt	halophilic_bacteria_pool	moderate	UP001227964	4644	1				
+Marinobacter halodurans	2528979	salt	halophilic_bacteria_pool	moderate	UP000313645	4702	1				
+Marinobacter nanhaiticus D15-8W	626887	salt	halophilic_bacteria_pool	moderate	UP000013165	4680	1				
+Natrialba aegyptia DSM 13077	1227491	salt	haloarchaea_pool	extreme	UP000011591	4399	1				
+Natrialba asiatica	29540	salt	haloarchaea_pool	extreme	UP000011554	4176	1				
+Natrialba chahannaoensis JCM 10990	1227492	salt	haloarchaea_pool	extreme	UP000011693	4030	1				
+Natrialba hulunbeirensis JCM 10989	1227493	salt	haloarchaea_pool	extreme	UP000011519	3852	1				
+Natrialba magadii	547559	salt	haloarchaea_pool	extreme	UP000001879	4204	1				
+Natrialba taiwanensis DSM 12281	1230458	salt	haloarchaea_pool	extreme	UP000011648	4374	1				
+Natrinema gari JCM 14663	1230459	salt	haloarchaea_pool	extreme	UP000011592	4056	1		2.98	M NaCl	
+Natrinema pellirubrum	797303	salt	haloarchaea_pool	extreme	UP000011593	4176	1				
+Natrinema salifodinae	1202768	salt	haloarchaea_pool	extreme	UP000183275	4090	0		3.62	M NaCl	
+Natrinema versiforme JCM 10478	1227496	salt	haloarchaea_pool	extreme	UP000011632	4160	1				
+Natronobacterium lacisalsi AJ5	358396	salt	haloarchaea_pool	extreme	UP000011555	4151	0				
+Natronobacterium texcoconense	1095778	salt	haloarchaea_pool	extreme	UP000198848	4046	0		2.98	M NaCl	
+Natronococcus amylolyticus DSM 10524	1227497	salt	haloarchaea_pool	extreme	UP000011688	4317	1				
+Natronococcus jeotgali DSM 18795	1227498	salt	haloarchaea_pool	extreme	UP000011531	4417	1				
+Natronococcus occultus SP4	694430	salt	haloarchaea_pool	extreme	UP000010878	4153	1				
+Natronolimnohabitans innermongolicus JCM 12255	1227499	salt	haloarchaea_pool	extreme	UP000011602	4400	0				
+Natronomonas pharaonis	2257	salt	haloarchaea_pool			2777	1				
+Natronorubrum bangense JCM 10635	1227500	salt	haloarchaea_pool	extreme	UP000011690	3979	1		1.03	M NaCl	
+Natronorubrum texcoconense	1095776	salt	haloarchaea_pool	extreme	UP000198882	4465	0				
+Natronorubrum thiooxidans	308853	salt	haloarchaea_pool	extreme	UP000185936	4231	1				
+Natronorubrum tibetense GA33	1114856	salt	haloarchaea_pool	extreme	UP000011599	4671	1		1.03	M NaCl	
+Oceanobacillus jeddahensis	1462527	salt	halophilic_bacteria_pool	moderate	UP001059773	4720	0				
+Oceanobacillus neutriphilus	531815	salt	halophilic_bacteria_pool	moderate	UP000641206	5302	1		1.45	M NaCl	
+Oceanobacillus sojae	582851	salt	halophilic_bacteria_pool	moderate	UP000321558	4693	1				
+Pontibacillus marinus BH030004 = DSM 16465	1385511	salt	halophilic_bacteria_pool	moderate	UP000030403	4252	1		0.86	M NaCl	
+Pontibacillus salipaludis	1697394	salt	halophilic_bacteria_pool	moderate	UP000642571	4180	1		0.43	M NaCl	
+Pontibacillus yanchengensis	462910	salt	halophilic_bacteria_pool	moderate	UP000466692	8140	1				
+Salarchaeum japonicum	555573	salt	haloarchaea_pool			2569	1				
+Salinibacter ruber	309807	salt	halophilic_bacteria_pool	extreme	UP000008674	2813	1		1.71	M NaCl	
+Salinicola corii	2606937	salt	halophilic_bacteria_pool	moderate	UP000466024	4176	1		1.71	M NaCl	
+Salinicola lusitanus	1949085	salt	halophilic_bacteria_pool	moderate	UP001453229	4223	1				
+Salinicola rhizosphaerae	1443141	salt	halophilic_bacteria_pool	moderate	UP000646745	3751	0		2.61	M NaCl	
+Thiohalobacter thiocyanaticus	585455	salt	halophilic_bacteria_pool	moderate	UP000218765	5870	1		1.59	M NaCl	

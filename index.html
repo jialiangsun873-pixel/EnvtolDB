@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>总览 · EnvTolDB</title><style>
+body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
+header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
+header a:hover{color:#0c1726}
+main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
+.kpi b{font-size:24px;display:block}
+.kpi span{font-size:12px;color:#5f7086}
+.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
+td{padding:5px 8px;border-bottom:1px solid #e6eef7}
+tr:hover td{background:#f0f6fc}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
+.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.muted{color:#5f7086;font-size:12px}
+input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
+textarea{width:100%;min-height:110px;font-family:monospace}
+button{background:#0c1726;color:#fff;border:none;cursor:pointer}
+pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+a{color:#1f6fd0}
+footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+</style></head><body>
+<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
+<nav><a href="index.html" style="font-weight:700;color:#0c1726">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
+<main><div class="note">EnvTolDB（环境耐受蛋白数据库）收录 5 个环境组、231 个物种、668888 条 UniProt 蛋白序列本体与 539,714 条实验测量（ddG/ΔTm/Tm vs pH/溶剂 Tm）。每条序列带 accession（可点开 uniprot.org 核对）与 sha256 校验和；浏览对全站登录用户开放；数据修订仅限管理员，每次写入都记录操作人。</div>
+<div class="kpis">
+<div class="kpi"><b>231</b><span>物种（5 个环境组 + 中温对照）</span></div>
+<div class="kpi"><b>668,888</b><span>UniProt 蛋白序列（每条带 sha256）</span></div>
+<div class="kpi"><b>539,708</b><span>实验测量（ddG / ΔTm / Tm-pH / 溶剂 Tm）</span></div>
+<div class="kpi"><b>146,319</b><span>AlphaFold 结构记录（pLDDT / 盐桥密度）</span></div>
+</div>
+<div class="card"><h2>环境组</h2><table><tr><th>key</th><th>名称</th><th>说明</th></tr><tr><td>thermo</td><td>嗜热</td><td>OGT &gt; 45°C 生物的参考蛋白组（87 物种）</td></tr><tr><td>salt</td><td>耐盐</td><td>haloarchaea 与耐盐细菌参考蛋白组（86 物种，按 salinity grade 分级）</td></tr><tr><td>ph</td><td>耐酸碱</td><td>acidophile / alkaliphile 两个亚池（26 物种）</td></tr><tr><td>solvent</td><td>耐溶剂</td><td>有机溶剂耐受模式菌株（14 物种，证据分级见 evidence_level）</td></tr><tr><td>meso</td><td>中温对照</td><td>4 个负对照池（18 物种，22 株条目）</td></tr></table></div>
+<div class="card"><h2>如何使用本站</h2>
+<p style="font-size:13px">① <a href="species/">按物种浏览</a>：每个物种页列出全部入库蛋白（含 pLDDT/盐桥）与 FASTA 下载；
+② <a href="solvents.html">溶剂统计</a>：17 种有机溶剂的 ΔTm 聚合；
+③ <a href="downloads.html">下载</a>：整库 SQLite、每池 TSV、每物种 FASTA；
+④ 批量/程序化访问请下载 SQLite 后本地 SQL 查询（schema 见 <a href="api-docs.html">API 文档</a>页）。</p></div>
+<div class="card"><h2>核验声明</h2><p style="font-size:13px">
+每条序列可通过 accession 在 uniprot.org 打开官方条目比对；SHA-256 用于完整性校验；
+人工核验记录（verified）必须附带核验证据；所有导入批次记录来源声明与时间。</p></div>
+<div class="card"><h2>引用</h2><p style="font-size:13px">若在研究中使用本数据库，请引用：EnvProGen 论文（撰写中）。EnvTolDB 整合 UniProtKB 参考蛋白组、BacDive、OrganiZymeDB、FireProtDB、ProThermDB 与 Europe PMC 文献锚定，提供 231 个环境耐受/对照物种、668,888 条蛋白序列与 539,714 条实验测量的统一检索。检索接口见 API 文档。</p></div>
+<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
+<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+</body></html>

@@ -1,0 +1,39 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实验参数 · EnvTolDB</title><style>
+body{font-family:-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:#f5f8fc;color:#0c1726}
+header{background:#f5f8fc;border-bottom:1px solid #dce5ef;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header a{color:#48596e;text-decoration:none;margin-left:16px;font-size:14px}
+header a:hover{color:#0c1726}
+main{max-width:1160px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:22px;margin:0 0 6px}h2{font-size:16px;color:#17324d}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+.kpi{flex:1;min-width:170px;background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:14px 16px}
+.kpi b{font-size:24px;display:block}
+.kpi span{font-size:12px;color:#5f7086}
+.card{background:#fff;border:1px solid #dce5ef;border-radius:6px;padding:16px 18px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#eef3f9;text-align:left;padding:6px 8px;border-bottom:1.5px solid #dce5ef}
+td{padding:5px 8px;border-bottom:1px solid #e6eef7}
+tr:hover td{background:#f0f6fc}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#e6eef7;color:#48596e}
+.b-ok{background:#e4f4ee;color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.muted{color:#5f7086;font-size:12px}
+input,select,button,textarea{font-size:13px;padding:4px 8px;border:1px solid #dce5ef;border-radius:4px;background:#fff;color:#0c1726;font-family:inherit}
+textarea{width:100%;min-height:110px;font-family:monospace}
+button{background:#0c1726;color:#fff;border:none;cursor:pointer}
+pre{background:#eef3f9;padding:10px;border-radius:4px;font-size:12px;overflow:auto;max-height:340px}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+a{color:#1f6fd0}
+footer{max-width:1160px;margin:20px auto;padding:0 18px;color:#5f7086;font-size:12px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:8px 14px;border-radius:4px;margin-bottom:16px;font-size:13px}
+</style></head><body>
+<header><div><b style="font-size:18px">EnvTolDB</b> <span class="muted">环境耐受蛋白数据库 · Environment-Tolerant Proteome Database</span></div>
+<nav><a href="index.html">总览</a><a href="species/">物种</a><a href="solvents.html">溶剂统计</a><a href="experiments.html">实验参数</a><a href="methods.html">采集方法</a><a href="downloads.html">下载</a><a href="api-docs.html">API</a></nav></header>
+<main><div class="note">实验参数层共 539,708 条。逐条检索（含条件/突变/来源）请下载 SQLite 本地查询；
+本页为聚合视图。</div>
+<div class="card"><h2>按类型</h2><table><tr><th>kind</th><th>条数</th><th>挂接 accession</th><th>均值</th></tr><tr><td><span class='badge'>ddG</span></td><td>533,071</td><td>1,410</td><td>-1.0</td></tr><tr><td><span class='badge'>dTm_protherm</span></td><td>2,921</td><td>0</td><td>-2.4</td></tr><tr><td><span class='badge'>Tm_vs_pH</span></td><td>1,883</td><td>294</td><td>59.4</td></tr><tr><td><span class='badge'>Tm_aqueous</span></td><td>613</td><td>613</td><td>56.6</td></tr><tr><td><span class='badge'>Tm_solvent</span></td><td>610</td><td>610</td><td>44.4</td></tr><tr><td><span class='badge'>dTm_solvent</span></td><td>610</td><td>610</td><td>-12.2</td></tr></table>
+<p class="muted">ddG 未挂接行保留 wt_sha256（FireProtDB 源野生型序列哈希），可回溯源文件核对；挂接率低反映该库以常温菌为主，非数据错误。</p></div>
+<p class="muted" style="text-align:center">EnvTolDB · 每条序列带 UniProt accession 与 sha256 校验和 · 更新 2026-11-18</p></main>
+<footer>引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。</footer>
+</body></html>
