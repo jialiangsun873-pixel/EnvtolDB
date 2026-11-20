@@ -1,0 +1,273 @@
+{
+  "_comment": "DatasetDB 站点配置——结构、标签、链接模板、数据字典都在这里；改完保存即生效（按 mtime 热加载，无需重启）。db_path 可被环境变量 DATASETDB 覆盖。",
+  "db_path": "/public/home/sjl2/datasetdb/dataset.db",
+  "site": {
+    "title": "EnvTolDB · 环境耐受蛋白数据库",
+    "brand_subtitle": "Environment-Tolerant Proteome Database",
+    "notice": "EnvTolDB（环境耐受蛋白数据库）收录 {n_pools} 个环境组、{n_species} 个物种、{n_proteins} 条 UniProt 蛋白序列本体与 539,714 条实验测量（ddG/ΔTm/Tm vs pH/溶剂 Tm）。每条序列带 accession（可点开 uniprot.org 核对）与 sha256 校验和；浏览对全站登录用户开放；数据修订仅限管理员，每次写入都记录操作人。",
+    "citation": "若在研究中使用本数据库，请引用：EnvProGen 论文（撰写中）。EnvTolDB 整合 UniProtKB 参考蛋白组、BacDive、OrganiZymeDB、FireProtDB、ProThermDB 与 Europe PMC 文献锚定，提供 231 个环境耐受/对照物种、668,888 条蛋白序列与 539,714 条实验测量的统一检索。检索接口见 API 文档。",
+    "title_en": "EnvTolDB — Environment-Tolerant Proteome Database",
+    "notice_en": "EnvTolDB integrates {n_pools} environmental groups, {n_species} curated organisms, {n_proteins} UniProt protein sequences (each with accession and SHA-256 checksum), 539,708 experimental measurements, and Europe PMC literature-anchoring evidence. Browsing is open to everyone; data edits are restricted to administrators and fully audit-logged.",
+    "citation_en": "If you use EnvTolDB in your research, please cite the EnvProGen manuscript (in preparation) and the underlying sources: UniProtKB, BacDive, OrganiZymeDB, FireProtDB, ProThermDB, Europe PMC."
+  },
+  "pools": [
+    {
+      "key": "thermo",
+      "label": "嗜热",
+      "grades": [
+        "thermophilic",
+        ""
+      ],
+      "description": "OGT > 45°C 生物的参考蛋白组（87 物种）"
+    },
+    {
+      "key": "salt",
+      "label": "耐盐",
+      "grades": [
+        "extreme",
+        "moderate",
+        ""
+      ],
+      "description": "haloarchaea 与耐盐细菌参考蛋白组（86 物种，按 salinity grade 分级）"
+    },
+    {
+      "key": "ph",
+      "label": "耐酸碱",
+      "grades": [
+        "acidophilic",
+        "alkaliphilic",
+        ""
+      ],
+      "description": "acidophile / alkaliphile 两个亚池（26 物种）"
+    },
+    {
+      "key": "solvent",
+      "label": "耐溶剂",
+      "grades": [
+        "solvent_tolerant",
+        ""
+      ],
+      "description": "有机溶剂耐受模式菌株（14 物种，证据分级见 evidence_level）"
+    },
+    {
+      "key": "meso",
+      "label": "中温对照",
+      "grades": [
+        "mesophilic_control",
+        ""
+      ],
+      "description": "4 个负对照池（18 物种，22 株条目）"
+    },
+    {
+      "key": "cold",
+      "label": "嗜冷",
+      "grades": [
+        "psychrophilic",
+        "cold_tolerant",
+        ""
+      ],
+      "description": "文献确认的冷适应生物（OGT < 15°C 为主）：γ-proteobacteria、Bacteroidetes、冷产甲烷古菌（29 物种 / 117,277 蛋白）",
+      "description_en": "Cold-adapted organisms with OGT < 15 °C (29 species / 117,277 proteins), completing the temperature axis against the thermophilic group"
+    },
+    {
+      "key": "piezo",
+      "label": "嗜压",
+      "grades": [
+        "piezophilic"
+      ],
+      "description": "深海高压环境生物（Photobacterium profundum SS9 等，5 物种 / 10,354 蛋白）"
+    },
+    {
+      "key": "rad",
+      "label": "耐辐射",
+      "grades": [
+        "radiation_resistant"
+      ],
+      "description": "电离辐射耐受生物（Deinococcus radiodurans R1 等，6 物种 / 12,073 蛋白）"
+    }
+  ],
+  "links": {
+    "uniprot_protein": "https://www.uniprot.org/uniprotkb/{accession}",
+    "uniprot_proteome": "https://www.uniprot.org/proteomes/{proteome_id}",
+    "ncbi_taxon": "https://www.ncbi.nlm.nih.gov/taxonomy/{taxon_id}",
+    "bacdive_search": "https://bacdive.dsmz.de/search?search={name}",
+    "europepmc": "https://europepmc.org/search?query=%22{name}%22"
+  },
+  "import": {
+    "batch_cap": 20000,
+    "motif_min": 4
+  },
+  "data_dictionary": [
+    {
+      "field": "pool",
+      "meaning": "环境组，取值见上方各池（thermo/salt/ph/solvent/meso）"
+    },
+    {
+      "field": "grade",
+      "meaning": "组内分级：salt=extreme|moderate；ph=acidophilic|alkaliphilic；其余见 pools 配置"
+    },
+    {
+      "field": "lit_anchored",
+      "meaning": "Europe PMC 严格共现检索（物种名 × 环境词，标题/摘要）是否命中"
+    },
+    {
+      "field": "evidence_level",
+      "meaning": "溶剂组人工评级：high / medium / medium-strain-unverified / weak / hydrocarbon-only"
+    },
+    {
+      "field": "bacdive_value",
+      "meaning": "BacDive 实测最优生长条件：salinity 单位 M NaCl；ph_opt 单位 pH"
+    },
+    {
+      "field": "proteins.seq_sha256",
+      "meaning": "序列 SHA-256；任何拷贝都可校验完整性"
+    },
+    {
+      "field": "proteins.verified",
+      "meaning": "人工核验标记；核验时必须写 evidence（做了什么比对）"
+    },
+    {
+      "field": "attrs",
+      "meaning": "自定义参数 JSON，key 受字段定义约束（类型/枚举校验）"
+    }
+  ],
+  "sources": [
+    {
+      "pool": "salt",
+      "path": "/public/home/sjl2/stress_proteins/salt/proteomes/species_index.tsv",
+      "columns": {
+        "species": "name",
+        "taxon_id": "taxon_id",
+        "proteome_id": "proteome_id",
+        "salinity_grade": "grade",
+        "group": "subgroup",
+        "rows": "n_seqs",
+        "lit_anchored": "lit_anchored"
+      }
+    },
+    {
+      "pool": "ph",
+      "path": "/public/home/sjl2/stress_proteins/ph/proteomes/species_index.tsv",
+      "columns": {
+        "species": "name",
+        "taxon_id": "taxon_id",
+        "group": "grade",
+        "note": "evidence_note",
+        "rows": "n_seqs",
+        "lit_anchored": "lit_anchored"
+      }
+    },
+    {
+      "pool": "thermo",
+      "path": "/public/home/sjl2/thermophiles/organism_summary.tsv",
+      "columns": {
+        "species": "name",
+        "protein_count": "n_seqs"
+      }
+    },
+    {
+      "pool": "solvent",
+      "path": "/public/home/sjl2/stress_proteins/solvent/metadata.csv",
+      "columns": {
+        "species": "name",
+        "taxon_id": "taxon_id",
+        "evidence_level": "evidence_level",
+        "evidence_note": "evidence_note"
+      }
+    }
+  ],
+  "collection": {
+    "_intro": "以下为 EnvTolDB 每个环境组的采集协议：物种入选标准、序列检索方式、文献锚定与实验校准覆盖。所有组共用同一检索管线：UniProt taxonomy API 精确学名解析 → 参考蛋白组（缺则全 taxon）→ ≥50aa 过滤 + 去重。注意冗余口径按池不同并如实记录：嗜热组为 30% 聚类代表（36,297/72,559），耐盐/耐酸碱/耐溶剂组为 90% linclust 代表，对照组为精确去重集。",
+    "pools": [
+      {
+        "pool": "thermo",
+        "title": "嗜热组（87 物种 / 36,297 蛋白 = 30% 聚类代表）",
+        "criteria": "文献 genus 级 OGT 表（Bakelaar et al.; Kernavis et al.）筛选 OGT > 45°C，补充 Pyrococcus、Methanopyrus、Aquifex、Thermotoga、Sulfolobus 等超嗜热模式菌。 序列口径：72,559 条聚类超集的 30% 代表（36,297 条），非全量蛋白组。",
+        "anchoring": "不设文献锚定门槛（UniProt 对这批模式菌的热表型注释完备），87 种全部保留。",
+        "calibration": "蛋白计数与长度统计来自 organism-level 汇总表。",
+        "en": {
+          "criteria": "Genus-level OGT tables (Bakelaar et al.; Kernavis et al.) with OGT > 45 °C, plus established hyperthermophile models (Pyrococcus, Methanopyrus, Aquifex, Thermotoga, Sulfolobus). Sequences are 30%-identity cluster representatives (36,297 of a 72,559-protein superset).",
+          "anchoring": "No literature-anchoring gate (thermal phenotype annotation in UniProt is comprehensive for these well-studied organisms); all 87 species retained.",
+          "calibration": "Per-species protein counts and length statistics from the organism-level summary table."
+        }
+      },
+      {
+        "pool": "salt",
+        "title": "耐盐组（86 物种 / 357,067 蛋白）",
+        "criteria": "Halobacteria 纲盐古菌 + 文献记录莫尔级 NaCl 最适的耐盐细菌属（Salinibacter、Halomonas、Chromohalobacter、Gracilibacillus、Halobacillus、Oceanobacillus、Marinobacter、Halorhodospira 等），按文献 NaCl 最适分 extreme / moderate 两级。",
+        "anchoring": "Europe PMC 严格共现检索（物种名 × halophilic/halotolerant/salt tolerance/hypersaline，标题或摘要）通过 71/86（83%）。",
+        "calibration": "BacDive Halophily 表抓取实测 NaCl 最适（% 与 g/L 统一换算 mol/L），两轮抓取后覆盖 51 条物种记录。分析子组：extreme 200,135 / moderate 122,045 序列。",
+        "en": {
+          "criteria": "Halobacteria-class haloarchaea plus halophilic bacterial genera with molar-range NaCl optima (Salinibacter, Halomonas, Chromohalobacter, Gracilibacillus, Halobacillus, Oceanobacillus, Marinobacter, Halorhodospira and others); each species graded extreme / moderate by documented NaCl optimum.",
+          "anchoring": "Europe PMC strict co-occurrence (species × halophilic/halotolerant/salt tolerance/hypersaline in title/abstract): 71/86 species (83%).",
+          "calibration": "BacDive 'Halophily' tables scraped for measured NaCl optima in molarity (two-pass crawl); 51 species records. Analyzed subsets: extreme 200,135 / moderate 122,045 sequences."
+        }
+      },
+      {
+        "pool": "ph",
+        "title": "耐酸碱组（26 物种 / 76,342 蛋白）",
+        "criteria": "酸嗜极菌 = 最适生长 pH < 3（Acidithiobacillus 三种、Ferroplasma acidiphilum、Leptospirillum ferriphilum、Sulfobacillus、Acidiphilium cryptum、Picrophilus 等，16 种）；碱嗜菌 = 最适 pH > 9（Bacillus pseudofirmus OF4、Alkaliphilus oremlandii、Amphibacillus xylanus、Caldalkalibacillus uzonensis、Desulfonatronovibrio 等，10 种）。两亚池全程分开标记。",
+        "anchoring": "共现检索通过 24/26（92%）。",
+        "calibration": "BacDive 培养 pH 最适值覆盖 6/16 酸嗜物种。分析集：酸 55,228 / 碱 19,899 序列（≤2000aa）。",
+        "en": {
+          "criteria": "Acidophiles with optimal growth pH < 3 (16 species: Acidithiobacillus, Ferroplasma, Leptospirillum, Sulfobacillus, Acidiphilium, Picrophilus and related) and alkaliphiles with optimal growth pH > 9 (10 species: Bacillus pseudofirmus OF4, Alkaliphilus oremlandii, Amphibacillus xylanus, Caldalkalibacillus uzonensis, Desulfonatronovibrio and related); kept as separate sub-pools throughout.",
+          "anchoring": "Co-occurrence search passed for 24/26 species (92%).",
+          "calibration": "BacDive optimal-pH values available for 6/16 acidophile species. Analyzed sets: 55,228 acidophilic / 19,899 alkaliphilic sequences (≤2,000 aa)."
+        }
+      },
+      {
+        "pool": "solvent",
+        "title": "耐溶剂组（14 物种 / 15 株蛋白组 / 96,750 分析序列）",
+        "criteria": "文献记录的有机溶剂耐受模式菌：P. putida KT2440/S12/DOT-T1E/mt-2、P. taiwanensis VLB120、Rhodococcus erythropolis/jostii/opacus、A. baylyi ADP1、B. cepacia/vietnamiensis、S. maltophilia K279a、Marinobacter、Alcanivorax。双路线合并：路线 P = 15 个耐受株参考蛋白组（63,292 条，作耐受适应背景）；路线 A = UniProt 全文 \"organic solvent tolerance\" 检索 14,575 条，按名称/功能注释清洗为 3,549 条蛋白级正例（如 LptD）。",
+        "anchoring": "株表型 ≠ 蛋白级耐受，因此每个物种带人工评级（严格共现 + 二次回填：high 4 / medium 6 / medium-strain-unverified 3 / weak 或 hydrocarbon-only 3）；Comamonas testosteroni 因缺乏直接溶剂耐受文献被排除出主分析。",
+        "calibration": "溶剂效应的实验验证来自 OrganiZymeDB（见实验参数层）。",
+        "en": {
+          "criteria": "Literature-documented organic-solvent-tolerant organisms: P. putida KT2440/S12/DOT-T1E/mt-2, P. taiwanensis VLB120, Rhodococcus erythropolis/jostii/opacus, A. baylyi ADP1, B. cepacia/vietnamiensis, S. maltophilia K279a, Marinobacter, Alcanivorax. Two routes combined: (P) 15 strain reference proteomes (63,292 sequences, tolerance-adapted background); (A) UniProt full-text 'organic solvent tolerance' search, 14,575 raw hits cleaned to 3,549 protein-level records (e.g. LptD).",
+          "anchoring": "Graded evidence levels assigned by manual review of strict co-occurrence results plus a second-pass backfill (high 4 / medium 6 / medium-strain-unverified 3 / weak or hydrocarbon-only 3); Comamonas testosteroni excluded from primary analyses.",
+          "calibration": "Solvent effects validated experimentally via OrganiZymeDB (see experiments layer)."
+        }
+      },
+      {
+        "pool": "meso",
+        "title": "中温对照组（18 物种 / 22 株条目 / 99,557 蛋白）",
+        "criteria": "四个对照池按系统发育与生活方式匹配处理组：产甲烷古菌匹配盐古菌（Methanosarcina 三种、Methanococcus、Methanocorpusculum、Methanospirillum），中温细菌匹配各细菌池（E. coli K-12 MG1655、B. subtilis 168、Deinococcus radiodurans、Lactococcus lactis、Corynebacterium glutamicum、M. smegmatis、S. aureus、Shewanella oneidensis、Yersinia、Proteus、Serratia、Aeromonas 等）。跨池重复物种只存一份。",
+        "anchoring": "对照组不设锚定门槛（作为阴性背景使用）。",
+        "calibration": "—",
+        "en": {
+          "criteria": "Four control pools matched by phylogeny and lifestyle: methanogenic archaea for haloarchaea (Methanosarcina ×3, Methanococcus, Methanocorpusculum, Methanospirillum) and mesophilic bacteria for the bacterial pools (E. coli K-12 MG1655, B. subtilis 168, Deinococcus radiodurans, Lactococcus lactis, Corynebacterium glutamicum, M. smegmatis, S. aureus, Shewanella oneidensis and others); organisms shared across pools stored once.",
+          "anchoring": "No anchoring gate (negative-control background).",
+          "calibration": "—"
+        }
+      },
+      {
+        "pool": "experiments",
+        "title": "实验参数层（539,714 条实测）",
+        "criteria": "四个实验来源聚合：① OrganiZymeDB 全量导出清洗（27,945 条溶剂测量；其中 613 条热稳定测量进入 EnvTolDB 实验层，展开为 1,839 行 = 613 dTm_solvent + 613 水相 Tm + 613 溶剂相 Tm），按 UniProt accession 直连；② FireProtDB 全库 533,071 条 ddG，按野生型序列 SHA-256 自动比对挂接（1,410 条命中——该库以常温菌为主，未命中行保留 wt_sha256 可回查）；③ ProTherm-L4 2,921 条单点 ΔTm（202 个 PDB 结构，Shrake-Rupley RSA）；④ 文献 Tm-pH 编译 1,883 条（sha1 前缀比对，294 命中）。",
+        "anchoring": "meltome 级预测 Tm 数据集被刻意排除，保证实验层严格只含实验测量。",
+        "calibration": "每条记录带 source / source_ref（doi 或源记录号）；人工核验 verified 必须写 evidence。",
+        "en": {
+          "criteria": "Four experimental sources aggregated: (i) OrganiZymeDB (27,945 cleaned measurements; 613 thermal-stability records with computable solvent ΔTm entered the experiments layer as 1,839 rows — 613 dTm_solvent + 613 aqueous-Tm + 613 solvent-Tm), linked by UniProt accession; (ii) FireProtDB, 533,071 ΔΔG records, linked by SHA-256 of the wild-type sequence (1,410 matches — the source database is dominated by mesophilic systems; unmatched rows retain the wild-type hash for provenance); (iii) ProTherm-L4, 2,921 single-site ΔTm mutations on 200 PDB structures with Shrake–Rupley RSA; (iv) a literature Tm-versus-pH compilation (1,883 records, 294 linked by SHA-1 prefix).",
+          "anchoring": "Meltome-scale predicted-Tm datasets were deliberately excluded so the experiments layer contains strictly experimental values.",
+          "calibration": "Every record carries source and source_ref (DOI or source record id); verified flags require written evidence."
+        }
+      },
+      {
+        "pool": "cold",
+        "title": "嗜冷组（29 物种 / 117,277 蛋白）",
+        "criteria": "文献确认的冷适应生物：γ-proteobacteria（Colwellia、Pseudoalteromonas、Psychrobacter、Psychromonas、Moritella、Shewanella 冷栖种）、Bacteroidetes（Psychroflexus、Polaribacter、Psychroserpens、Flavobacterium psychrophilum 等）、Firmicutes/Actinobacteria（Carnobacterium、Cryobacterium、Subtercola、Paenibacillus glacialis）、冷产甲烷古菌（Methanococcoides burtonii、Polaromonas）。分级：psychrophilic（OGT<15°C）/ cold_tolerant（0–20°C 且明确冷适应）。序列口径：光标翻页全量下载（含株级子树），≥50 aa。",
+        "anchoring": "Europe PMC 共现检索（物种名 × psychrophilic/psychrotolerant/cold-adapted/cold-active）：9/29（31%）——嗜冷文献常用 cold-adapted 等词在正文而非标题/摘要，保守口径低估为如实记录；后续可用全文检索放宽。",
+        "calibration": "BacDive OGT 字段待补抓；温度维度双向检验（thermo +0.006 vs cold 预期负向偏移）"
+      }
+    ],
+    "_intro_en": "Collection protocol per group: species curation criteria, sequence retrieval, literature anchoring, and experimental calibration. Shared pipeline: UniProt taxonomy API exact name resolution → reference proteome (else all proteins of the taxon) → ≥50 aa filter + dedup. Redundancy scope is recorded per pool: thermophilic = 30% cluster representatives; halophilic/pH/solvent = 90% linclust representatives; controls = exact dedup.",
+    "pools_en": [
+      {
+        "pool": "cold",
+        "title": "Cold-adapted group (29 species / 117,277 proteins)",
+        "criteria": "Literature-documented cold-adapted organisms across γ-proteobacteria, Bacteroidetes, Firmicutes/Actinobacteria and cold methanogenic archaea; graded psychrophilic (OGT < 15 °C) or cold_tolerant (0–20 °C with documented cold habitat). Sequences downloaded in full via cursor pagination (strain descendants included), ≥50 aa.",
+        "anchoring": "Europe PMC co-occurrence passed for 9/29 (31%) — psychrophile literature typically uses 'cold-adapted' in body text rather than title/abstract; the conservative title/abstract gate underestimates and is recorded as such.",
+        "calibration": "BacDive OGT pending; completes the two-sided temperature test (thermophilic +0.006 vs expected negative shift for cold)."
+      }
+    ]
+  }
+}
