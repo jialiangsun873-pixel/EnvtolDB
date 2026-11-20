@@ -79,9 +79,9 @@ database (Downloads) — every table below is a plain SQL table. A REST API also
 self-hosted instance.</div>
 <div class="card"><h2>Schema</h2>
 <table><tr><th>table</th><th>columns (key ones)</th><th>rows</th></tr>
-<tr><td><code>species</code></td><td>name, taxon_id, pool, grade, proteome_id, n_seqs, lit_anchored, evidence_level, bacdive_value, attrs</td><td>260</td></tr>
-<tr><td><code>proteins</code></td><td>accession, species_id, name, length, sequence, seq_sha256, source, verified, evidence, attrs</td><td>786,165</td></tr>
-<tr><td><code>experiments</code></td><td>accession, kind, value, unit, condition, mutation, wt_sha256, source, source_ref</td><td>539,872</td></tr>
+<tr><td><code>species</code></td><td>name, taxon_id, pool, grade, proteome_id, n_seqs, lit_anchored, evidence_level, bacdive_value, attrs</td><td>271</td></tr>
+<tr><td><code>proteins</code></td><td>accession, species_id, name, length, sequence, seq_sha256, source, verified, evidence, attrs</td><td>808,592</td></tr>
+<tr><td><code>experiments</code></td><td>accession, kind, value, unit, condition, mutation, wt_sha256, source, source_ref</td><td>681,685</td></tr>
 <tr><td><code>structures</code></td><td>accession, pool, n_residues, mean_plddt, frac_plddt70, salt_bridges_per_100</td><td>146,319</td></tr>
 <tr><td><code>literature</code> / <code>measurements</code> / <code>import_batches</code> / <code>audit_log</code></td>
 <td>anchoring hits, BacDive-style measurements, source declarations, edit history</td><td>—</td></tr></table></div>
@@ -109,7 +109,7 @@ sqlite3 dataset.db "SELECT accession, mean_plddt, salt_bridges_per_100 FROM stru
 <p style="font-size:13.5px">If you use EnvTolDB in your research, please cite the EnvProGen manuscript (in preparation) and the underlying sources: UniProtKB, BacDive, OrganiZymeDB, FireProtDB, ProThermDB, Europe PMC.</p></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.1 · built 2026-11-19 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.1 · built 2026-11-20 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
