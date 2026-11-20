@@ -1,46 +1,88 @@
 # EnvTolDB — Environment-Tolerant Proteome Database
 
-环境耐受蛋白数据库 · A curated, queryable database of proteins from
-environment-tolerant organisms (thermophilic, halophilic, acidophilic,
-alkaliphilic, solvent-tolerant) with mesophilic controls.
+**A curated, provenance-tracked database of proteins from environment-tolerant organisms.**
 
-[![Deploy](https://github.com/OWNER/REPO/actions/workflows/deploy.yml/badge.svg)](../../actions)
+[![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue)](https://jialiangsun873-pixel.github.io/EnvtolDB/)
+[![Release](https://img.shields.io/badge/Release-v3.2-green)](https://github.com/jialiangsun873-pixel/EnvtolDB/releases/tag/v3.1)
 
-| Layer | Records |
+| | |
 |---|---:|
-| Species (5 groups + controls) | 231 |
-| UniProt protein sequences (SHA-256 checksummed) | 668,888 |
-| Experimental measurements (ddG / ΔTm / Tm-vs-pH / solvent Tm) | 539,708 |
-| AlphaFold structure records (pLDDT / salt-bridge density) | 146,319 |
+| **Species** | **271** across 8 environmental dimensions |
+| **Protein sequences** | **808,592** (UniProt, SHA-256 checksummed) |
+| **Experimental measurements** | **681,685** (ddG / ΔTm / Tm / t½ / k_inact, from 6 sources) |
+| **AlphaFold structure records** | **146,319** (pLDDT / salt-bridge density) |
+| **BRENDA enzyme parameters** | **137,038** (pH/temp optimum, stability, range) |
+| **BacDive strain phenotypes** | **4,047** (OGT / salinity / isolation source) |
 
-## Site (GitHub Pages)
+## What is EnvTolDB?
 
-`site/` is the complete static site — enable **Settings → Pages → Deploy from
-branch (main / root)** and it goes live. Contains: dashboard, 231 species pages
-(full protein tables, FASTA downloads), solvent aggregation, experimental layer
-summary, collection protocols, downloads (SQLite + TSV + FASTA).
+EnvTolDB collects and integrates protein sequences and experimental stability data from
+organisms that thrive in extreme environments — thermophiles, halophiles, acidophiles,
+alkaliphiles, solvent-tolerant bacteria, psychrophiles, piezophiles, and
+radiation-resistant organisms — with mesophilic controls for comparison.
 
-## Rebuild from source database
+Every record is traceable:
+- Sequences carry UniProt accessions (verifiable at uniprot.org) + SHA-256 checksums
+- Experimental records carry DOI + source database + per-record condition details
+- Literature anchoring status is recorded per species (Europe PMC co-occurrence)
+- All edits are audit-logged with operator identity and timestamp
 
-```bash
-python3 generator/build_static_site.py   # reads /public/home/sjl2/datasetdb/dataset.db
-# adapt DB path at the top of the script, then commit the regenerated site/
+## Eight environmental dimensions
+
+| Dimension | Species | Proteins | Structures | Experiments |
+|---|---:|---:|---:|---:|
+| Thermophilic | 87 | 36,295 | 36,295 | 2 |
+| Halophilic | 86 | 357,067 | 60,914 | 185 |
+| Acid/Alkaliphilic | 26 | 76,342 | 69 | 177 |
+| Solvent-tolerant | 14 | 99,627 | 48,912 | 190 |
+| Cold-adapted | 29 | 117,277 | 0 | 347 |
+| Mesophilic control | 18 | 99,557 | 129 | 2,080 |
+| Piezophilic | 5 | 10,354 | 0 | 0 |
+| Radiation-resistant | 6 | 12,073 | 0 | 0 |
+
+## Web interface
+
+Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
+- Species browsing with sortable protein tables
+- Per-solvent ΔTm aggregation with bar charts
+- Collection protocol documentation (EN/中文)
+- Bulk download: SQLite, per-species FASTA, per-pool TSV
+- REST API (self-hosted instance) — [API docs](https://jialiangsun873-pixel.github.io/EnvtolDB/api.html)
+
+## Repository structure
+
+```
+├── index.html                  # Dashboard (stats + pool cards)
+├── species/                    # 271 species pages + pool index pages
+├── solvents.html               # Per-solvent ΔTm aggregation
+├── experiments.html            # Experimental layer overview
+├── methods.html                # Collection protocols (EN/中文)
+├── downloads.html              # Bulk download page
+├── api.html                    # API documentation
+├── downloads/                  # FASTA + TSV + CHECKSUMS
+│   ├── fasta/                  #   260 species FASTA.gz
+│   ├── tsv/                    #   5 pool TSV exports
+│   └── CHECKSUMS.txt           #   SHA-256 of all downloads
+└── .github/workflows/deploy.yml  # Auto-deploy on push
 ```
 
-## Bulk access
+## Data sources
 
-- `site/downloads/dataset.db.gz` — full SQLite (~250MB gz / ~500MB raw); query
-  locally: `sqlite3 dataset.db "SELECT ..."` (schema in `site/api-docs.html`)
-- `site/downloads/fasta/*.fasta.gz` — per-species FASTA
-- `site/downloads/tsv/*.tsv` — per-pool species tables
-- `site/downloads/CHECKSUMS.txt` — SHA-256 of every download
-
-## Citation
-
-EnvProGen manuscript (in preparation). Sources: UniProtKB, BacDive,
-OrganiZymeDB (Debruyne & Pucci, NAR 2026), FireProtDB (Štourač et al., NAR 2021),
-ProThermDB (Nikam et al., NAR 2021), Europe PMC.
+| Source | Records | Reference |
+|---|---:|---|
+| UniProtKB | 786,165 sequences | [uniprot.org](https://www.uniprot.org) |
+| FireProtDB | 533,071 ddG | [Štourač et al., NAR 2021](https://doi.org/10.1093/nar/gkab799) |
+| BRENDA | 137,038 enzyme parameters | [BRENDA](https://www.brenda-enzymes.org) |
+| ProThermDB | 2,921 ΔTm | [Nikam et al., NAR 2021](https://doi.org/10.1093/nar/gkaa1070) |
+| OrganiZymeDB | 1,833 solvent Tm | [Debruyne & Pucci, NAR 2026](https://doi.org/10.1093/nar/gkag1069) |
+| BacDive | 4,047 strains | [Reimer et al., NAR 2022](https://doi.org/10.1093/nar/gkab799) |
+| Europe PMC | 135 anchoring records | [europepmc.org](https://europepmc.org) |
 
 ## License
 
-MIT (code & site); data released under CC-BY 4.0 with upstream source terms.
+Code: MIT. Data: CC-BY 4.0 (with upstream source terms — see individual source databases).
+
+## Citation
+
+If you use EnvTolDB, please cite the EnvProGen manuscript (in preparation) and the
+underlying sources listed above.
