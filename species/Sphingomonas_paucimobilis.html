@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sphingomonas paucimobilis · EnvTolDB</title>
+<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 231 organisms, 668,888 UniProt proteins, 539,708 experimental measurements.">
+<style>
+:root{--ink:#13233b;--soft:#43597a;--faint:#7285a0;--line:#d9e4f0;--bg:#f5f8fc;--card:#fff;
+ --accent:#1668dc;--accent-ink:#0d4bb5;--ok:#17805f;--ok-bg:#e4f4ee;--no:#c4424f;--no-bg:#fdeef0;
+ --radius:8px;--shadow:0 1px 3px rgba(15,40,80,.08)}
+*{box-sizing:border-box}
+body{font-family:Inter,-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--ink)}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:-2px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{padding:5px 11px;border-radius:6px;color:var(--soft);font-size:13.5px}
+nav a:hover{background:#eef3f9;color:var(--ink);text-decoration:none}
+nav a.on{background:#e7f0fb;color:var(--accent-ink);font-weight:600}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.langbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--soft)}
+.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.gh:hover{color:var(--ink)}
+main{max-width:1140px;margin:0 auto;padding:26px 18px 70px}
+.hero{background:linear-gradient(180deg,#eef4fb,#f8fbff);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 26px;margin-bottom:22px}
+.hero h1{font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
+.hero .tag{font-size:15px;color:var(--soft);margin-bottom:16px}
+.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.rel{background:var(--accent);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600}
+.rel2{background:#fff;border:1px solid var(--line);color:var(--soft);font-size:12px;padding:3px 10px;border-radius:12px}
+.srch{display:flex;gap:8px;max-width:560px}
+.srch input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid #b9cbe2;border-radius:8px}
+.srch input:focus{outline:2px solid #9cc3e5;border-color:var(--accent)}
+.srch button{padding:10px 20px;font-size:14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+.hint{font-size:12px;color:var(--faint);margin-top:6px}
+.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:150px}
+.chip b{font-size:21px;display:block}
+.chip span{font-size:11.5px;color:var(--faint)}
+h2.sec{font-size:19px;margin:26px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.pcard b{font-size:15px}.pcard .n{font-size:24px;font-weight:700;display:block;margin:2px 0}
+.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th{background:#eef3f9;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#e2ecf6}
+td{padding:6px 10px;border-bottom:1px solid #ecf2f8}
+tr:hover td{background:#f4f8fd}
+.badge{display:inline-block;padding:1px 9px;border-radius:11px;font-size:11.5px;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.b-grade{background:#e7f0fb;color:var(--accent-ink)}
+.bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle}
+.bar-neg{background:#e58a93}.bar-pos{background:#7bbf9e}
+.muted{color:var(--faint);font-size:12.5px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:9px 14px;border-radius:6px;margin-bottom:16px;font-size:13.5px}
+.err{background:#fdeef0;border:1px solid #f3c6cb;color:#c4424f;padding:8px 14px;border-radius:6px;margin-bottom:14px;font-size:13px}
+code{font-family:ui-monospace,'JetBrains Mono',monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+pre{background:#eef3f9;padding:12px;border-radius:6px;font-size:12.5px;overflow:auto;max-height:360px}
+input,button{font-size:13.5px;padding:7px 11px;border:1px solid #b9cbe2;border-radius:6px;background:#fff;color:var(--ink);font-family:inherit}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+button:hover{background:var(--accent-ink)}
+details{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;background:#fff}
+summary{cursor:pointer;font-weight:600;font-size:13.5px}
+.crumb{font-size:12.5px;color:var(--faint);margin-bottom:14px}
+.crumb a{color:var(--faint)}
+footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+</style></head><body>
+<header>
+  <a class="brand" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2.6 20.4 7.4v9.2L12 21.4 3.6 16.6V7.4Z"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M12 5v2.8M12 16.2V19M5.7 8.5l2.4 1.4M15.9 14.1l2.4 1.4M18.3 8.7l-2.4 1.3M8.1 14l-2.4 1.4" opacity=".5"/></svg><span>EnvTolDB<small>Environment-Tolerant Proteome Database</small></span></a>
+  <nav><a href="../index.html" class="" data-zh="总览">Overview</a><a href="../species/index.html" class="" data-zh="物种">Species</a><a href="../solvents.html" class="" data-zh="溶剂统计">Solvents</a><a href="../experiments.html" class="" data-zh="实验参数">Experiments</a><a href="../methods.html" class="" data-zh="采集方法">Methods</a><a href="../downloads.html" class="" data-zh="下载">Downloads</a><a href="../api.html" class="" data-zh="API">API</a></nav>
+  <div class="hdr-right"><button class="langbtn" data-l="en" onclick="setLang('en')">EN</button><button class="langbtn" data-l="zh" onclick="setLang('zh')">中文</button><a class="gh" href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub ↗</a></div>
+</header>
+<main>
+<div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › Sphingomonas paucimobilis</div>
+<div class="card"><h2>Sphingomonas paucimobilis</h2>
+<p style="font-size:14px">Oligotrophic · grade <b>oligotrophic</b> ·
+NCBI txid 13689 · proteome — ·
+<b>96</b> proteins (22 experiment-linked) · <span class="badge b-ok">yes</span> ·
+evidence —
+</p>
+<p class="muted">Provenance: <a href="https://www.ncbi.nlm.nih.gov/taxonomy/13689" target="_blank" rel="noopener">NCBI txid13689</a> · <a href="https://europepmc.org/search?query=%22Sphingomonas%20paucimobilis%22" target="_blank" rel="noopener">Europe PMC</a> · last edited by system</p>
+<p class="muted">EPMC hits=189 </p>
+<p><a class="btn" href="../downloads/fasta/Sphingomonas_paucimobilis.fasta.gz" download>⬇ FASTA (.fasta.gz)</a></p></div>
+<div class="card"><h2>Proteins (96)</h2>
+<input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
+<table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
+<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experiments</th><th onclick="sortTable(this)">Verified</th></tr></thead>
+<tbody><tr><td><code>Q6VQX7</code></td><td>Bifunctional protein PutA [Includes: Proline dehydrogenase (EC 1</td><td>1200</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q76LC4</code></td><td>Alpha-L-rhamnosidase</td><td>1117</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ9</code></td><td>ORFD</td><td>846</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX4</code></td><td>ORFY</td><td>840</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX8</code></td><td>ORFU</td><td>710</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RR27</code></td><td>Feruloyl-CoA synthetase</td><td>709</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY3</code></td><td>cytochrome-c oxidase (EC 7.1.1.9)</td><td>552</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WSS8</code></td><td>Benzoylformate decarboxylase</td><td>538</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A2PZP2</code></td><td>TIR domain-containing protein</td><td>530</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RQW2</code></td><td>Dioxygenase (EC 1.13.11.-)</td><td>491</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q52008</code></td><td>Lignostilbene-alpha,beta-dioxygenase isozyme III (LSD-III) (EC 1</td><td>490</td><td>—</td><td>3</td><td></td></tr><tr><td><code>Q7X5E1</code></td><td>5-carboxyvanillic acid transport protein</td><td>486</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q53353</code></td><td>Lignostilbene-alpha,beta-dioxygenase isozyme I (LSD-I) (EC 1.13.</td><td>485</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A2PZP3</code></td><td>Vanillin dehydrogenase</td><td>480</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY0</code></td><td>ORFS</td><td>476</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q84IP9</code></td><td>Putative vanillin dehydrogenase</td><td>476</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9RP80</code></td><td>Phosphoglucomutase/phosphomannomutase</td><td>462</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ6</code></td><td>ORFG</td><td>448</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9APE3</code></td><td>Beta-glucosidase</td><td>435</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q93UV0</code></td><td>Serine palmitoyltransferase (SPT) (EC 2.3.1.50)</td><td>420</td><td>—</td><td>8</td><td></td></tr><tr><td><code>Q5NTE5</code></td><td>Gallate dioxygenase</td><td>418</td><td>—</td><td>4</td><td></td></tr><tr><td><code>O24782</code></td><td>Cytochrome P450 (Fatty acid alpha-hydroxylase)</td><td>415</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ5</code></td><td>long-chain-acyl-CoA dehydrogenase (EC 1.3.8.8)</td><td>412</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A2PZP1</code></td><td>Uncharacterized protein</td><td>402</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RQV9</code></td><td>LigR protein</td><td>393</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF7</code></td><td>Hypothetical TonB-dependent receptor</td><td>385</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RQW1</code></td><td>ORF1 protein</td><td>351</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q84IP8</code></td><td>5-carboxyvanillic acid decarboxylse</td><td>350</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9APE1</code></td><td>Beta-1,4-glucuronosyltransferase</td><td>348</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF1</code></td><td>2,5-dichlorohydroquinone reductive dechlorinase</td><td>346</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A2PZP4</code></td><td>histidine kinase (EC 2.7.13.3)</td><td>337</td><td>—</td><td>0</td><td></td></tr><tr><td><code>O82834</code></td><td>Biphenyl ring cleavage enzyme (OH-DDVA oxygenase)</td><td>334</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RJ47</code></td><td>5-carboxyvanillate decarboxylase</td><td>334</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5QKZ2</code></td><td>long-chain-acyl-CoA dehydrogenase (EC 1.3.8.8)</td><td>333</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9Z9I9</code></td><td>OH-DDVA meta-cleavage compound hydrolase</td><td>332</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ7</code></td><td>ORFF</td><td>330</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WYU8</code></td><td>3-O-methylgallate 3,4-dioxygenase</td><td>330</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VR00</code></td><td>ORFC</td><td>327</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VR01</code></td><td>ORFB</td><td>323</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VR02</code></td><td>ORFA</td><td>322</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF5</code></td><td>Hydroquinone meta-cleavage dioxygenase</td><td>321</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ8</code></td><td>ORFE</td><td>313</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9KWI1</code></td><td>Metapyrocatechase (EC 1.13.11.2) (CatO2ase) (Catechol 2,3-dioxyg</td><td>307</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF6</code></td><td>LinR</td><td>303</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7DH56</code></td><td>Beta subunit of protocatechuate 4,5-dioxygenase</td><td>302</td><td>—</td><td>0</td><td></td></tr><tr><td><code>P11122</code></td><td>Biphenyl-2,3-diol 1,2-dioxygenase (EC 1.13.11.39) (2,3-dihydroxy</td><td>299</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9KWI2</code></td><td>2,3-dihydroxybiphenyl 1,2-dioxygenase</td><td>299</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RQV8</code></td><td>ORF2 protein</td><td>297</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX3</code></td><td>Haloalkane dehalogenase (EC 3.8.1.5)</td><td>296</td><td>—</td><td>7</td><td></td></tr><tr><td><code>Q6VQY1</code></td><td>Cbb3-type cytochrome c oxidase subunit</td><td>295</td><td>—</td><td>0</td><td></td></tr><tr><td><code>P47243</code></td><td>2,2&#x27;,3-trihydroxybiphenyl dioxygenase (EC 1.13.11.-)</td><td>294</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WSS9</code></td><td>3-keto-5-aminohexanoate cleavage protein</td><td>292</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RTG2</code></td><td>UTP--glucose-1-phosphate uridylyltransferase (EC 2.7.7.9) (UDP-g</td><td>289</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RR28</code></td><td>Feruloyl-CoA hydratase/lyase</td><td>284</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8RR26</code></td><td>Feruloyl-CoA hydratase/lyase</td><td>277</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF4</code></td><td>B-ketoadipate-enol-lactone hydrolase</td><td>269</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9WXJ9</code></td><td>Glutathione S-transferase homolog</td><td>265</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ1</code></td><td>TnpA (TnpA2) (TnpA3) (TnpA4) (Transposase)</td><td>264</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q2HXE0</code></td><td>Chromosomal replication initiator protein DnaA</td><td>263</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q05565</code></td><td>Beta-hemolysin</td><td>263</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX5</code></td><td>ORFX</td><td>258</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY4</code></td><td>ORFO</td><td>254</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q4F6Y3</code></td><td>2,5-dichloro-2,5-cyclohexadiene-1,4-diol dehydrogenase</td><td>250</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY7</code></td><td>LinC</td><td>250</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ4</code></td><td>2,5-dichloro-2,5-cyclohexadiene-1,4-diol dehydrogenase (LinX1)</td><td>250</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WST2</code></td><td>AB hydrolase-1 domain-containing protein</td><td>250</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q8GDE6</code></td><td>LinX2 (ORFUP)</td><td>250</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WST0</code></td><td>IclR family transcriptional regulator</td><td>249</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY2</code></td><td>ORFQ</td><td>248</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q60FX2</code></td><td>Putative alkyl salicylate esterase</td><td>243</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF3</code></td><td>Carboxylesterase</td><td>238</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A411LJN5</code></td><td>Bacteriorhodopsin</td><td>237</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX6</code></td><td>ORFW</td><td>233</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WYU7</code></td><td>Putative 4-hydroxy-4-methyl-2-oxoglutarate aldolase (Regulator o</td><td>222</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7WYU6</code></td><td>Putative 4-hydroxy-4-methyl-2-oxoglutarate aldolase (Regulator o</td><td>217</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VPF2</code></td><td>Uncharacterized protein</td><td>210</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY9</code></td><td>ORFK</td><td>205</td><td>—</td><td>0</td><td></td></tr><tr><td><code>O33705</code></td><td>Glutathione S-transferase</td><td>201</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q60FX3</code></td><td>Putative formaldehyde dehydrogenase</td><td>175</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQX9</code></td><td>ORFT</td><td>158</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5EDH7</code></td><td>Dehydrochlorinase (LinA2)</td><td>156</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ2</code></td><td>LinA</td><td>154</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7BRG9</code></td><td>Inner membrane Hg(II) uptake protein</td><td>144</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7DH57</code></td><td>Alpha subunit of protocatechuate 4,5-dioxygenase</td><td>139</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQZ0</code></td><td>ORFJ&#x27;</td><td>125</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9KWL5</code></td><td>Protocatechuate 4,5-dioxygenase small subunit</td><td>124</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7BRG2</code></td><td>Mercuric transport protein MerT (Mercury ion transport protein)</td><td>116</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7BRH1</code></td><td>Mercuric transport protein MerT (Mercury ion transport protein)</td><td>116</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5QKZ0</code></td><td>Uncharacterized protein</td><td>98</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q7BRH0</code></td><td>Periplasmic mercury ion-binding protein</td><td>92</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9WW07</code></td><td>Periplasmic mercury ion-binding protein</td><td>91</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q6VQY5</code></td><td>&#x27;ORFN</td><td>86</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9S5V9</code></td><td>Beta-etherase</td><td>26</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9KWL4</code></td><td>Protocatechuate 4,5-dioxygenase large subunit</td><td>25</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9WW55</code></td><td>Mer operon activator/repressor regulatory protein</td><td>17</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q9WVX7</code></td><td>Mer operon activator/repressor regulatory protein</td><td>16</td><td>—</td><td>0</td><td></td></tr></tbody></table>
+<p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>
+</main>
+<footer>
+  <b>EnvTolDB</b> v3.1 · built 2026-11-21 · MIT (code) / CC-BY 4.0 (data) ·
+  <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
+  <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
+</footer>
+<script>
+// ---- language toggle (EN default; 中文 via data-zh) ----
+function setLang(l){
+  document.documentElement.lang = l==='zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    if(l==='zh'){ if(!el.dataset.en) el.dataset.en = el.textContent; el.textContent = el.dataset.zh; }
+    else { if(el.dataset.en) el.textContent = el.dataset.en; }
+  });
+  document.querySelectorAll('.langbtn').forEach(b=>b.style.fontWeight = b.dataset.l===l ? '700':'400');
+  try{ localStorage.setItem('envtoldb_lang', l); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  let l='en'; try{ l = localStorage.getItem('envtoldb_lang')||'en'; }catch(e){}
+  setLang(l);
+});
+// ---- sortable tables ----
+function sortTable(th){
+  const tb = th.closest('table').querySelector('tbody') || th.closest('table');
+  const idx = Array.from(th.parentNode.children).indexOf(th);
+  const dir = th.dataset.dir === 'asc' ? -1 : 1;
+  th.dataset.dir = dir===1 ? 'asc' : 'desc';
+  const rows = Array.from(tb.querySelectorAll('tr')).filter(r=>!r.querySelector('th'));
+  rows.sort((a,b)=>{
+    const A=a.children[idx], B=b.children[idx];
+    if(!A||!B) return 0;
+    const na=parseFloat(A.textContent.replace(/[,%]/g,'')), nb=parseFloat(B.textContent.replace(/[,%]/g,''));
+    const numA=!isNaN(na)&&A.textContent.match(/[\d.]/), numB=!isNaN(nb)&&B.textContent.match(/[\d.]/);
+    let c = (numA&&numB) ? na-nb : A.textContent.localeCompare(B.textContent);
+    return c*dir;
+  });
+  rows.forEach(r=>tb.appendChild(r));
+}
+// ---- live species filter ----
+function filterSpecies(input){
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('[data-sp-row]').forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().indexOf(q)>-1 ? '' : 'none';
+  });
+}
+</script>
+</body></html>
