@@ -28,9 +28,9 @@ db.row_factory = sqlite3.Row
 db.execute("PRAGMA busy_timeout=60000")
 
 POOLS = {p["key"]: p for p in cfg["pools"]}
-POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphilic", "cold": "Cold-adapted", "piezo": "Piezophilic", "rad": "Radiation-resistant",
+POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphilic", "metal": "Metal-resistant", "endolithic": "Endolithic", "xerophilic": "Xerophilic", "cold": "Cold-adapted", "piezo": "Piezophilic", "rad": "Radiation-resistant",
            "solvent": "Solvent-tolerant", "meso": "Mesophilic controls", "cold": "Cold-adapted"}
-POOL_ZH = {"thermo": "嗜热", "salt": "耐盐", "ph": "耐酸碱", "solvent": "耐溶剂", "meso": "中温对照", "cold": "嗜冷", "piezo": "嗜压", "rad": "耐辐射"}
+POOL_ZH = {"thermo": "嗜热", "salt": "耐盐", "ph": "耐酸碱", "solvent": "耐溶剂", "meso": "中温对照", "cold": "嗜冷", "piezo": "嗜压", "rad": "耐辐射", "metal": "耐重金属", "endolithic": "石内内生", "xerophilic": "耐干燥"}
 
 for sub in ("species", "downloads/fasta", "downloads/tsv", ".github/workflows"):
     os.makedirs(os.path.join(OUT, sub), exist_ok=True)

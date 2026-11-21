@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trichoderma longibrachiatum · EnvTolDB</title>
+<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 231 organisms, 668,888 UniProt proteins, 539,708 experimental measurements.">
+<style>
+:root{--ink:#13233b;--soft:#43597a;--faint:#7285a0;--line:#d9e4f0;--bg:#f5f8fc;--card:#fff;
+ --accent:#1668dc;--accent-ink:#0d4bb5;--ok:#17805f;--ok-bg:#e4f4ee;--no:#c4424f;--no-bg:#fdeef0;
+ --radius:8px;--shadow:0 1px 3px rgba(15,40,80,.08)}
+*{box-sizing:border-box}
+body{font-family:Inter,-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--ink)}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:-2px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{padding:5px 11px;border-radius:6px;color:var(--soft);font-size:13.5px}
+nav a:hover{background:#eef3f9;color:var(--ink);text-decoration:none}
+nav a.on{background:#e7f0fb;color:var(--accent-ink);font-weight:600}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.langbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--soft)}
+.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.gh:hover{color:var(--ink)}
+main{max-width:1140px;margin:0 auto;padding:26px 18px 70px}
+.hero{background:linear-gradient(180deg,#eef4fb,#f8fbff);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 26px;margin-bottom:22px}
+.hero h1{font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
+.hero .tag{font-size:15px;color:var(--soft);margin-bottom:16px}
+.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.rel{background:var(--accent);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600}
+.rel2{background:#fff;border:1px solid var(--line);color:var(--soft);font-size:12px;padding:3px 10px;border-radius:12px}
+.srch{display:flex;gap:8px;max-width:560px}
+.srch input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid #b9cbe2;border-radius:8px}
+.srch input:focus{outline:2px solid #9cc3e5;border-color:var(--accent)}
+.srch button{padding:10px 20px;font-size:14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+.hint{font-size:12px;color:var(--faint);margin-top:6px}
+.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:150px}
+.chip b{font-size:21px;display:block}
+.chip span{font-size:11.5px;color:var(--faint)}
+h2.sec{font-size:19px;margin:26px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.pcard b{font-size:15px}.pcard .n{font-size:24px;font-weight:700;display:block;margin:2px 0}
+.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th{background:#eef3f9;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#e2ecf6}
+td{padding:6px 10px;border-bottom:1px solid #ecf2f8}
+tr:hover td{background:#f4f8fd}
+.badge{display:inline-block;padding:1px 9px;border-radius:11px;font-size:11.5px;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.b-grade{background:#e7f0fb;color:var(--accent-ink)}
+.bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle}
+.bar-neg{background:#e58a93}.bar-pos{background:#7bbf9e}
+.muted{color:var(--faint);font-size:12.5px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:9px 14px;border-radius:6px;margin-bottom:16px;font-size:13.5px}
+.err{background:#fdeef0;border:1px solid #f3c6cb;color:#c4424f;padding:8px 14px;border-radius:6px;margin-bottom:14px;font-size:13px}
+code{font-family:ui-monospace,'JetBrains Mono',monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+pre{background:#eef3f9;padding:12px;border-radius:6px;font-size:12.5px;overflow:auto;max-height:360px}
+input,button{font-size:13.5px;padding:7px 11px;border:1px solid #b9cbe2;border-radius:6px;background:#fff;color:var(--ink);font-family:inherit}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+button:hover{background:var(--accent-ink)}
+details{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;background:#fff}
+summary{cursor:pointer;font-weight:600;font-size:13.5px}
+.crumb{font-size:12.5px;color:var(--faint);margin-bottom:14px}
+.crumb a{color:var(--faint)}
+footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+</style></head><body>
+<header>
+  <a class="brand" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2.6 20.4 7.4v9.2L12 21.4 3.6 16.6V7.4Z"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M12 5v2.8M12 16.2V19M5.7 8.5l2.4 1.4M15.9 14.1l2.4 1.4M18.3 8.7l-2.4 1.3M8.1 14l-2.4 1.4" opacity=".5"/></svg><span>EnvTolDB<small>Environment-Tolerant Proteome Database</small></span></a>
+  <nav><a href="../index.html" class="" data-zh="总览">Overview</a><a href="../species/index.html" class="" data-zh="物种">Species</a><a href="../solvents.html" class="" data-zh="溶剂统计">Solvents</a><a href="../experiments.html" class="" data-zh="实验参数">Experiments</a><a href="../methods.html" class="" data-zh="采集方法">Methods</a><a href="../downloads.html" class="" data-zh="下载">Downloads</a><a href="../api.html" class="" data-zh="API">API</a></nav>
+  <div class="hdr-right"><button class="langbtn" data-l="en" onclick="setLang('en')">EN</button><button class="langbtn" data-l="zh" onclick="setLang('zh')">中文</button><a class="gh" href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub ↗</a></div>
+</header>
+<main>
+<div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › Trichoderma longibrachiatum</div>
+<div class="card"><h2>Trichoderma longibrachiatum</h2>
+<p style="font-size:14px">Xerophilic · grade <b>psychrophilic</b> ·
+NCBI txid 5548 · proteome — ·
+<b>124</b> proteins (10 experiment-linked) · <span class="badge b-ok">yes</span> ·
+evidence —
+</p>
+<p class="muted">Provenance: <a href="https://www.ncbi.nlm.nih.gov/taxonomy/5548" target="_blank" rel="noopener">NCBI txid5548</a> · <a href="https://europepmc.org/search?query=%22Trichoderma%20longibrachiatum%22" target="_blank" rel="noopener">Europe PMC</a> · last edited by system</p>
+<p class="muted">EPMC hits=1035 </p>
+<p><a class="btn" href="../downloads/fasta/Trichoderma_longibrachiatum.fasta.gz" download>⬇ FASTA (.fasta.gz)</a></p></div>
+<div class="card"><h2>Proteins (124)</h2>
+<input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
+<table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
+<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experiments</th><th onclick="sortTable(this)">Verified</th></tr></thead>
+<tbody><tr><td><code>D3H5H5</code></td><td>Chlorophenol O-methyltransferase (COMPT) (EC 2.1.1.136)</td><td>467</td><td>—</td><td>4</td><td></td></tr><tr><td><code>Q12714</code></td><td>Endoglucanase EG-1 (EC 3.2.1.4) (Cellulase) (Endo-1,4-beta-gluca</td><td>463</td><td>—</td><td>6</td><td></td></tr><tr><td><code>F5BU83</code></td><td>Glucanase (EC 3.2.1.-)</td><td>462</td><td>—</td><td>0</td><td></td></tr><tr><td><code>D2K6B1</code></td><td>chitinase (EC 3.2.1.14)</td><td>424</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q2EI15</code></td><td>chitinase (EC 3.2.1.14)</td><td>424</td><td>—</td><td>0</td><td></td></tr><tr><td><code>I6RE33</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>357</td><td>—</td><td>0</td><td></td></tr><tr><td><code>E3VVU4</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>340</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A140AX04</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>339</td><td>—</td><td>0</td><td></td></tr><tr><td><code>E3VVU3</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>339</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5CC84</code></td><td>Peptide synthetase</td><td>332</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5CC83</code></td><td>Peptide synthetase</td><td>330</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5CC89</code></td><td>Peptide synthetase</td><td>326</td><td>—</td><td>0</td><td></td></tr><tr><td><code>D6N0Z5</code></td><td>chitinase (EC 3.2.1.14)</td><td>322</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A0D5ME03</code></td><td>chitinase (EC 3.2.1.14)</td><td>321</td><td>—</td><td>0</td><td></td></tr><tr><td><code>I6RE25</code></td><td>Elongation factor 1-alpha</td><td>309</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HW73</code></td><td>chitinase (EC 3.2.1.14)</td><td>273</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA1</code></td><td>chitinase (EC 3.2.1.14)</td><td>273</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB5</code></td><td>chitinase (EC 3.2.1.14)</td><td>273</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL88</code></td><td>chitinase (EC 3.2.1.14)</td><td>272</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL84</code></td><td>chitinase (EC 3.2.1.14)</td><td>271</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB8</code></td><td>chitinase (EC 3.2.1.14)</td><td>271</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HW67</code></td><td>chitinase (EC 3.2.1.14)</td><td>270</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL98</code></td><td>chitinase (EC 3.2.1.14)</td><td>270</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWB4</code></td><td>chitinase (EC 3.2.1.14)</td><td>268</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MYI2</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>266</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVW8</code></td><td>chitinase (EC 3.2.1.14)</td><td>264</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HW70</code></td><td>chitinase (EC 3.2.1.14)</td><td>263</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWC1</code></td><td>chitinase (EC 3.2.1.14)</td><td>263</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q2QFB1</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>262</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL79</code></td><td>chitinase (EC 3.2.1.14)</td><td>261</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HB40</code></td><td>Actin</td><td>261</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9H9X1</code></td><td>Actin</td><td>259</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB4</code></td><td>chitinase (EC 3.2.1.14)</td><td>257</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVJ3</code></td><td>chitinase (EC 3.2.1.14)</td><td>255</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWB8</code></td><td>chitinase (EC 3.2.1.14)</td><td>254</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWC4</code></td><td>chitinase (EC 3.2.1.14)</td><td>253</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVK4</code></td><td>chitinase (EC 3.2.1.14)</td><td>252</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWC3</code></td><td>chitinase (EC 3.2.1.14)</td><td>252</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVJ6</code></td><td>chitinase (EC 3.2.1.14)</td><td>244</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL90</code></td><td>chitinase (EC 3.2.1.14)</td><td>242</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HAM9</code></td><td>Actin</td><td>240</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9H9T5</code></td><td>Actin</td><td>239</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HB48</code></td><td>Actin</td><td>239</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HB78</code></td><td>Actin</td><td>239</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HWB6</code></td><td>chitinase (EC 3.2.1.14)</td><td>237</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9H9M6</code></td><td>Actin</td><td>232</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLE8</code></td><td>Elongation factor 1-alpha</td><td>226</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MND7</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MNF0</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MNK9</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MRF7</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MTB9</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MTC5</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MUI0</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9N1H4</code></td><td>Actin</td><td>223</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A1C9CIU2</code></td><td>Arsenic resistance protein</td><td>218</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HB57</code></td><td>DNA-directed RNA polymerase (EC 2.7.7.6)</td><td>216</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA3</code></td><td>chitinase (EC 3.2.1.14)</td><td>216</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL89</code></td><td>chitinase (EC 3.2.1.14)</td><td>213</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD4</code></td><td>Elongation factor 1-alpha</td><td>213</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVW4</code></td><td>chitinase (EC 3.2.1.14)</td><td>210</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLE6</code></td><td>Elongation factor 1-alpha</td><td>209</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLF1</code></td><td>Elongation factor 1-alpha</td><td>208</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLE7</code></td><td>Elongation factor 1-alpha</td><td>207</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD5</code></td><td>Elongation factor 1-alpha</td><td>205</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA0</code></td><td>chitinase (EC 3.2.1.14)</td><td>203</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL95</code></td><td>chitinase (EC 3.2.1.14)</td><td>202</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD1</code></td><td>Elongation factor 1-alpha</td><td>195</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB9</code></td><td>Elongation factor 1-alpha</td><td>194</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD7</code></td><td>Elongation factor 1-alpha</td><td>194</td><td>—</td><td>0</td><td></td></tr><tr><td><code>F8W669</code></td><td>Endo-1,4-beta-xylanase (EC 3.2.1.8)</td><td>190</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB2</code></td><td>chitinase (EC 3.2.1.14)</td><td>186</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL91</code></td><td>chitinase (EC 3.2.1.14)</td><td>184</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A1C9CIU9</code></td><td>Methylated arsenite oxidase</td><td>177</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD0</code></td><td>Translation elongation factor 1 alpha</td><td>177</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVV5</code></td><td>chitinase (EC 3.2.1.14)</td><td>175</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HVW0</code></td><td>chitinase (EC 3.2.1.14)</td><td>173</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC0</code></td><td>Translation elongation factor 1 alpha</td><td>172</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA6</code></td><td>chitinase (EC 3.2.1.14)</td><td>169</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B5LX28</code></td><td>Translation elongation factor 1 alpha</td><td>167</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA5</code></td><td>chitinase (EC 3.2.1.14)</td><td>166</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD3</code></td><td>Translation elongation factor 1 alpha</td><td>166</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC6</code></td><td>Translation elongation factor 1 alpha</td><td>165</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL93</code></td><td>chitinase (EC 3.2.1.14)</td><td>164</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB3</code></td><td>chitinase (EC 3.2.1.14)</td><td>164</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A024HW64</code></td><td>Chitinase 18-5</td><td>162</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC4</code></td><td>Translation elongation factor 1 alpha</td><td>162</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD9</code></td><td>Translation elongation factor 1 alpha</td><td>159</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL94</code></td><td>chitinase (EC 3.2.1.14)</td><td>157</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA4</code></td><td>chitinase (EC 3.2.1.14)</td><td>155</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC7</code></td><td>Translation elongation factor 1 alpha</td><td>144</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL92</code></td><td>chitinase (EC 3.2.1.14)</td><td>139</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0PCX4</code></td><td>Epl1 protein</td><td>138</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL80</code></td><td>chitinase (EC 3.2.1.14)</td><td>135</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC3</code></td><td>Translation elongation factor 1 alpha</td><td>128</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A1B1SKQ6</code></td><td>Calmodulin</td><td>125</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLD8</code></td><td>Translation elongation factor 1 alpha</td><td>100</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A8A6MTP6</code></td><td>Translation elongation factor 1-alpha</td><td>93</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B3FNH1</code></td><td>Translation elongation factor 1 alpha</td><td>93</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6N0UM18</code></td><td>Trypsin-like protease T-PRA1</td><td>91</td><td>—</td><td>0</td><td></td></tr><tr><td><code>J7JQF1</code></td><td>Translation elongation factor 1 alpha</td><td>91</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A8A6MVF3</code></td><td>Translation elongation factor 1-alpha</td><td>90</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HCL0</code></td><td>Calmodulin</td><td>89</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B3FNI4</code></td><td>Translation elongation factor 1 alpha</td><td>86</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q58N92</code></td><td>Translation elongation factor 1 alpha</td><td>84</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A140AX69</code></td><td>Translation elongation factor 1-alpha</td><td>80</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A077GV42</code></td><td>Translation elongation factor 1-alpha</td><td>77</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HA90</code></td><td>Hydrophobin</td><td>74</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9HAZ9</code></td><td>Hydrophobin</td><td>71</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB0</code></td><td>chitinase (EC 3.2.1.14)</td><td>67</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLB1</code></td><td>chitinase (EC 3.2.1.14)</td><td>66</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A7D5LY13</code></td><td>Hydrophobin 4</td><td>65</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A7D5LZB6</code></td><td>Hydrophobin 4</td><td>65</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q58NA0</code></td><td>Translation elongation factor 1 alpha</td><td>58</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MNB3</code></td><td>Calmodulin</td><td>56</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B6CXX6</code></td><td>Elongation factor 1a (Transcription elongation factor alpha 1) (</td><td>56</td><td>—</td><td>0</td><td></td></tr><tr><td><code>A0A6B9MN74</code></td><td>Translation elongation factor alpha 1</td><td>47</td><td>—</td><td>0</td><td></td></tr><tr><td><code>J9PGA6</code></td><td>Elongation factor tef-1a (Translation elongation factor 1-alpha)</td><td>46</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLA9</code></td><td>chitinase (EC 3.2.1.14)</td><td>45</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLE5</code></td><td>Translation elongation factor 1 alpha</td><td>43</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL97</code></td><td>chitinase (EC 3.2.1.14)</td><td>31</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SL99</code></td><td>chitinase (EC 3.2.1.14)</td><td>31</td><td>—</td><td>0</td><td></td></tr><tr><td><code>Q5TJZ6</code></td><td>Translation elongation factor 1</td><td>26</td><td>—</td><td>0</td><td></td></tr><tr><td><code>B7SLC5</code></td><td>Translation elongation factor 1 alpha</td><td>23</td><td>—</td><td>0</td><td></td></tr></tbody></table>
+<p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>
+</main>
+<footer>
+  <b>EnvTolDB</b> v3.1 · built 2026-11-21 · MIT (code) / CC-BY 4.0 (data) ·
+  <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
+  <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
+</footer>
+<script>
+// ---- language toggle (EN default; 中文 via data-zh) ----
+function setLang(l){
+  document.documentElement.lang = l==='zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    if(l==='zh'){ if(!el.dataset.en) el.dataset.en = el.textContent; el.textContent = el.dataset.zh; }
+    else { if(el.dataset.en) el.textContent = el.dataset.en; }
+  });
+  document.querySelectorAll('.langbtn').forEach(b=>b.style.fontWeight = b.dataset.l===l ? '700':'400');
+  try{ localStorage.setItem('envtoldb_lang', l); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  let l='en'; try{ l = localStorage.getItem('envtoldb_lang')||'en'; }catch(e){}
+  setLang(l);
+});
+// ---- sortable tables ----
+function sortTable(th){
+  const tb = th.closest('table').querySelector('tbody') || th.closest('table');
+  const idx = Array.from(th.parentNode.children).indexOf(th);
+  const dir = th.dataset.dir === 'asc' ? -1 : 1;
+  th.dataset.dir = dir===1 ? 'asc' : 'desc';
+  const rows = Array.from(tb.querySelectorAll('tr')).filter(r=>!r.querySelector('th'));
+  rows.sort((a,b)=>{
+    const A=a.children[idx], B=b.children[idx];
+    if(!A||!B) return 0;
+    const na=parseFloat(A.textContent.replace(/[,%]/g,'')), nb=parseFloat(B.textContent.replace(/[,%]/g,''));
+    const numA=!isNaN(na)&&A.textContent.match(/[\d.]/), numB=!isNaN(nb)&&B.textContent.match(/[\d.]/);
+    let c = (numA&&numB) ? na-nb : A.textContent.localeCompare(B.textContent);
+    return c*dir;
+  });
+  rows.forEach(r=>tb.appendChild(r));
+}
+// ---- live species filter ----
+function filterSpecies(input){
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('[data-sp-row]').forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().indexOf(q)>-1 ? '' : 'none';
+  });
+}
+</script>
+</body></html>
