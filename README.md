@@ -57,6 +57,7 @@ All four 2026 pools (cold/pH/piezo/rad) now carry AlphaFold structure backfills.
 | Source | Records | Note |
 |---|---:|---|
 | FireProtDB | 533,071 | ddG / ΔTm mutations |
+| ThermoMutDB | 8,239 | ddG / dTm (2.0, 250 proteins, [Xavier/Rodrigues NAR](http://thermomutdb.pathotrack.health)) |
 | Meltome Atlas | 206,549 | In-cell melting temperatures, 48,698 proteins × 14 organisms (Jarzab 2020) |
 | BRENDA (stability + optima) | 137,038 | T_stab / T_opt / pH optima-stability-range |
 | BRENDA (kinetics, v3) | 75,520 | Km 27,880 / IC50 15,974 / kcat 14,061 / Ki 8,988 / specific activity 8,617 |
@@ -112,6 +113,7 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 
 ## Changelog
 
+- **v3.4.1 (2026-11-23)** — ThermoMutDB 2.0 import (+8,239 ddG/dTm, 250 proteins)
 - **v3.4 (2026-11-23)** — Meltome Atlas in-cell melt temperatures (+206,549); BRENDA v3 kinetics (+75,520: Km/kcat/Ki/IC50/SA); identity layer (metal/inhibitor/oxygen, 1,320); CLEAN EC predictions (2.44M); structure backfill for all four new pools (structures 146K→234K); ProThermDB 100% SIFTS-linked; 4-dimension literature extraction (salt/arsenic/magnetotactic/oligotrophic, +1,192)
 - **v3.3 (2026-11-21)** — arsenic (7), magnetotactic (5), oligotrophic (6) pools; BRENDA→UniProt 67%
 - **v3.2 (2026-11-21)** — metal/endolithic/xerophilic pools; EN-first UI v2
