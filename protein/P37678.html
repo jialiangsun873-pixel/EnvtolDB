@@ -74,7 +74,7 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 </header>
 <main>
 <div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › P37678 — 3-keto-L-gulonate-6-phosphate decarboxyl</div>
-<div class="card"><h2>P37678 — 3-keto-L-gulonate-6-phosphate decarboxylase SgbH (KGPDC) (EC 4.1.1.85) (3-dehydro-L-gulonate-6-phosphate decarboxylase)</h2>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script><div class="card"><h2>P37678 — 3-keto-L-gulonate-6-phosphate decarboxylase SgbH (KGPDC) (EC 4.1.1.85) (3-dehydro-L-gulonate-6-phosphate decarboxylase)</h2>
 <p style="font-size:14px">length <b>220</b> aa · verified <span class="badge b-no">no</span> ·
 no structure record ·
 <b>2</b> experiment-linked records · <a href='https://www.uniprot.org/uniprotkb/P37678' target=_blank rel=noopener>UniProt</a> · <a href='https://alphafold.ebi.ac.uk/search?query=P37678' target=_blank rel=noopener>AlphaFold</a> · <a href='https://www.ncbi.nlm.nih.gov/protein/P37678' target=_blank rel=noopener>NCBI</a> · <a href='https://europepmc.org/search?query=P37678' target=_blank rel=noopener>Europe PMC</a></p>
@@ -82,6 +82,7 @@ no structure record ·
 <div class='card'><h2>Experimental records (2)</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr><tr><td>pHopt</td><td><b>7.5</b> pH</td><td style='font-size:12px'>EC 4.1.1.85 | #3,4# assay at &lt;3,5,7&gt;</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 4.1.1.85</span></td></tr><tr><td>Topt</td><td><b>25</b> °C</td><td style='font-size:12px'>EC 4.1.1.85 | #3,4# assay at &lt;3,5,7&gt;</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 4.1.1.85</span></td></tr></table></div>
 
 <div class='card'><h2>Gene (CDS coordinates)</h2><p><code>NC_000913.3</code> 3748577–3749239 (+ strand, 663 nt) · <a href='https://www.ncbi.nlm.nih.gov/nuccore/NC_000913.3?report=fasta&from=3748577&to=3749239&strand=2' target=_blank rel=noopener>CDS FASTA at NCBI</a> · gene-sequence layer collecting (IPG pipeline)</p></div>
+
 <div class='card'><h2>Sequence (220 aa)</h2><code style='font-size:11px;word-break:break-all'>MSRPLLQLALDHSSLEAAQRDVTLLKDSVDIVEAGTILCLNEGLGAVKALREQCPDKIIV<br>ADWKVADAGETLAQQAFGAGANWMTIICAAPLATVEKGHAMAQRCGGEIQIELFGNWTLD<br>DARDWHRIGVRQAIYHRGRDAQASGQQWGEADLARMKALSDIGLELSITGGITPADLPLF<br>KDIRVKAFIAGRALAGAANPAQVAGDFHAQIDAIWGGARA</code></div>
 </main>
 <footer>
@@ -121,6 +122,32 @@ function sortTable(th){
   });
   rows.forEach(r=>tb.appendChild(r));
 }
+// ---- protein table pagination (50/page) ----
+function pgProt(btn, dir){
+  const wrap = btn.closest('[data-pg-wrap]');
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  if (!rows.length) return;
+  let page = parseInt(wrap.dataset.page || '1');
+  const size = 50;
+  const maxp = Math.ceil(rows.length / size);
+  page = Math.min(maxp, Math.max(1, page + dir));
+  wrap.dataset.page = page;
+  rows.forEach((tr, i) => tr.style.display = (i >= (page-1)*size && i < page*size) ? '' : 'none');
+  wrap.querySelector('.pgstat').textContent = `page ${page} / ${maxp}  (${rows.length} proteins)`;
+}
+function pgInit(wrap){
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  rows.forEach((tr, i) => tr.style.display = i < 50 ? '' : 'none');
+  const maxp = Math.max(1, Math.ceil(rows.length / 50));
+  wrap.dataset.page = '1';
+  const st = wrap.querySelector('.pgstat');
+  if (st) st.textContent = `page 1 / ${maxp}  (${rows.length} proteins)`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-pg-wrap]').forEach(pgInit);
+});
 // ---- live species filter ----
 function filterSpecies(input){
   const q = input.value.toLowerCase();

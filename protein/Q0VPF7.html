@@ -74,14 +74,15 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 </header>
 <main>
 <div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › Q0VPF7 — Succinate--CoA ligase [ADP-forming] subu</div>
-<div class="card"><h2>Q0VPF7 — Succinate--CoA ligase [ADP-forming] subunit beta (EC 6.2.1.5) (Succinyl-CoA synthetase subunit beta) (SCS-beta)</h2>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script><div class="card"><h2>Q0VPF7 — Succinate--CoA ligase [ADP-forming] subunit beta (EC 6.2.1.5) (Succinyl-CoA synthetase subunit beta) (SCS-beta)</h2>
 <p style="font-size:14px">length <b>389</b> aa · verified <span class="badge b-no">no</span> ·
-mean pLDDT <b>95.5</b> · salt bridges/100 <b>6.68</b> ·
+<b>389</b> residues · mean pLDDT <b>95.5</b> · pLDDT≥70 <b>99%</b> · salt bridges/100 <b>6.68</b> ·
 <b>2</b> experiment-linked records · <a href='https://www.uniprot.org/uniprotkb/Q0VPF7' target=_blank rel=noopener>UniProt</a> · <a href='https://alphafold.ebi.ac.uk/search?query=Q0VPF7' target=_blank rel=noopener>AlphaFold</a> · <a href='https://www.ncbi.nlm.nih.gov/protein/Q0VPF7' target=_blank rel=noopener>NCBI</a> · <a href='https://europepmc.org/search?query=Q0VPF7' target=_blank rel=noopener>Europe PMC</a></p>
 <p class="muted">All experimental records for this protein, across sources, with per-record conditions and DOIs.</p></div>
 <div class='card'><h2>Experimental records (2)</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr><tr><td>pHopt</td><td><b>7.4</b> pH</td><td style='font-size:12px'>EC 6.2.1.5</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 6.2.1.5</span></td></tr><tr><td>Topt</td><td><b>30</b> °C</td><td style='font-size:12px'>EC 6.2.1.5</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 6.2.1.5</span></td></tr></table></div>
 
 <div class='card'><h2>Gene</h2><p class='muted'>Genome mapping in progress (NCBI IPG pipeline running; this protein has no RefSeq CDS mapping yet).</p></div>
+<div class='card'><h2>Structure (AlphaFold model)</h2><div style='height:420px'><div class='viewer_3Dmoljs' data-pdb='https://alphafold.ebi.ac.uk/files/AF-Q0VPF7-F1-model_v6.pdb' data-backgroundcolor='0xffffff' data-style='cartoon' data-select='none' data-zoomtoshowcavity='true' style='height:100%;width:100%'></div></div><p class='muted'>Interactive model requires network access to alphafold.ebi.ac.uk · <a href='https://alphafold.ebi.ac.uk/entry/Q0VPF7' target=_blank rel=noopener>AFDB entry</a> · colour-by-bfactor view available on AFDB.</p></div>
 <div class='card'><h2>Sequence (389 aa)</h2><code style='font-size:11px;word-break:break-all'>MNLHEYQSKQLFADYGLPVSTGFACDTPEEVAAKAKEIGGDKWVVKAQVHAGGRGKAGGV<br>KLVDTPEDAAAFAKKWLGKQLVTFQTDEHGQPVSKILVETCTDIAKELYLSAVLDRASRR<br>VVFMASTEGGVDIETVAEETPEKILKAEIDPLVGAQPYQAREIAFKLGLEGKQVNQFAKI<br>FVGLAKLFVDKDLALIEVNPLVITDTGDLHCLDAKINVDGSALYRHPDIKALDDPSQEDE<br>RERRAAEWDLNYVALEGNIGCMVNGAGLAMGTMDLVKLKGGAPANFLDVGGGATKERVTE<br>AFKIILSDDQVKGVLVNIFGGIVRCDLIAEGIIGAVEEVGVTVPVVVRLEGNNAELGSQK<br>LAESGMNIIAAQSFDDAAEQVVKAVGGAA</code></div>
 </main>
 <footer>
@@ -121,6 +122,32 @@ function sortTable(th){
   });
   rows.forEach(r=>tb.appendChild(r));
 }
+// ---- protein table pagination (50/page) ----
+function pgProt(btn, dir){
+  const wrap = btn.closest('[data-pg-wrap]');
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  if (!rows.length) return;
+  let page = parseInt(wrap.dataset.page || '1');
+  const size = 50;
+  const maxp = Math.ceil(rows.length / size);
+  page = Math.min(maxp, Math.max(1, page + dir));
+  wrap.dataset.page = page;
+  rows.forEach((tr, i) => tr.style.display = (i >= (page-1)*size && i < page*size) ? '' : 'none');
+  wrap.querySelector('.pgstat').textContent = `page ${page} / ${maxp}  (${rows.length} proteins)`;
+}
+function pgInit(wrap){
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  rows.forEach((tr, i) => tr.style.display = i < 50 ? '' : 'none');
+  const maxp = Math.max(1, Math.ceil(rows.length / 50));
+  wrap.dataset.page = '1';
+  const st = wrap.querySelector('.pgstat');
+  if (st) st.textContent = `page 1 / ${maxp}  (${rows.length} proteins)`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-pg-wrap]').forEach(pgInit);
+});
 // ---- live species filter ----
 function filterSpecies(input){
   const q = input.value.toLowerCase();

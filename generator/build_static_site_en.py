@@ -144,6 +144,32 @@ function sortTable(th){
   });
   rows.forEach(r=>tb.appendChild(r));
 }
+// ---- protein table pagination (50/page) ----
+function pgProt(btn, dir){
+  const wrap = btn.closest('[data-pg-wrap]');
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  if (!rows.length) return;
+  let page = parseInt(wrap.dataset.page || '1');
+  const size = 50;
+  const maxp = Math.ceil(rows.length / size);
+  page = Math.min(maxp, Math.max(1, page + dir));
+  wrap.dataset.page = page;
+  rows.forEach((tr, i) => tr.style.display = (i >= (page-1)*size && i < page*size) ? '' : 'none');
+  wrap.querySelector('.pgstat').textContent = `page ${page} / ${maxp}  (${rows.length} proteins)`;
+}
+function pgInit(wrap){
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  rows.forEach((tr, i) => tr.style.display = i < 50 ? '' : 'none');
+  const maxp = Math.max(1, Math.ceil(rows.length / 50));
+  wrap.dataset.page = '1';
+  const st = wrap.querySelector('.pgstat');
+  if (st) st.textContent = `page 1 / ${maxp}  (${rows.length} proteins)`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-pg-wrap]').forEach(pgInit);
+});
 // ---- live species filter ----
 function filterSpecies(input){
   const q = input.value.toLowerCase();
@@ -307,8 +333,8 @@ PROTEIN_PAGES = {r[0] for r in db.execute(
     "SELECT DISTINCT accession FROM experiments WHERE accession IS NOT NULL AND EXISTS (SELECT 1 FROM proteins p WHERE p.accession=experiments.accession)")}
 print(f"蛋白详情页: {len(PROTEIN_PAGES):,}", flush=True)
 acc2struct = {}
-for r in db.execute("SELECT accession, mean_plddt, salt_bridges_per_100 FROM structures"):
-    acc2struct[r["accession"]] = (r["mean_plddt"], r["salt_bridges_per_100"])
+for r in db.execute("SELECT accession, mean_plddt, salt_bridges_per_100, n_residues, frac_plddt70 FROM structures"):
+    acc2struct[r["accession"]] = (r["mean_plddt"], r["salt_bridges_per_100"], r["n_residues"], r["frac_plddt70"])
 acc2exp = defaultdict(int)
 for r in db.execute("SELECT accession, COUNT(*) c FROM experiments WHERE accession IS NOT NULL GROUP BY accession"):
     acc2exp[r["accession"]] = r["c"]
@@ -355,7 +381,7 @@ for pool, items in sp_by_pool.items():
             acc_cell = (f"<a href='../protein/{esc(p['accession'])}.html'><code>{esc(p['accession'])}</code></a>"
                         if p["accession"] in PROTEIN_PAGES else f"<code>{esc(p['accession'])}</code>")
             trs.append(f"<tr><td>{acc_cell}</td><td>{esc((p['name'] or '')[:64])}</td>"
-                       f"<td>{p['length']}</td><td>{f'{st[0]:.1f}' if st else '—'}</td>"
+                       f"<td>{p['length']}</td><td>{(f'{st[0]:.1f} · {st[1]:.2f}' if st else '—')}</td>"
                        f"<td style='font-size:12px'>{ptxt}</td><td>{v}</td></tr>")
         gz = f"downloads/fasta/{slug}.fasta.gz"
         gz_rel = ("../" + gz) if True else gz
@@ -372,9 +398,11 @@ evidence {esc(sp['evidence_level'] or '—')}
 <p><a class="btn" href="{gz_rel}" download>⬇ FASTA (.fasta.gz)</a></p></div>
 <div class="card"><h2>Proteins ({len(prots):,})</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
+<div data-pg-wrap>
 <table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
-<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
-<tbody>{''.join(trs)}</tbody></table>
+<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT · salt-bridges/100</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
+<tbody>{''.join(trs)}</tbody></table></div>
+<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div>
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>"""
         open(f"{OUT}/species/{slug}.html", "w", encoding="utf-8").write(page(sp["name"], b, "species-detail", crumb=True, subdir=True))
         count += 1
@@ -443,6 +471,16 @@ for acc in sorted(PROTEIN_PAGES):
             f"<td>{(cf or 0):.2f}</td><td style='font-size:12px'>{esc(pn[:80])}</td><td style='font-size:12px'>{esc(gn)}</td>"
             f"<td style='font-size:12px'>{esc(fn2[:120])}</td></tr>"
             for ec, cf, pn, gn, fn2 in ec_rows) + "</table></div>"
+    struct_html = ""
+    if st:
+        struct_html = (f"<div class='card'><h2>Structure (AlphaFold model)</h2>"
+                       f"<div style='height:420px'>"
+                       f"<div class='viewer_3Dmoljs' data-pdb='https://alphafold.ebi.ac.uk/files/AF-{acc}-F1-model_v6.pdb' "
+                       f"data-backgroundcolor='0xffffff' data-style='cartoon' data-select='none' data-zoomtoshowcavity='true' "
+                       f"style='height:100%;width:100%'></div></div>"
+                       f"<p class='muted'>Interactive model requires network access to alphafold.ebi.ac.uk · "
+                       f"<a href='https://alphafold.ebi.ac.uk/entry/{acc}' target=_blank rel=noopener>AFDB entry</a> · "
+                       f"colour-by-bfactor view available on AFDB.</p></div>")
     seq_html = ""
     if pseq:
         wrapped = "<br>".join(pseq[i:i+60] for i in range(0, len(pseq), 60))
@@ -461,14 +499,15 @@ for acc in sorted(PROTEIN_PAGES):
              f"<a href='{af_base}search?query={acc}' target=_blank rel=noopener>AlphaFold</a> · "
              f"<a href='https://www.ncbi.nlm.nih.gov/protein/{acc}' target=_blank rel=noopener>NCBI</a> · "
              f"<a href='https://europepmc.org/search?query={acc}' target=_blank rel=noopener>Europe PMC</a>")
-    body = f"""<div class="card"><h2>{esc(acc)} — {esc(pname or '')}</h2>
+    body = """<script src="https://3Dmol.org/build/3Dmol-min.js"></script>""" + f"""<div class="card"><h2>{esc(acc)} — {esc(pname or '')}</h2>
 <p style="font-size:14px">length <b>{plen}</b> aa · verified {V_OK if pver else '<span class="badge b-no">no</span>'} ·
-{('mean pLDDT <b>' + f"{st[0]:.1f}" + '</b> · salt bridges/100 <b>' + f"{st[1]:.2f}" + '</b>') if st else 'no structure record'} ·
+{('<b>' + f"{st[2]}" + '</b> residues · mean pLDDT <b>' + f"{st[0]:.1f}" + '</b> · pLDDT≥70 <b>' + f"{st[3]*100:.0f}" + '%</b> · salt bridges/100 <b>' + f"{st[1]:.2f}" + '</b>') if st else 'no structure record'} ·
 <b>{n_exp_all}</b> experiment-linked records · {links}</p>
 <p class="muted">All experimental records for this protein, across sources, with per-record conditions and DOIs.</p></div>
 {f"<div class='card'><h2>Experimental records ({len(exp_rows)})</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr>{erows}</table></div>" if exp_rows else "<div class='card'><h2>Experimental records</h2><p class='muted'>No measured parameters link to this protein yet.</p></div>"}
 {ec_html}
 {gene_html}
+{struct_html}
 {seq_html}"""
     open(f"{OUT}/protein/{acc}.html", "w", encoding="utf-8").write(
         page(f"{acc} — {(pname or '')[:40]}", body, "species", crumb=True, subdir=True))

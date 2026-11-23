@@ -85,9 +85,11 @@ evidence —
 <p><a class="btn" href="../downloads/fasta/Vibrio_vulnificus.fasta.gz" download>⬇ FASTA (.fasta.gz)</a></p></div>
 <div class="card"><h2>Proteins (0)</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
+<div data-pg-wrap>
 <table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
-<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
-<tbody></tbody></table>
+<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT · salt-bridges/100</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
+<tbody></tbody></table></div>
+<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div>
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>
 </main>
 <footer>
@@ -127,6 +129,32 @@ function sortTable(th){
   });
   rows.forEach(r=>tb.appendChild(r));
 }
+// ---- protein table pagination (50/page) ----
+function pgProt(btn, dir){
+  const wrap = btn.closest('[data-pg-wrap]');
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  if (!rows.length) return;
+  let page = parseInt(wrap.dataset.page || '1');
+  const size = 50;
+  const maxp = Math.ceil(rows.length / size);
+  page = Math.min(maxp, Math.max(1, page + dir));
+  wrap.dataset.page = page;
+  rows.forEach((tr, i) => tr.style.display = (i >= (page-1)*size && i < page*size) ? '' : 'none');
+  wrap.querySelector('.pgstat').textContent = `page ${page} / ${maxp}  (${rows.length} proteins)`;
+}
+function pgInit(wrap){
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  rows.forEach((tr, i) => tr.style.display = i < 50 ? '' : 'none');
+  const maxp = Math.max(1, Math.ceil(rows.length / 50));
+  wrap.dataset.page = '1';
+  const st = wrap.querySelector('.pgstat');
+  if (st) st.textContent = `page 1 / ${maxp}  (${rows.length} proteins)`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-pg-wrap]').forEach(pgInit);
+});
 // ---- live species filter ----
 function filterSpecies(input){
   const q = input.value.toLowerCase();

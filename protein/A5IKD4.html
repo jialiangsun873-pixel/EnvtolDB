@@ -74,14 +74,15 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 </header>
 <main>
 <div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › A5IKD4 — Extracellular endo-alpha-(1-&gt;5)-L-arabin</div>
-<div class="card"><h2>A5IKD4 — Extracellular endo-alpha-(1-&gt;5)-L-arabinanase (ABN) (EC 3.2.1.99) (Endo-1,5-alpha-L-arabinanase)</h2>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script><div class="card"><h2>A5IKD4 — Extracellular endo-alpha-(1-&gt;5)-L-arabinanase (ABN) (EC 3.2.1.99) (Endo-1,5-alpha-L-arabinanase)</h2>
 <p style="font-size:14px">length <b>471</b> aa · verified <span class="badge b-no">no</span> ·
-mean pLDDT <b>96.0</b> · salt bridges/100 <b>5.31</b> ·
+<b>471</b> residues · mean pLDDT <b>96.0</b> · pLDDT≥70 <b>96%</b> · salt bridges/100 <b>5.31</b> ·
 <b>5</b> experiment-linked records · <a href='https://www.uniprot.org/uniprotkb/A5IKD4' target=_blank rel=noopener>UniProt</a> · <a href='https://alphafold.ebi.ac.uk/search?query=A5IKD4' target=_blank rel=noopener>AlphaFold</a> · <a href='https://www.ncbi.nlm.nih.gov/protein/A5IKD4' target=_blank rel=noopener>NCBI</a> · <a href='https://europepmc.org/search?query=A5IKD4' target=_blank rel=noopener>Europe PMC</a></p>
 <p class="muted">All experimental records for this protein, across sources, with per-record conditions and DOIs.</p></div>
 <div class='card'><h2>Experimental records (5)</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr><tr><td>pHopt</td><td><b>6</b> pH</td><td style='font-size:12px'>EC 3.2.1.99</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 3.2.1.99</span></td></tr><tr><td>pHrange</td><td><b>4</b> pH</td><td style='font-size:12px'>EC 3.2.1.99</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 3.2.1.99</span></td></tr><tr><td>Topt</td><td><b>73</b> °C</td><td style='font-size:12px'>EC 3.2.1.99</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 3.2.1.99</span></td></tr><tr><td>Trange</td><td><b>62</b> °C</td><td style='font-size:12px'>EC 3.2.1.99</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 3.2.1.99</span></td></tr><tr><td>Tstab</td><td><b>90</b> °C</td><td style='font-size:12px'>EC 3.2.1.99 | #23# the enzyme is fully heat-stable (up to 10 h</td><td style='font-size:12px'>BRENDA<br><span style=color:#6b7a8d>EC 3.2.1.99</span></td></tr></table></div>
 
 <div class='card'><h2>Gene (CDS coordinates)</h2><p><code>NC_009486.1</code> 641028–642443 (+ strand, 1416 nt) · <a href='https://www.ncbi.nlm.nih.gov/nuccore/NC_009486.1?report=fasta&from=641028&to=642443&strand=2' target=_blank rel=noopener>CDS FASTA at NCBI</a> · gene-sequence layer collecting (IPG pipeline)</p></div>
+<div class='card'><h2>Structure (AlphaFold model)</h2><div style='height:420px'><div class='viewer_3Dmoljs' data-pdb='https://alphafold.ebi.ac.uk/files/AF-A5IKD4-F1-model_v6.pdb' data-backgroundcolor='0xffffff' data-style='cartoon' data-select='none' data-zoomtoshowcavity='true' style='height:100%;width:100%'></div></div><p class='muted'>Interactive model requires network access to alphafold.ebi.ac.uk · <a href='https://alphafold.ebi.ac.uk/entry/A5IKD4' target=_blank rel=noopener>AFDB entry</a> · colour-by-bfactor view available on AFDB.</p></div>
 <div class='card'><h2>Sequence (471 aa)</h2><code style='font-size:11px;word-break:break-all'>MRFLFLMITLTALTGYILADEQPTFRWAVVHDPSIIKVGNMYYVFGTHLQVAKSKDLMHW<br>EQINTSAHDKNPIIPNINEELKETLSWARTRNDIWAPQVIQLSDGRYYMYYCASTFGSPR<br>SAIGIAVSDDIEGPYKHYAVIVKSGQVYSVDGPSEDGTPYDSRKHPNALDPGVFYDKEGN<br>LWMVYGSWFGGIYILKLDPNTGLPLPGQGYGKRLVGGNHSSMEGPYILYSPDTDYYYLFL<br>SFGGLDYRGGYNIRVARSKNPNGPYYDPEGKSMENCMGSKTVISNYGAKLVGNFILSESN<br>TIDFKAFGYVSPGHNSAYYDPETGKYFIFFHTRFPGRGETYQLRVHQLFLNEDGWFVMAP<br>FPYGGETVSKLPNEEIVGEYQFINHGKEITDKIKQPVRIKLNSDGSITGAVEGRWERKEH<br>YITLKIIEGNTTVIYKGVLLKQWHYSEKKWVTVFTALSNQGVSVWGIRVEE</code></div>
 </main>
 <footer>
@@ -121,6 +122,32 @@ function sortTable(th){
   });
   rows.forEach(r=>tb.appendChild(r));
 }
+// ---- protein table pagination (50/page) ----
+function pgProt(btn, dir){
+  const wrap = btn.closest('[data-pg-wrap]');
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  if (!rows.length) return;
+  let page = parseInt(wrap.dataset.page || '1');
+  const size = 50;
+  const maxp = Math.ceil(rows.length / size);
+  page = Math.min(maxp, Math.max(1, page + dir));
+  wrap.dataset.page = page;
+  rows.forEach((tr, i) => tr.style.display = (i >= (page-1)*size && i < page*size) ? '' : 'none');
+  wrap.querySelector('.pgstat').textContent = `page ${page} / ${maxp}  (${rows.length} proteins)`;
+}
+function pgInit(wrap){
+  const tb = wrap.querySelector('tbody');
+  const rows = Array.from(tb.querySelectorAll('tr'));
+  rows.forEach((tr, i) => tr.style.display = i < 50 ? '' : 'none');
+  const maxp = Math.max(1, Math.ceil(rows.length / 50));
+  wrap.dataset.page = '1';
+  const st = wrap.querySelector('.pgstat');
+  if (st) st.textContent = `page 1 / ${maxp}  (${rows.length} proteins)`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-pg-wrap]').forEach(pgInit);
+});
 // ---- live species filter ----
 function filterSpecies(input){
   const q = input.value.toLowerCase();
