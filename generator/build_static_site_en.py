@@ -324,9 +324,17 @@ for r in db.execute("""SELECT accession, kind, value, unit FROM experiments
   AND (kind LIKE 'brenda_%' OR kind IN ('meltome_tm','thermomut_ddg','thermomut_dtm','ddG','dTm_protherm','Tm_vs_pH','dTm_solvent','Tm_aqueous','Tm_solvent','des_k_inact','des_t_half'))
   ORDER BY accession"""):
     short = KIND_SHORT.get(r["kind"], r["kind"])
-    if len(acc2params[r["accession"]]) < 8:
+    if len(acc2params[r["accession"]]) < 6:
         val = f"{r['value']:g}"
         acc2params[r["accession"]].append(f"{short}={val}{(' ' + r['unit']) if r['unit'] and r['kind'].startswith('brenda_t') else ''}")
+# CLEAN EC 预测: 每蛋白最多 3 个高置信 EC (实验参数之后追加, 无实验参数的蛋白以此为主显示)
+for r in db.execute("""SELECT accession, ec, confidence FROM clean_ec
+  WHERE confidence >= 0.5 ORDER BY accession, confidence DESC"""):
+    lst = acc2params[r["accession"]]
+    if len([x for x in lst if not x.startswith("EC ")]) >= 6:
+        continue
+    if len([x for x in lst if x.startswith("EC ")]) < 3:
+        lst.append(f"EC {r['ec']} ({r['confidence']:.2f})")
 
 count = 0
 for pool, items in sp_by_pool.items():
@@ -340,7 +348,7 @@ for pool, items in sp_by_pool.items():
             st = acc2struct.get(p["accession"])
             v = V_OK if p["verified"] else ""
             plist = acc2params.get(p["accession"])
-            ptxt = (" · ".join(plist) + (f" (+{acc2exp[p['accession']]-len(plist)} more)" if acc2exp[p["accession"]] > len(plist) else "")) if plist else f"<span style='color:#b6bfca'>{acc2exp.get(p['accession'], 0)}</span>"
+            ptxt = (" · ".join(plist) + (f" (+{acc2exp[p['accession']]+1-len(plist)} more exp)" if acc2exp[p["accession"]] > len([x for x in plist if not x.startswith("EC ")]) else "")) if plist else f"<span style='color:#b6bfca'>0 exp</span>"
             trs.append(f"<tr><td><code>{esc(p['accession'])}</code></td><td>{esc((p['name'] or '')[:64])}</td>"
                        f"<td>{p['length']}</td><td>{f'{st[0]:.1f}' if st else '—'}</td>"
                        f"<td style='font-size:12px'>{ptxt}</td><td>{v}</td></tr>")
