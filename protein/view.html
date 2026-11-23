@@ -87,56 +87,15 @@ fetch('../species/data/' + SP + '.json').then(r => {
   }
 
   h += '<div class="card"><h2>Structure (AlphaFold predicted model)</h2>' +
-       '<div style="height:420px"><div id="structbox" class="muted" style="height:100%;display:flex;align-items:center;justify-content:center">Loading 3D viewer…</div></div>' +
-       '<p class="muted">' + (d.st ? 'EnvTolDB structure record present (metrics above).' : 'Not yet validated in EnvTolDB — model fetched live from AlphaFold DB.') +
-       ' If the viewer stays empty, your network cannot reach alphafold.ebi.ac.uk — use the <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a>.</p></div>';
+       '<iframe src="viewer3d.html?acc=' + ACC + '" style="width:100%;height:440px;border:0" loading="lazy"></iframe>' +
+       '<p class="muted">' + (d.st ? 'EnvTolDB structure record present (metrics above).' : 'Not yet validated in EnvTolDB — model fetched live from AlphaFold DB.') + '</p></div>';
 
   if (d.s) {
     h += '<div class="card"><h2>Sequence (' + d.s.length + ' aa)</h2><code class="seq">' + wrap60(d.s) + '</code></div>';
   }
   app.innerHTML = h;
   // 3Dmol 动态初始化: 兼容新旧 API, 失败只影响结构区不影响整页
-  try {
-    const box = document.getElementById('structbox');
-    const fail = (msg) => { const b = document.getElementById('structbox');
-      if (b) b.innerHTML = '<p class="muted">3D view unavailable: ' + msg +
-      '<br>Direct sources: <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a> · ' +
-      '<a href="https://www.uniprot.org/uniprotkb/' + ACC + '" target="_blank">UniProt structure section</a></p>'; };
-    const loadScript = (u) => new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = u; s.onload = res; s.onerror = () => rej(new Error('load ' + u));
-      document.head.appendChild(s);
-    });
-    (async () => {
-      if (!window.$3Dmol) {
-        try { await loadScript('../3Dmol-min.js'); }
-        catch (e) { await loadScript('/EnvtolDB/3Dmol-min.js'); }
-      }
-      if (!window.$3Dmol) { fail('viewer library could not be loaded'); return; }
-      const SOURCES = [
-        'https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb',                                  // 自托管代理 (本地 PDB 优先/AFDB 回源)
-        'https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb'                       // AFDB 直链回退
-      ];
-      box.innerHTML = '';
-      const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
-      let si = 0;
-      const trySrc = () => {
-        if (si >= SOURCES.length) { fail('all structure sources unreachable'); return; }
-        const u = SOURCES[si++];
-        $3Dmol.download(u, viewer, { format: 'pdb' }, () => {
-          try {
-            if (!viewer.models || Object.keys(viewer.models).length === 0) { trySrc(); return; }
-            viewer.zoomTo(); viewer.render();
-          } catch (_) { try { viewer.zoomTo(); viewer.render(); } catch (_) {} }
-        });
-      };
-      trySrc();
-      setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('sources unreachable — first visit needs one-time cert accept at <a href="https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb" target="_blank">this link</a> (click through the certificate warning), or alphafold.ebi.ac.uk is unreachable'); } catch (_) {} }, 20000);
-    })().catch(e => fail(esc(e.message)));
-  } catch (e3d) {
-    const box = document.getElementById('structbox');
-    if (box) box.innerHTML = '<p class="muted">3D viewer error: ' + esc(e3d.message) + '</p>';
-  }
+
 }).catch(err => {
   document.getElementById('app').innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Failed to load data: ' + err.message + '</p></div>';
 });

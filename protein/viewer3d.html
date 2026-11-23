@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<style>body{margin:0;background:#fff;overflow:hidden}</style></head>
+<body>
+<div id="box" style="width:100%;height:420px;display:flex;align-items:center;justify-content:center">
+  <p style="color:#6b7a8d;font-family:system-ui">Loading 3D viewer…</p>
+</div>
+<script src="../3Dmol-min.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const ACC = (q.get('acc') || '').toUpperCase();
+const box = document.getElementById('box');
+const fail = (msg) => { box.innerHTML = '<p style="color:#6b7a8d;font-family:system-ui;text-align:center">3D unavailable: ' + msg +
+  '<br><a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank" style="color:#0b62c4">AFDB entry</a></p>'; };
+
+function init() {
+  if (!window.$3Dmol) { fail('viewer library failed to load'); return; }
+  box.innerHTML = '';
+  try {
+    const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
+    const SOURCES = [
+      'https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb',
+      'https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb'
+    ];
+    let si = 0;
+    const trySrc = () => {
+      if (si >= SOURCES.length) { fail('all structure sources unreachable'); return; }
+      const u = SOURCES[si++];
+      $3Dmol.download(u, viewer, { format: 'pdb' }, () => {
+        try {
+          if (!viewer.models || Object.keys(viewer.models).length === 0) { trySrc(); return; }
+          viewer.zoomTo(); viewer.render();
+        } catch (_) { try { viewer.zoomTo(); viewer.render(); } catch (_) {} }
+      });
+    };
+    trySrc();
+    setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('sources unreachable — first time? open <a href="https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb" target="_blank" style="color:#0b62c4">this proxy link</a> once and accept the certificate'); } catch (_) {} }, 20000);
+  } catch (e) { fail(e.message); }
+}
+if (window.$3Dmol) init();
+else {
+  const s = document.querySelector('script[src="../3Dmol-min.js"]');
+  if (s) { s.onload = init; s.onerror = () => fail('library load blocked'); }
+  else fail('library missing');
+}
+</script></body></html>
