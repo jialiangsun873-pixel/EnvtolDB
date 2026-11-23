@@ -309,6 +309,24 @@ for r in db.execute("SELECT accession, mean_plddt, salt_bridges_per_100 FROM str
 acc2exp = defaultdict(int)
 for r in db.execute("SELECT accession, COUNT(*) c FROM experiments WHERE accession IS NOT NULL GROUP BY accession"):
     acc2exp[r["accession"]] = r["c"]
+# 每蛋白参数摘要: kind(短名)+值, 每蛋白最多展示 8 条
+KIND_SHORT = {"brenda_ts": "Tstab", "brenda_to": "Topt", "brenda_tr": "Trange",
+              "brenda_pho": "pHopt", "brenda_phs": "pHstab", "brenda_phr": "pHrange",
+              "brenda_km": "Km", "brenda_tn": "kcat", "brenda_sa": "SpAct",
+              "brenda_ki": "Ki", "brenda_ic50": "IC50",
+              "meltome_tm": "Tm_cell", "thermomut_ddg": "ddG", "thermomut_dtm": "dTm",
+              "ddG": "ddG_fire", "dTm_protherm": "dTm_prot", "Tm_vs_pH": "Tm@pH",
+              "dTm_solvent": "dTm_solv", "Tm_aqueous": "Tm_aq", "Tm_solvent": "Tm_solv",
+              "des_k_inact": "k_inact", "des_t_half": "t½"}
+acc2params = defaultdict(list)
+for r in db.execute("""SELECT accession, kind, value, unit FROM experiments
+  WHERE accession IS NOT NULL AND value IS NOT NULL
+  AND (kind LIKE 'brenda_%' OR kind IN ('meltome_tm','thermomut_ddg','thermomut_dtm','ddG','dTm_protherm','Tm_vs_pH','dTm_solvent','Tm_aqueous','Tm_solvent','des_k_inact','des_t_half'))
+  ORDER BY accession"""):
+    short = KIND_SHORT.get(r["kind"], r["kind"])
+    if len(acc2params[r["accession"]]) < 8:
+        val = f"{r['value']:g}"
+        acc2params[r["accession"]].append(f"{short}={val}{(' ' + r['unit']) if r['unit'] and r['kind'].startswith('brenda_t') else ''}")
 
 count = 0
 for pool, items in sp_by_pool.items():
@@ -321,9 +339,11 @@ for pool, items in sp_by_pool.items():
         for p in prots:
             st = acc2struct.get(p["accession"])
             v = V_OK if p["verified"] else ""
+            plist = acc2params.get(p["accession"])
+            ptxt = (" · ".join(plist) + (f" (+{acc2exp[p['accession']]-len(plist)} more)" if acc2exp[p["accession"]] > len(plist) else "")) if plist else f"<span style='color:#b6bfca'>{acc2exp.get(p['accession'], 0)}</span>"
             trs.append(f"<tr><td><code>{esc(p['accession'])}</code></td><td>{esc((p['name'] or '')[:64])}</td>"
                        f"<td>{p['length']}</td><td>{f'{st[0]:.1f}' if st else '—'}</td>"
-                       f"<td>{acc2exp.get(p['accession'], 0)}</td><td>{v}</td></tr>")
+                       f"<td style='font-size:12px'>{ptxt}</td><td>{v}</td></tr>")
         gz = f"downloads/fasta/{slug}.fasta.gz"
         gz_rel = ("../" + gz) if True else gz
         lit = ANCH_OK if sp["lit_anchored"] else ANCH_NO
@@ -340,7 +360,7 @@ evidence {esc(sp['evidence_level'] or '—')}
 <div class="card"><h2>Proteins ({len(prots):,})</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
 <table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
-<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experiments</th><th onclick="sortTable(this)">Verified</th></tr></thead>
+<th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
 <tbody>{''.join(trs)}</tbody></table>
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>"""
         open(f"{OUT}/species/{slug}.html", "w", encoding="utf-8").write(page(sp["name"], b, "species-detail", crumb=True, subdir=True))
