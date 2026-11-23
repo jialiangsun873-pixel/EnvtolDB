@@ -97,9 +97,22 @@ fetch('../species/data/' + SP + '.json').then(r => {
     h += '<div class="card"><h2>Sequence (' + d.s.length + ' aa)</h2><code class="seq">' + wrap60(d.s) + '</code></div>';
   }
   app.innerHTML = h;
-  if (window.$3Dmol) $3Dmol.autoInit();
+  // 3Dmol 动态初始化: 兼容新旧 API, 失败只影响结构区不影响整页
+  try {
+    const el = document.querySelector('.viewer_3Dmoljs');
+    if (el && window.$3Dmol) {
+      if (typeof $3Dmol.autoInit === 'function') { $3Dmol.autoInit(); }
+      else {
+        const viewer = $3Dmol.createViewer(el, { backgroundColor: 'white' });
+        if (viewer) $3Dmol.download('https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb', viewer, { format: 'pdb' });
+      }
+    }
+  } catch (e3d) {
+    const vd = document.querySelector('.viewer_3Dmoljs');
+    if (vd) vd.innerHTML = '<p class="muted">3D viewer unavailable — open the AFDB entry link above to view the model.</p>';
+  }
 }).catch(err => {
-  document.getElementById('app').innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Failed to load: ' + err.message + '</p></div>';
+  document.getElementById('app').innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Failed to load data: ' + err.message + '</p></div>';
 });
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
