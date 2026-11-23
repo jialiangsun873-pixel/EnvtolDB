@@ -21,7 +21,7 @@ a{color:#0b62c4}
 </style></head><body>
 <div class="pgwrap"><a href="../index.html">← EnvTolDB</a> · <a id="bk" href="#">back to species</a></div>
 <div id="app" class="wrap"><p class="muted">Loading protein data…</p></div>
-<script src="./3Dmol-min.js"></script>
+
 <script>
 const q = new URLSearchParams(location.search);
 const ACC = q.get('acc') || '';
@@ -98,17 +98,27 @@ fetch('../species/data/' + SP + '.json').then(r => {
   // 3Dmol 动态初始化: 兼容新旧 API, 失败只影响结构区不影响整页
   try {
     const box = document.getElementById('structbox');
-    const fail = (msg) => { box.innerHTML = '<p class="muted">3D view unavailable: ' + msg +
+    const fail = (msg) => { const b = document.getElementById('structbox');
+      if (b) b.innerHTML = '<p class="muted">3D view unavailable: ' + msg +
       '<br>Direct sources: <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a> · ' +
       '<a href="https://www.uniprot.org/uniprotkb/' + ACC + '" target="_blank">UniProt structure section</a></p>'; };
-    if (!window.$3Dmol) { fail('viewer library blocked by network'); }
-    else {
+    const loadScript = (u) => new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = u; s.onload = res; s.onerror = () => rej(new Error('load ' + u));
+      document.head.appendChild(s);
+    });
+    (async () => {
+      if (!window.$3Dmol) {
+        try { await loadScript('../3Dmol-min.js'); }
+        catch (e) { await loadScript('/EnvtolDB/3Dmol-min.js'); }
+      }
+      if (!window.$3Dmol) { fail('viewer library could not be loaded'); return; }
       box.innerHTML = '';
       const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
       $3Dmol.download('https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb', viewer, { format: 'pdb' },
-        () => { viewer.zoomTo(); viewer.render(); });
-      setTimeout(() => { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('model PDB could not be fetched (network/404)'); }, 12000);
-    }
+        () => { try { viewer.zoomTo(); viewer.render(); } catch (_) {} });
+      setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('model PDB could not be fetched (network/404)'); } catch (_) {} }, 15000);
+    })().catch(e => fail(esc(e.message)));
   } catch (e3d) {
     const box = document.getElementById('structbox');
     if (box) box.innerHTML = '<p class="muted">3D viewer error: ' + esc(e3d.message) + '</p>';
