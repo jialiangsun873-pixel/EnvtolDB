@@ -52,7 +52,7 @@ fetch('../species/data/' + SP + '.json').then(r => {
   else h += ' · <span class="muted">no structure record</span>';
   h += ' · <b>' + d.ex.length + '</b> experimental records</p>';
   h += '<p class="muted">links: <a href="https://www.uniprot.org/uniprotkb/' + ACC + '" target="_blank">UniProt</a> · ' +
-       '<a href="https://alphafold.ebi.ac.uk/search?query=' + ACC + '" target="_blank">AlphaFold</a> · ' +
+       '<a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AlphaFold</a> · ' +
        '<a href="https://www.ncbi.nlm.nih.gov/protein/' + ACC + '" target="_blank">NCBI</a> · ' +
        '<a href="https://europepmc.org/search?query=' + ACC + '" target="_blank">Europe PMC</a></p></div>';
 
