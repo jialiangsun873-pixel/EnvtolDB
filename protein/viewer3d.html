@@ -29,8 +29,9 @@ function init() {
       $3Dmol.download(u, viewer, { format: 'pdb' }, () => {
         try {
           if (!viewer.models || Object.keys(viewer.models).length === 0) { trySrc(); return; }
+          viewer.setStyle({}, { cartoon: { color: 'spectrum' }, stick: { radius: 0.15, hidden: false } });
           viewer.zoomTo(); viewer.render();
-        } catch (_) { try { viewer.zoomTo(); viewer.render(); } catch (_) {} }
+        } catch (_) { try { viewer.setStyle({}, { cartoon: { color: 'spectrum' } }); viewer.zoomTo(); viewer.render(); } catch (_) {} }
       });
     };
     trySrc();
