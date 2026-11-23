@@ -175,7 +175,7 @@ def page(title, body, active="", crumb="", subdir=False):
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)} · EnvTolDB</title>
-<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 231 organisms, 668,888 UniProt proteins, 539,708 experimental measurements.">
+<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 301 organisms, 892,811 UniProt proteins, 973,185 experimental measurements, 2.44M EC annotations.">
 <style>{CSS}</style></head><body>
 <header>
   <a class="brand" href="{pre}index.html">{LOGO}<span>EnvTolDB<small>Environment-Tolerant Proteome Database</small></span></a>
@@ -380,7 +380,22 @@ kinds = db.execute("""SELECT kind, COUNT(*), SUM(CASE WHEN accession IS NOT NULL
                       ROUND(AVG(value),1) FROM experiments GROUP BY kind ORDER BY 2 DESC""").fetchall()
 KIND_EN = {"ddG": "ΔΔG of folding (kcal/mol)", "dTm_protherm": "ΔTm of single-site mutations (°C)",
            "Tm_vs_pH": "Tm at varying pH (°C)", "dTm_solvent": "solvent-induced ΔTm (°C)",
-           "Tm_aqueous": "absolute Tm, aqueous control (°C)", "Tm_solvent": "absolute Tm in solvent (°C)"}
+           "Tm_aqueous": "absolute Tm, aqueous control (°C)", "Tm_solvent": "absolute Tm in solvent (°C)",
+           "meltome_tm": "in-cell melting temperature (°C, TPP)",
+           "brenda_ts": "T_stability (°C)", "brenda_to": "T_optimum (°C)", "brenda_tr": "T_range (°C)",
+           "brenda_pho": "pH_optimum", "brenda_phs": "pH_stability", "brenda_phr": "pH_range",
+           "brenda_km": "Km, Michaelis constant (µM/mM)",
+           "brenda_tn": "kcat turnover number (s⁻¹)",
+           "brenda_sa": "specific activity (U/mg)",
+           "brenda_ki": "Ki inhibition constant (µM/mM)",
+           "brenda_ic50": "IC50 inhibitor concentration (µM/mM)",
+           "thermomut_ddg": "ΔΔG of mutation (kcal/mol, ThermoMutDB)",
+           "thermomut_dtm": "ΔTm of mutation (°C, ThermoMutDB)",
+           "salt_tab_tab": "salt stability table value", "arsenic_tab_tab": "arsenic stability table value",
+           "magnetotactic_tab_tab": "magnetotactic stability table value",
+           "oligotrophic_tab_tab": "oligotrophic stability table value",
+           "des_k_inact": "k_inact in DES (DES literature)",
+           "des_t_half": "t½ in DES (min, DES literature)"}
 krows = "".join(f"<tr><td><span class='badge'>{esc(r[0])}</span> {KIND_EN.get(r[0],'')}</td>"
                 f"<td>{r[1]:,}</td><td>{r[2] or 0:,}</td><td>{r[3]}</td>"
                 f"<td>{esc(KIND_EN.get(r[0], ''))}</td></tr>" for r in kinds)
@@ -390,8 +405,8 @@ b = f"""<div class="note">Experimental layer: {stats_all if False else totals['e
 unlinked rows retain the source wild-type hash for provenance.</div>
 <div class="card"><h2>By kind</h2><table><tr><th>kind</th><th>records</th><th>linked</th><th>mean value</th></tr>{krows}</table>
 <p class="muted">Full per-record browsing: download the SQLite database. Layer totals:
-533,071 (FireProtDB) + 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,839 (OrganiZymeDB) + 164 (DES literature)
-= 539,708.</p></div>
+533,071 (FireProtDB) + 206,549 (Meltome Atlas) + 212,538 (BRENDA stability + kinetics) + 8,239 (ThermoMutDB)
++ 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,833 (OrganiZymeDB) + 5,967 (literature table mining) + 164 (DES) ≈ 973,000.</p></div>
 <div class="card"><h2>Deep-eutectic-solvent (DES) subset</h2>
 <p style="font-size:13.5px">{des_n} records from 3 dehydrogenases (ADH-A, Lk-ADH, GDH) across 11 ChCl/betaine-based
 DES systems (water 10–50 wt %, 30 °C incubation): <code>des_k_inact</code> (82) and <code>des_t_half</code> (82).
