@@ -34,7 +34,7 @@ POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphi
 POOL_ZH = {"thermo": "嗜热", "salt": "耐盐", "ph": "耐酸碱", "solvent": "耐溶剂", "meso": "中温对照", "cold": "嗜冷", "piezo": "嗜压", "rad": "耐辐射", "metal": "耐重金属", "endolithic": "石内内生", "xerophilic": "耐干燥",
            "arsenic": "耐砷", "magnetotactic": "趋磁", "oligotrophic": "耐贫营养"}
 
-for sub in ("species", "protein", "downloads/fasta", "downloads/tsv", ".github/workflows"):
+for sub in ("species", "species/data", "protein", "downloads/fasta", "downloads/tsv", ".github/workflows"):
     os.makedirs(os.path.join(OUT, sub), exist_ok=True)
 open(f"{OUT}/.nojekyll", "w").close()
 
@@ -329,9 +329,15 @@ for pool in POOLS:
 print("pool pages ✓", flush=True)
 
 # ================= per-species pages =================
-PROTEIN_PAGES = {r[0] for r in db.execute(
-    "SELECT DISTINCT accession FROM experiments WHERE accession IS NOT NULL AND EXISTS (SELECT 1 FROM proteins p WHERE p.accession=experiments.accession)")}
-print(f"蛋白详情页: {len(PROTEIN_PAGES):,}", flush=True)
+ipg = {}
+try:
+    for line in open("/public/home/sjl2/datasetdb/gene_seqs/ipg_map.tsv"):
+        p_ = line.rstrip("\n").split("\t")
+        if len(p_) >= 5 and p_[1] != "MISS" and p_[0] not in ipg:
+            ipg[p_[0]] = (p_[1], p_[2], p_[3], p_[4])
+except FileNotFoundError:
+    pass
+print(f"IPG 坐标可用: {len(ipg):,}", flush=True)
 acc2struct = {}
 for r in db.execute("SELECT accession, mean_plddt, salt_bridges_per_100, n_residues, frac_plddt70 FROM structures"):
     acc2struct[r["accession"]] = (r["mean_plddt"], r["salt_bridges_per_100"], r["n_residues"], r["frac_plddt70"])
@@ -366,11 +372,30 @@ for r in db.execute("""SELECT accession, ec, confidence FROM clean_ec
         lst.append(f"EC {r['ec']} ({r['confidence']:.2f})")
 
 count = 0
+import json as _json
 for pool, items in sp_by_pool.items():
     for sp in items:
         slug = slugify(sp["name"])
         prots = db.execute("SELECT accession, name, length, verified FROM proteins WHERE species_id=? ORDER BY length DESC",
                            (sp["id"],)).fetchall()
+        # ── 全蛋白 JSON (供蛋白详情模板页) ──
+        data = {}
+        for p in prots:
+            acc = p["accession"]
+            st = acc2struct.get(acc)
+            data[acc] = {
+                "n": p["name"] or "", "l": p["length"], "v": p["verified"],
+                "s": db.execute("SELECT sequence FROM proteins WHERE accession=?", (acc,)).fetchone()[0],
+                "st": ({"pl": st[0], "sb": st[1], "nr": st[2], "f70": st[3]} if st else None),
+                "ec": [ [r[0], round(r[1] or 0, 2), r[2] or "", r[3] or ""] for r in db.execute(
+                    "SELECT ec, confidence, protein_name, gene_name FROM clean_ec WHERE accession=? ORDER BY confidence DESC", (acc,)) ],
+                "ex": [ [r[0], r[1], r[2] or "", (r[3] or "")[:200], r[4] or "", (r[5] or "")[:90]] for r in db.execute(
+                    "SELECT kind, value, unit, condition, source, source_ref FROM experiments WHERE accession=? AND value IS NOT NULL", (acc,)) ],
+                "ipg": ipg.get(acc),
+            }
+        os.makedirs(f"{OUT}/species/data", exist_ok=True)
+        with open(f"{OUT}/species/data/{slug}.json", "w", encoding="utf-8") as f:
+            _json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
         n_exp = sum(acc2exp.get(p["accession"], 0) for p in prots)
         trs = []
         for p in prots:
@@ -378,8 +403,7 @@ for pool, items in sp_by_pool.items():
             v = V_OK if p["verified"] else ""
             plist = acc2params.get(p["accession"])
             ptxt = (" · ".join(plist) + (f" (+{acc2exp[p['accession']]+1-len(plist)} more exp)" if acc2exp[p["accession"]] > len([x for x in plist if not x.startswith("EC ")]) else "")) if plist else f"<span style='color:#b6bfca'>0 exp</span>"
-            acc_cell = (f"<a href='../protein/{esc(p['accession'])}.html'><code>{esc(p['accession'])}</code></a>"
-                        if p["accession"] in PROTEIN_PAGES else f"<code>{esc(p['accession'])}</code>")
+            acc_cell = f"<a href='../protein/view.html?acc={esc(p['accession'])}&amp;sp={slug}'><code>{esc(p['accession'])}</code></a>"
             trs.append(f"<tr><td>{acc_cell}</td><td>{esc((p['name'] or '')[:64])}</td>"
                        f"<td>{p['length']}</td><td>{(f'{st[0]:.1f} · {st[1]:.2f}' if st else '—')}</td>"
                        f"<td style='font-size:12px'>{ptxt}</td><td>{v}</td></tr>")
@@ -433,85 +457,6 @@ each record; download the SQLite database for the full table.</div>
 <tbody>{srows}</tbody></table>
 <p class="muted">Alcohol series shows the classic chain-length effect (methanol −9 → ethanol −10 → isopropanol −14 →
 tert-butanol −23 °C); DMSO and polyols are mildest. Consistent with the logP correlation (Spearman ρ = −0.502) reported in the manuscript.</p></div>"""
-# ================= protein detail pages =================
-import time as _time
-_t0p = _time.time()
-ipg = {}
-try:
-    for line in open("/public/home/sjl2/datasetdb/gene_seqs/ipg_map.tsv"):
-        p_ = line.rstrip("\n").split("\t")
-        if len(p_) >= 5 and p_[1] != "MISS" and p_[0] not in ipg:
-            ipg[p_[0]] = (p_[1], p_[2], p_[3], p_[4])
-except FileNotFoundError:
-    pass
-print(f"IPG 坐标可用: {len(ipg):,}", flush=True)
-
-uni_base = "https://www.uniprot.org/uniprotkb/"
-af_base = "https://alphafold.ebi.ac.uk/"
-for acc in sorted(PROTEIN_PAGES):
-    prow = db.execute("SELECT name, length, sequence, verified FROM proteins WHERE accession=?", (acc,)).fetchone()
-    if not prow:
-        continue
-    pname, plen, pseq, pver = prow
-    exp_rows = db.execute("""SELECT kind, value, unit, condition, source, source_ref, evidence
-        FROM experiments WHERE accession=? AND value IS NOT NULL ORDER BY kind""", (acc,)).fetchall()
-    ec_rows = db.execute("""SELECT ec, confidence, protein_name, gene_name, enzyme_function FROM clean_ec
-        WHERE accession=? ORDER BY confidence DESC""", (acc,)).fetchall()
-    st = acc2struct.get(acc)
-    n_exp_all = acc2exp.get(acc, 0)
-    erows = "".join(
-        f"<tr><td>{esc(KIND_SHORT.get(k, k))}</td><td><b>{val:g}</b> {esc(u or '')}</td>"
-        f"<td style='font-size:12px'>{esc(c[:160] if c else '')}</td>"
-        f"<td style='font-size:12px'>{esc(src2)}{('<br><span style=color:#6b7a8d>' + esc(ref[:70]) + '</span>') if ref else ''}</td></tr>"
-        for k, val, u, c, src2, ref, ev in exp_rows)
-    ec_html = ""
-    if ec_rows:
-        ec_html = "<div class='card'><h2>CLEAN predicted EC functions</h2><table><tr><th>EC</th><th>confidence</th><th>protein</th><th>gene</th><th>function</th></tr>" + "".join(
-            f"<tr><td><a href='https://www.rhea-db.org/searchresults?query={ec}' target=_blank rel=noopener><code>{ec}</code></a></td>"
-            f"<td>{(cf or 0):.2f}</td><td style='font-size:12px'>{esc(pn[:80])}</td><td style='font-size:12px'>{esc(gn)}</td>"
-            f"<td style='font-size:12px'>{esc(fn2[:120])}</td></tr>"
-            for ec, cf, pn, gn, fn2 in ec_rows) + "</table></div>"
-    struct_html = ""
-    if st:
-        struct_html = (f"<div class='card'><h2>Structure (AlphaFold model)</h2>"
-                       f"<div style='height:420px'>"
-                       f"<div class='viewer_3Dmoljs' data-pdb='https://alphafold.ebi.ac.uk/files/AF-{acc}-F1-model_v6.pdb' "
-                       f"data-backgroundcolor='0xffffff' data-style='cartoon' data-select='none' data-zoomtoshowcavity='true' "
-                       f"style='height:100%;width:100%'></div></div>"
-                       f"<p class='muted'>Interactive model requires network access to alphafold.ebi.ac.uk · "
-                       f"<a href='https://alphafold.ebi.ac.uk/entry/{acc}' target=_blank rel=noopener>AFDB entry</a> · "
-                       f"colour-by-bfactor view available on AFDB.</p></div>")
-    seq_html = ""
-    if pseq:
-        wrapped = "<br>".join(pseq[i:i+60] for i in range(0, len(pseq), 60))
-        seq_html = f"<div class='card'><h2>Sequence ({len(pseq)} aa)</h2><code style='font-size:11px;word-break:break-all'>{wrapped}</code></div>"
-    gene_html = ""
-    if acc in ipg:
-        nt, s0, s1, strand = ipg[acc]
-        gene_html = (f"<div class='card'><h2>Gene (CDS coordinates)</h2>"
-                     f"<p><code>{nt}</code> {s0}–{s1} ({'+' if strand=='+' else '−'} strand, {int(s1)-int(s0)+1 if s0 and s1 else '?'} nt) · "
-                     f"<a href='https://www.ncbi.nlm.nih.gov/nuccore/{nt}?report=fasta&from={s0}&to={s1}&strand=2' target=_blank rel=noopener>CDS FASTA at NCBI</a> · "
-                     f"gene-sequence layer collecting (IPG pipeline)</p></div>")
-    else:
-        gene_html = ("<div class='card'><h2>Gene</h2><p class='muted'>Genome mapping in progress "
-                     "(NCBI IPG pipeline running; this protein has no RefSeq CDS mapping yet).</p></div>")
-    links = (f"<a href='{uni_base}{acc}' target=_blank rel=noopener>UniProt</a> · "
-             f"<a href='{af_base}search?query={acc}' target=_blank rel=noopener>AlphaFold</a> · "
-             f"<a href='https://www.ncbi.nlm.nih.gov/protein/{acc}' target=_blank rel=noopener>NCBI</a> · "
-             f"<a href='https://europepmc.org/search?query={acc}' target=_blank rel=noopener>Europe PMC</a>")
-    body = """<script src="https://3Dmol.org/build/3Dmol-min.js"></script>""" + f"""<div class="card"><h2>{esc(acc)} — {esc(pname or '')}</h2>
-<p style="font-size:14px">length <b>{plen}</b> aa · verified {V_OK if pver else '<span class="badge b-no">no</span>'} ·
-{('<b>' + f"{st[2]}" + '</b> residues · mean pLDDT <b>' + f"{st[0]:.1f}" + '</b> · pLDDT≥70 <b>' + f"{st[3]*100:.0f}" + '%</b> · salt bridges/100 <b>' + f"{st[1]:.2f}" + '</b>') if st else 'no structure record'} ·
-<b>{n_exp_all}</b> experiment-linked records · {links}</p>
-<p class="muted">All experimental records for this protein, across sources, with per-record conditions and DOIs.</p></div>
-{f"<div class='card'><h2>Experimental records ({len(exp_rows)})</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr>{erows}</table></div>" if exp_rows else "<div class='card'><h2>Experimental records</h2><p class='muted'>No measured parameters link to this protein yet.</p></div>"}
-{ec_html}
-{gene_html}
-{struct_html}
-{seq_html}"""
-    open(f"{OUT}/protein/{acc}.html", "w", encoding="utf-8").write(
-        page(f"{acc} — {(pname or '')[:40]}", body, "species", crumb=True, subdir=True))
-
 open(f"{OUT}/solvents.html", "w", encoding="utf-8").write(page("Solvents", b, "solvents"))
 print("solvents ✓", flush=True)
 

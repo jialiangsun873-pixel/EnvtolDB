@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protein · EnvTolDB</title>
+
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#f7f9fb;color:#17222e}
+.wrap{max-width:960px;margin:0 auto;padding:24px 18px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:14px 0}
+h1{font-size:22px;margin:6px 0}h2{font-size:17px;margin:8px 0}
+code{background:#eef3f9;padding:1px 5px;border-radius:5px;font-size:13px;word-break:break-all}
+table{border-collapse:collapse;width:100%}
+td,th{border-bottom:1px solid #e8eef4;padding:6px 8px;text-align:left;font-size:13.5px;vertical-align:top}
+.muted{color:#6b7a8d;font-size:13px}
+.seq{font-family:ui-monospace,monospace;font-size:11px;line-height:1.7;word-break:break-all}
+a{color:#0b62c4}
+.badge{background:#e7f0fb;color:#0b62c4;border-radius:6px;padding:1px 7px;font-size:12px}
+#app{min-height:200px}
+.pgwrap{max-width:960px;margin:0 auto;padding:14px 18px}
+.pgwrap a{color:#0b62c4;text-decoration:none}
+</style></head><body>
+<div class="pgwrap"><a href="../index.html">← EnvTolDB</a> · <a id="bk" href="#">back to species</a></div>
+<div id="app" class="wrap"><p class="muted">Loading protein data…</p></div>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const ACC = q.get('acc') || '';
+const SP  = q.get('sp') || '';
+const KIND_LABEL = {brenda_ts:'T_stability (°C)', brenda_to:'T_optimum (°C)', brenda_tr:'T_range (°C)',
+ brenda_pho:'pH_optimum', brenda_phs:'pH_stability', brenda_phr:'pH_range',
+ brenda_km:'Km (µM/mM)', brenda_tn:'kcat (s⁻¹)', brenda_sa:'specific activity (U/mg)',
+ brenda_ki:'Ki (µM/mM)', brenda_ic50:'IC50 (µM/mM)', meltome_tm:'in-cell Tm (°C, TPP)',
+ thermomut_ddg:'ΔΔG (kcal/mol)', thermomut_dtm:'ΔTm (°C)', ddG:'ddG (FireProtDB)',
+ dTm_protherm:'ΔTm (ProTherm)', Tm_vs_pH:'Tm@pH (°C)', dTm_solvent:'ΔTm solvent (°C)',
+ Tm_aqueous:'Tm aqueous (°C)', Tm_solvent:'Tm solvent (°C)', des_k_inact:'k_inact DES', des_t_half:'t½ DES (min)'};
+
+document.getElementById('bk').href = '../species/' + SP + '.html';
+
+fetch('../species/data/' + SP + '.json').then(r => {
+  if (!r.ok) throw new Error('data not found');
+  return r.json();
+}).then(data => {
+  const d = data[ACC];
+  const app = document.getElementById('app');
+  if (!d) { app.innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Protein not found in this species dataset.</p></div>'; return; }
+  document.title = ACC + ' — ' + (d.n.slice(0,60) || 'Protein') + ' · EnvTolDB';
+  let h = '<div class="card"><h1>' + ACC + ' — ' + esc(d.n) + '</h1>';
+  h += '<p style="font-size:14px">length <b>' + d.l + '</b> aa · verified ' +
+       (d.v ? '<span class="badge">yes</span>' : '<span class="badge" style="background:#f3e8e8;color:#a33">no</span>');
+  if (d.st) h += ' · <b>' + d.st.nr + '</b> residues · mean pLDDT <b>' + d.st.pl.toFixed(1) +
+                 '</b> · pLDDT≥70 <b>' + Math.round(d.st.f70*100) + '%</b> · salt bridges/100 <b>' + d.st.sb.toFixed(2) + '</b>';
+  else h += ' · <span class="muted">no structure record</span>';
+  h += ' · <b>' + d.ex.length + '</b> experimental records</p>';
+  h += '<p class="muted">links: <a href="https://www.uniprot.org/uniprotkb/' + ACC + '" target="_blank">UniProt</a> · ' +
+       '<a href="https://alphafold.ebi.ac.uk/search?query=' + ACC + '" target="_blank">AlphaFold</a> · ' +
+       '<a href="https://www.ncbi.nlm.nih.gov/protein/' + ACC + '" target="_blank">NCBI</a> · ' +
+       '<a href="https://europepmc.org/search?query=' + ACC + '" target="_blank">Europe PMC</a></p></div>';
+
+  if (d.ex.length) {
+    h += '<div class="card"><h2>Experimental records (' + d.ex.length + ')</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr>';
+    for (const e of d.ex) {
+      h += '<tr><td>' + esc(KIND_LABEL[e[0]] || e[0]) + '</td><td><b>' + fmt(e[1]) + '</b> ' + esc(e[2]) +
+           '</td><td style="font-size:12px">' + esc(e[3]) + '</td><td style="font-size:12px">' + esc(e[4]) +
+           (e[5] ? '<br><span class="muted">' + esc(e[5]) + '</span>' : '') + '</td></tr>';
+    }
+    h += '</table></div>';
+  } else {
+    h += '<div class="card"><h2>Experimental records</h2><p class="muted">No measured parameters link to this protein yet.</p></div>';
+  }
+
+  if (d.ec && d.ec.length) {
+    h += '<div class="card"><h2>CLEAN predicted EC functions (' + d.ec.length + ')</h2><table><tr><th>EC</th><th>conf.</th><th>protein</th><th>gene</th></tr>';
+    for (const e of d.ec.slice(0, 25)) {
+      h += '<tr><td><a href="https://www.rhea-db.org/searchresults?query=' + e[0] + '" target="_blank"><code>' + e[0] + '</code></a></td><td>' + e[1].toFixed(2) + '</td><td style="font-size:12px">' + esc(e[2]) + '</td><td style="font-size:12px">' + esc(e[3]) + '</td></tr>';
+    }
+    if (d.ec.length > 25) h += '<tr><td colspan=4 class="muted">… ' + (d.ec.length-25) + ' more</td></tr>';
+    h += '</table></div>';
+  }
+
+  if (d.ipg) {
+    h += '<div class="card"><h2>Gene (CDS coordinates)</h2><p><code>' + d.ipg[0] + '</code> ' + d.ipg[1] + '–' + d.ipg[2] +
+         ' (' + (d.ipg[3] === '+' ? '+' : '−') + ' strand) · <a href="https://www.ncbi.nlm.nih.gov/nuccore/' + d.ipg[0] +
+         '?report=fasta&from=' + d.ipg[1] + '&to=' + d.ipg[2] + '&strand=2" target="_blank">CDS FASTA at NCBI</a> · ' +
+         '<span class="muted">gene-sequence layer collecting (IPG pipeline)</span></p></div>';
+  } else {
+    h += '<div class="card"><h2>Gene</h2><p class="muted">Genome mapping in progress (NCBI IPG pipeline; no RefSeq CDS mapping for this protein yet).</p></div>';
+  }
+
+  if (d.st) {
+    h += '<div class="card"><h2>Structure (AlphaFold model)</h2><div style="height:420px">' +
+         '<div class="viewer_3Dmoljs" data-pdb="https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb" ' +
+         'data-backgroundcolor="0xffffff" data-style="cartoon" style="height:100%;width:100%"></div></div>' +
+         '<p class="muted">Interactive model needs access to alphafold.ebi.ac.uk · <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a></p></div>';
+  }
+
+  if (d.s) {
+    h += '<div class="card"><h2>Sequence (' + d.s.length + ' aa)</h2><code class="seq">' + wrap60(d.s) + '</code></div>';
+  }
+  app.innerHTML = h;
+  if (window.$3Dmol) $3Dmol.autoInit();
+}).catch(err => {
+  document.getElementById('app').innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Failed to load: ' + err.message + '</p></div>';
+});
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(v){ return typeof v === 'number' ? +v.toFixed(4) : v; }
+function wrap60(s){ let o=[]; for (let i=0;i<s.length;i+=60) o.push(s.slice(i,i+60)); return o.join('<br>'); }
+</script></body></html>
