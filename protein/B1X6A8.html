@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B1X6A8 — Mannosyl-3-phosphoglycerate phosphatase  · EnvTolDB</title>
+<meta name="description" content="EnvTolDB — environment-tolerant proteome database: 301 organisms, 892,811 UniProt proteins, 973,185 experimental measurements, 2.44M EC annotations.">
+<style>
+:root{--ink:#13233b;--soft:#43597a;--faint:#7285a0;--line:#d9e4f0;--bg:#f5f8fc;--card:#fff;
+ --accent:#1668dc;--accent-ink:#0d4bb5;--ok:#17805f;--ok-bg:#e4f4ee;--no:#c4424f;--no-bg:#fdeef0;
+ --radius:8px;--shadow:0 1px 3px rgba(15,40,80,.08)}
+*{box-sizing:border-box}
+body{font-family:Inter,-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--ink)}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:-2px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{padding:5px 11px;border-radius:6px;color:var(--soft);font-size:13.5px}
+nav a:hover{background:#eef3f9;color:var(--ink);text-decoration:none}
+nav a.on{background:#e7f0fb;color:var(--accent-ink);font-weight:600}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.langbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--soft)}
+.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+.gh:hover{color:var(--ink)}
+main{max-width:1140px;margin:0 auto;padding:26px 18px 70px}
+.hero{background:linear-gradient(180deg,#eef4fb,#f8fbff);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 26px;margin-bottom:22px}
+.hero h1{font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
+.hero .tag{font-size:15px;color:var(--soft);margin-bottom:16px}
+.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.rel{background:var(--accent);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600}
+.rel2{background:#fff;border:1px solid var(--line);color:var(--soft);font-size:12px;padding:3px 10px;border-radius:12px}
+.srch{display:flex;gap:8px;max-width:560px}
+.srch input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid #b9cbe2;border-radius:8px}
+.srch input:focus{outline:2px solid #9cc3e5;border-color:var(--accent)}
+.srch button{padding:10px 20px;font-size:14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+.hint{font-size:12px;color:var(--faint);margin-top:6px}
+.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:150px}
+.chip b{font-size:21px;display:block}
+.chip span{font-size:11.5px;color:var(--faint)}
+h2.sec{font-size:19px;margin:26px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.pcard b{font-size:15px}.pcard .n{font-size:24px;font-weight:700;display:block;margin:2px 0}
+.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+th{background:#eef3f9;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#e2ecf6}
+td{padding:6px 10px;border-bottom:1px solid #ecf2f8}
+tr:hover td{background:#f4f8fd}
+.badge{display:inline-block;padding:1px 9px;border-radius:11px;font-size:11.5px;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
+.b-grade{background:#e7f0fb;color:var(--accent-ink)}
+.bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle}
+.bar-neg{background:#e58a93}.bar-pos{background:#7bbf9e}
+.muted{color:var(--faint);font-size:12.5px}
+.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:9px 14px;border-radius:6px;margin-bottom:16px;font-size:13.5px}
+.err{background:#fdeef0;border:1px solid #f3c6cb;color:#c4424f;padding:8px 14px;border-radius:6px;margin-bottom:14px;font-size:13px}
+code{font-family:ui-monospace,'JetBrains Mono',monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
+pre{background:#eef3f9;padding:12px;border-radius:6px;font-size:12.5px;overflow:auto;max-height:360px}
+input,button{font-size:13.5px;padding:7px 11px;border:1px solid #b9cbe2;border-radius:6px;background:#fff;color:var(--ink);font-family:inherit}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+button:hover{background:var(--accent-ink)}
+details{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;background:#fff}
+summary{cursor:pointer;font-weight:600;font-size:13.5px}
+.crumb{font-size:12.5px;color:var(--faint);margin-bottom:14px}
+.crumb a{color:var(--faint)}
+footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+</style></head><body>
+<header>
+  <a class="brand" href="../index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2.6 20.4 7.4v9.2L12 21.4 3.6 16.6V7.4Z"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M12 5v2.8M12 16.2V19M5.7 8.5l2.4 1.4M15.9 14.1l2.4 1.4M18.3 8.7l-2.4 1.3M8.1 14l-2.4 1.4" opacity=".5"/></svg><span>EnvTolDB<small>Environment-Tolerant Proteome Database</small></span></a>
+  <nav><a href="../index.html" class="" data-zh="总览">Overview</a><a href="../species/index.html" class="" data-zh="物种">Species</a><a href="../solvents.html" class="" data-zh="溶剂统计">Solvents</a><a href="../experiments.html" class="" data-zh="实验参数">Experiments</a><a href="../methods.html" class="" data-zh="采集方法">Methods</a><a href="../downloads.html" class="" data-zh="下载">Downloads</a><a href="../api.html" class="" data-zh="API">API</a></nav>
+  <div class="hdr-right"><button class="langbtn" data-l="en" onclick="setLang('en')">EN</button><button class="langbtn" data-l="zh" onclick="setLang('zh')">中文</button><a class="gh" href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub ↗</a></div>
+</header>
+<main>
+<div class="crumb"><a href="../index.html">Home</a> › <a href="../species/index.html">Species</a> › B1X6A8 — Mannosyl-3-phosphoglycerate phosphatase </div>
+<div class="card"><h2>B1X6A8 — Mannosyl-3-phosphoglycerate phosphatase (MPGP) (EC 3.1.3.70)</h2>
+<p style="font-size:14px">length <b>271</b> aa · verified <span class="badge b-no">no</span> ·
+no structure record ·
+<b>1</b> experiment-linked records · <a href='https://www.uniprot.org/uniprotkb/B1X6A8' target=_blank rel=noopener>UniProt</a> · <a href='https://alphafold.ebi.ac.uk/search?query=B1X6A8' target=_blank rel=noopener>AlphaFold</a> · <a href='https://www.ncbi.nlm.nih.gov/protein/B1X6A8' target=_blank rel=noopener>NCBI</a> · <a href='https://europepmc.org/search?query=B1X6A8' target=_blank rel=noopener>Europe PMC</a></p>
+<p class="muted">All experimental records for this protein, across sources, with per-record conditions and DOIs.</p></div>
+<div class='card'><h2>Experimental records (1)</h2><table><tr><th>kind</th><th>value</th><th>conditions</th><th>source / ref</th></tr><tr><td>Tm@pH</td><td><b>43.93</b> °C</td><td style='font-size:12px'>pH 7.5, NaCl 0 M, n=1</td><td style='font-size:12px'>pH-Tm 编译<br><span style=color:#6b7a8d>10.1093/nar/gkab799</span></td></tr></table></div>
+
+<div class='card'><h2>Gene</h2><p class='muted'>Genome mapping in progress (NCBI IPG pipeline running; this protein has no RefSeq CDS mapping yet).</p></div>
+<div class='card'><h2>Sequence (271 aa)</h2><code style='font-size:11px;word-break:break-all'>MFSIQQPLLVFSDLDGTLLDSHSYDWQPAAPWLTRLREANVPVILCSSKTSAEMLYLQKT<br>LGLQGLPLIAENGAVIQLAEQWQEIDGFPRIISGISHGEISLVLNTLREKEHFKFTTFDD<br>VDDATIAEWTGLSRSQAALTQLHEASVTLIWRDSDERMAQFTARLNELGLQFMQGARFWH<br>VLDASAGKDQAANWIIATYQQLSGKRPTTLGLGDGPNDAPLLEVMDYAVIVKGLNREGVH<br>LHDEDPARVWRTQREGPEGWREGLDHFFSAR</code></div>
+</main>
+<footer>
+  <b>EnvTolDB</b> v3.1 · built 2026-11-23 · MIT (code) / CC-BY 4.0 (data) ·
+  <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
+  <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
+</footer>
+<script>
+// ---- language toggle (EN default; 中文 via data-zh) ----
+function setLang(l){
+  document.documentElement.lang = l==='zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    if(l==='zh'){ if(!el.dataset.en) el.dataset.en = el.textContent; el.textContent = el.dataset.zh; }
+    else { if(el.dataset.en) el.textContent = el.dataset.en; }
+  });
+  document.querySelectorAll('.langbtn').forEach(b=>b.style.fontWeight = b.dataset.l===l ? '700':'400');
+  try{ localStorage.setItem('envtoldb_lang', l); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  let l='en'; try{ l = localStorage.getItem('envtoldb_lang')||'en'; }catch(e){}
+  setLang(l);
+});
+// ---- sortable tables ----
+function sortTable(th){
+  const tb = th.closest('table').querySelector('tbody') || th.closest('table');
+  const idx = Array.from(th.parentNode.children).indexOf(th);
+  const dir = th.dataset.dir === 'asc' ? -1 : 1;
+  th.dataset.dir = dir===1 ? 'asc' : 'desc';
+  const rows = Array.from(tb.querySelectorAll('tr')).filter(r=>!r.querySelector('th'));
+  rows.sort((a,b)=>{
+    const A=a.children[idx], B=b.children[idx];
+    if(!A||!B) return 0;
+    const na=parseFloat(A.textContent.replace(/[,%]/g,'')), nb=parseFloat(B.textContent.replace(/[,%]/g,''));
+    const numA=!isNaN(na)&&A.textContent.match(/[\d.]/), numB=!isNaN(nb)&&B.textContent.match(/[\d.]/);
+    let c = (numA&&numB) ? na-nb : A.textContent.localeCompare(B.textContent);
+    return c*dir;
+  });
+  rows.forEach(r=>tb.appendChild(r));
+}
+// ---- live species filter ----
+function filterSpecies(input){
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('[data-sp-row]').forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().indexOf(q)>-1 ? '' : 'none';
+  });
+}
+</script>
+</body></html>
