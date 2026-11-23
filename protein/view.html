@@ -113,11 +113,25 @@ fetch('../species/data/' + SP + '.json').then(r => {
         catch (e) { await loadScript('/EnvtolDB/3Dmol-min.js'); }
       }
       if (!window.$3Dmol) { fail('viewer library could not be loaded'); return; }
+      const SOURCES = [
+        'https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb',                                  // 自托管代理 (本地 PDB 优先/AFDB 回源)
+        'https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb'                       // AFDB 直链回退
+      ];
       box.innerHTML = '';
       const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
-      $3Dmol.download('https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb', viewer, { format: 'pdb' },
-        () => { try { viewer.zoomTo(); viewer.render(); } catch (_) {} });
-      setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('model PDB could not be fetched (network/404)'); } catch (_) {} }, 15000);
+      let si = 0;
+      const trySrc = () => {
+        if (si >= SOURCES.length) { fail('all structure sources unreachable'); return; }
+        const u = SOURCES[si++];
+        $3Dmol.download(u, viewer, { format: 'pdb' }, () => {
+          try {
+            if (!viewer.models || Object.keys(viewer.models).length === 0) { trySrc(); return; }
+            viewer.zoomTo(); viewer.render();
+          } catch (_) { try { viewer.zoomTo(); viewer.render(); } catch (_) {} }
+        });
+      };
+      trySrc();
+      setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('sources unreachable — first visit needs one-time cert accept at <a href="https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb" target="_blank">this link</a> (click through the certificate warning), or alphafold.ebi.ac.uk is unreachable'); } catch (_) {} }, 20000);
     })().catch(e => fail(esc(e.message)));
   } catch (e3d) {
     const box = document.getElementById('structbox');
