@@ -21,7 +21,7 @@ a{color:#0b62c4}
 </style></head><body>
 <div class="pgwrap"><a href="../index.html">← EnvTolDB</a> · <a id="bk" href="#">back to species</a></div>
 <div id="app" class="wrap"><p class="muted">Loading protein data…</p></div>
-<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script src="./3Dmol-min.js"></script>
 <script>
 const q = new URLSearchParams(location.search);
 const ACC = q.get('acc') || '';
@@ -86,12 +86,10 @@ fetch('../species/data/' + SP + '.json').then(r => {
     h += '<div class="card"><h2>Gene</h2><p class="muted">Genome mapping in progress (NCBI IPG pipeline; no RefSeq CDS mapping for this protein yet).</p></div>';
   }
 
-  if (d.st) {
-    h += '<div class="card"><h2>Structure (AlphaFold model)</h2><div style="height:420px">' +
-         '<div class="viewer_3Dmoljs" data-pdb="https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb" ' +
-         'data-backgroundcolor="0xffffff" data-style="cartoon" style="height:100%;width:100%"></div></div>' +
-         '<p class="muted">Interactive model needs access to alphafold.ebi.ac.uk · <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a></p></div>';
-  }
+  h += '<div class="card"><h2>Structure (AlphaFold predicted model)</h2>' +
+       '<div style="height:420px"><div id="structbox" class="muted" style="height:100%;display:flex;align-items:center;justify-content:center">Loading 3D viewer…</div></div>' +
+       '<p class="muted">' + (d.st ? 'EnvTolDB structure record present (metrics above).' : 'Not yet validated in EnvTolDB — model fetched live from AlphaFold DB.') +
+       ' If the viewer stays empty, your network cannot reach alphafold.ebi.ac.uk — use the <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a>.</p></div>';
 
   if (d.s) {
     h += '<div class="card"><h2>Sequence (' + d.s.length + ' aa)</h2><code class="seq">' + wrap60(d.s) + '</code></div>';
@@ -99,17 +97,21 @@ fetch('../species/data/' + SP + '.json').then(r => {
   app.innerHTML = h;
   // 3Dmol 动态初始化: 兼容新旧 API, 失败只影响结构区不影响整页
   try {
-    const el = document.querySelector('.viewer_3Dmoljs');
-    if (el && window.$3Dmol) {
-      if (typeof $3Dmol.autoInit === 'function') { $3Dmol.autoInit(); }
-      else {
-        const viewer = $3Dmol.createViewer(el, { backgroundColor: 'white' });
-        if (viewer) $3Dmol.download('https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb', viewer, { format: 'pdb' });
-      }
+    const box = document.getElementById('structbox');
+    const fail = (msg) => { box.innerHTML = '<p class="muted">3D view unavailable: ' + msg +
+      '<br>Direct sources: <a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank">AFDB entry</a> · ' +
+      '<a href="https://www.uniprot.org/uniprotkb/' + ACC + '" target="_blank">UniProt structure section</a></p>'; };
+    if (!window.$3Dmol) { fail('viewer library blocked by network'); }
+    else {
+      box.innerHTML = '';
+      const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
+      $3Dmol.download('https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb', viewer, { format: 'pdb' },
+        () => { viewer.zoomTo(); viewer.render(); });
+      setTimeout(() => { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('model PDB could not be fetched (network/404)'); }, 12000);
     }
   } catch (e3d) {
-    const vd = document.querySelector('.viewer_3Dmoljs');
-    if (vd) vd.innerHTML = '<p class="muted">3D viewer unavailable — open the AFDB entry link above to view the model.</p>';
+    const box = document.getElementById('structbox');
+    if (box) box.innerHTML = '<p class="muted">3D viewer error: ' + esc(e3d.message) + '</p>';
   }
 }).catch(err => {
   document.getElementById('app').innerHTML = '<div class="card"><h2>' + ACC + '</h2><p class="muted">Failed to load data: ' + err.message + '</p></div>';
