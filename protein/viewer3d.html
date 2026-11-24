@@ -1,47 +1,248 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<style>body{margin:0;background:#fff;overflow:hidden}</style></head>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EnvTolDB 3D structure</title>
+<style>
+  :root { color-scheme: light; --ink: #172235; --muted: #66758a; --line: #dbe2ec; --accent: #0b62c4; --error: #a33a32; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; color: var(--ink); background: #f6f8fb; font: 13px/1.45 system-ui, sans-serif; overflow: hidden; }
+  #viewer { height: 100%; min-height: 320px; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  #stage { position: relative; min-height: 0; background: #fff; }
+  #box { position: absolute; inset: 0; }
+  #message { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: #fff; }
+  #message[hidden] { display: none; }
+  .panel { max-width: 560px; }
+  .panel strong { display: block; margin-bottom: 6px; font-size: 15px; }
+  .panel p { margin: 0; color: var(--muted); }
+  .panel ul { margin: 12px 0 0; padding: 0; list-style: none; color: var(--muted); text-align: left; }
+  .panel li + li { margin-top: 5px; }
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+  .actions a { color: var(--accent); text-underline-offset: 3px; }
+  #viewer[data-state="error"] .panel strong { color: var(--error); }
+  #statusbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 32px; padding: 7px 12px; border-top: 1px solid var(--line); color: var(--muted); background: #f6f8fb; font-size: 11.5px; }
+  #source { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #count { flex: none; font-variant-numeric: tabular-nums; }
+</style>
+</head>
 <body>
-<div id="box" style="width:100%;height:420px;display:flex;align-items:center;justify-content:center">
-  <p style="color:#6b7a8d;font-family:system-ui">Loading 3D viewer…</p>
-</div>
-<script src="../3Dmol-min.js"></script>
+<main id="viewer" data-state="loading">
+  <div id="stage">
+    <div id="box" role="img" aria-label="Interactive three-dimensional protein structure"></div>
+    <div id="message" role="status" aria-live="polite">
+      <div class="panel"><strong>Loading 3D structure</strong><p id="message-detail">Preparing the viewer…</p></div>
+    </div>
+  </div>
+  <footer id="statusbar"><span id="source">EnvTolDB structure viewer</span><span id="count"></span></footer>
+</main>
 <script>
-const q = new URLSearchParams(location.search);
-const ACC = (q.get('acc') || '').toUpperCase();
-const box = document.getElementById('box');
-const fail = (msg) => { box.innerHTML = '<p style="color:#6b7a8d;font-family:system-ui;text-align:center">3D unavailable: ' + msg +
-  '<br><a href="https://alphafold.ebi.ac.uk/entry/' + ACC + '" target="_blank" style="color:#0b62c4">AFDB entry</a></p>'; };
+(() => {
+  'use strict';
 
-function init() {
-  if (!window.$3Dmol) { fail('viewer library failed to load'); return; }
-  box.innerHTML = '';
-  try {
-    const viewer = $3Dmol.createViewer(box, { backgroundColor: 'white' });
-    const SOURCES = [
-      'https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb',
-      'https://alphafold.ebi.ac.uk/files/AF-' + ACC + '-F1-model_v6.pdb'
-    ];
-    let si = 0;
-    const trySrc = () => {
-      if (si >= SOURCES.length) { fail('all structure sources unreachable'); return; }
-      const u = SOURCES[si++];
-      $3Dmol.download(u, viewer, { format: 'pdb' }, () => {
-        try {
-          if (!viewer.models || Object.keys(viewer.models).length === 0) { trySrc(); return; }
-          viewer.setStyle({}, { cartoon: { color: 'spectrum' }, stick: { radius: 0.15, hidden: false } });
-          viewer.zoomTo(); viewer.render();
-        } catch (_) { try { viewer.setStyle({}, { cartoon: { color: 'spectrum' } }); viewer.zoomTo(); viewer.render(); } catch (_) {} }
+  const viewerElement = document.getElementById('viewer');
+  const box = document.getElementById('box');
+  const message = document.getElementById('message');
+  const sourceLabel = document.getElementById('source');
+  const countLabel = document.getElementById('count');
+  const ACC = (new URLSearchParams(location.search).get('acc') || '').trim().toUpperCase();
+  const ENTRY_URL = 'https://alphafold.ebi.ac.uk/entry/' + encodeURIComponent(ACC);
+  const MODEL_ID = 'AF-' + ACC + '-F1';
+  const SOURCES = [6, 4, 3, 2, 1].map(version => ({
+    label: 'AlphaFold DB v' + version,
+    url: 'https://alphafold.ebi.ac.uk/files/' + MODEL_ID + '-model_v' + version + '.pdb'
+  }));
+  const REQUEST_TIMEOUT_MS = 15000;
+
+  class ViewerError extends Error {
+    constructor(code, text, options = {}) {
+      super(text, options.cause ? { cause: options.cause } : undefined);
+      this.name = 'ViewerError';
+      this.code = code;
+      if (options.attempts) this.attempts = options.attempts;
+    }
+  }
+
+  function setState(state, source, count) {
+    viewerElement.dataset.state = state;
+    if (source !== undefined) sourceLabel.textContent = source;
+    if (count !== undefined) countLabel.textContent = count;
+  }
+
+  function setMessage(title, detail) {
+    message.replaceChildren();
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    const heading = document.createElement('strong');
+    heading.textContent = title;
+    const text = document.createElement('p');
+    text.id = 'message-detail';
+    text.textContent = detail;
+    panel.append(heading, text);
+    message.replaceChildren(panel);
+    message.hidden = false;
+    return panel;
+  }
+
+  function addLink(panel, text, url) {
+    let actions = panel.querySelector('.actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'actions';
+      panel.append(actions);
+    }
+    const link = document.createElement('a');
+    link.textContent = text;
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    actions.append(link);
+  }
+
+  function fail(title, detail, attempts, showLinks = true) {
+    const panel = setMessage(title, detail);
+    if (showLinks) addLink(panel, 'Open AFDB entry', ENTRY_URL);
+    if (showLinks && ACC) addLink(panel, 'Open PDB file', SOURCES[0].url);
+    if (attempts && attempts.length) {
+      const list = document.createElement('ul');
+      for (const attempt of attempts) {
+        const item = document.createElement('li');
+        item.textContent = attempt.source + ': ' + attempt.error;
+        list.append(item);
+      }
+      panel.append(list);
+    }
+    setState('error', 'Structure unavailable');
+    countLabel.textContent = '';
+    console.error('[EnvTolDB viewer]', title, detail, attempts || []);
+  }
+
+  function loadLibrary() {
+    const library = window.$3Dmol || window['3Dmol'];
+    if (library) return Promise.resolve(library);
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = '../3Dmol-min.js';
+      script.onload = () => {
+        const loaded = window.$3Dmol || window['3Dmol'];
+        if (loaded) resolve(loaded);
+        else reject(new ViewerError('library', 'The 3Dmol script loaded without exposing its API.'));
+      };
+      script.onerror = () => reject(new ViewerError('library', 'The local 3Dmol library could not be loaded.'));
+      document.head.append(script);
+    });
+  }
+
+  async function fetchText(url) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        credentials: 'omit',
+        headers: { Accept: 'text/plain,application/octet-stream,*/*' }
       });
-    };
-    trySrc();
-    setTimeout(() => { try { if (!viewer.models || Object.keys(viewer.models).length === 0) fail('sources unreachable — first time? open <a href="https://223.2.45.152:8443/dataset/af/' + ACC + '.pdb" target="_blank" style="color:#0b62c4">this proxy link</a> once and accept the certificate'); } catch (_) {} }, 20000);
-  } catch (e) { fail(e.message); }
-}
-if (window.$3Dmol) init();
-else {
-  const s = document.querySelector('script[src="../3Dmol-min.js"]');
-  if (s) { s.onload = init; s.onerror = () => fail('library load blocked'); }
-  else fail('library missing');
-}
-</script></body></html>
+      if (!response.ok) {
+        throw new ViewerError('http', 'HTTP ' + response.status + ' ' + response.statusText);
+      }
+      return await response.text();
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new ViewerError('timeout', 'timed out after ' + (REQUEST_TIMEOUT_MS / 1000) + ' s', { cause: error });
+      }
+      if (error instanceof ViewerError) throw error;
+      if (error.name === 'TypeError') {
+        throw new ViewerError('blocked', 'request blocked by the browser (network, certificate, or CORS)', { cause: error });
+      }
+      throw new ViewerError('network', error.message || String(error), { cause: error });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function validatePdb(text) {
+    const pdb = text.replace(/^\uFEFF/, '').trim();
+    if (pdb.length < 80) {
+      throw new ViewerError('invalid', 'response is empty or too short to be a PDB file');
+    }
+    let atoms = 0;
+    for (const line of pdb.split(/\r?\n/)) {
+      if (!/^(ATOM  |HETATM)/.test(line) || line.length < 54) continue;
+      const rawX = line.slice(30, 38).trim();
+      const rawY = line.slice(38, 46).trim();
+      const rawZ = line.slice(46, 54).trim();
+      if (!rawX || !rawY || !rawZ) continue;
+      const x = Number(rawX);
+      const y = Number(rawY);
+      const z = Number(rawZ);
+      if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) atoms += 1;
+    }
+    if (atoms === 0) {
+      throw new ViewerError('invalid', 'response contains no valid ATOM/HETATM coordinates');
+    }
+    return { pdb, atoms };
+  }
+
+  async function loadStructure() {
+    const attempts = [];
+    for (const source of SOURCES) {
+      sourceLabel.textContent = source.label + ' · downloading';
+      setMessage('Loading 3D structure', source.label + ' · downloading coordinates…');
+      try {
+        const result = validatePdb(await fetchText(source.url));
+        return { ...result, source };
+      } catch (error) {
+        const reason = error instanceof ViewerError ? error.message : (error.message || String(error));
+        attempts.push({ source: source.label, error: reason });
+        console.warn('[EnvTolDB viewer]', source.label, reason);
+        if (error instanceof ViewerError && error.code === 'blocked') break;
+      }
+    }
+    throw new ViewerError('sources', 'No AlphaFold model could be loaded.', { attempts });
+  }
+
+  function renderModel(library, result) {
+    const viewer = library.createViewer(box, { backgroundColor: 'white' });
+    const model = viewer.addModel(result.pdb, 'pdb');
+    const parsedAtoms = model && typeof model.selectedAtoms === 'function'
+      ? model.selectedAtoms({}).length
+      : 0;
+    if (!parsedAtoms) {
+      throw new ViewerError('parse', '3Dmol parsed the PDB but produced no atoms.');
+    }
+    viewer.setStyle({}, { cartoon: { color: 'spectrum' }, stick: { radius: 0.15, hidden: false } });
+    viewer.zoomTo();
+    viewer.render();
+    return parsedAtoms;
+  }
+
+  async function init() {
+    if (!/^[A-Z0-9]{6,10}$/.test(ACC)) {
+      fail('Invalid protein accession', 'The viewer requires a UniProt accession in the “acc” query parameter.', undefined, false);
+      return;
+    }
+    setMessage('Loading 3D structure', 'Loading the local 3Dmol library…');
+    try {
+      const library = await loadLibrary();
+      setMessage('Loading 3D structure', 'Fetching the AlphaFold PDB model…');
+      const result = await loadStructure();
+      box.replaceChildren();
+      const parsedAtoms = renderModel(library, result);
+      message.hidden = true;
+      setState('ready', result.source.label, result.atoms.toLocaleString() + ' PDB atoms · ' + parsedAtoms.toLocaleString() + ' rendered');
+      console.info('[EnvTolDB viewer]', { accession: ACC, source: result.source.url, pdbAtoms: result.atoms, renderedAtoms: parsedAtoms });
+    } catch (error) {
+      if (error instanceof ViewerError && error.attempts) {
+        fail('3D structure unavailable', error.message, error.attempts);
+      } else {
+        fail('3D structure unavailable', error.message || String(error));
+      }
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
