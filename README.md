@@ -14,6 +14,7 @@
 | **AlphaFold structure records** | **233,922** (pLDDT / salt-bridge density; all four new pools backfilled) |
 | **BRENDA enzyme parameters** | **212,538** (stability + Km / kcat / Ki / IC50 / specific activity; 67% linked) |
 | **Identity annotations** | **1,320** (metal-ion dependence / inhibitors / oxygen sensitivity) |
+| **Species literature (v3.6.2)** | **270 / 284** non-control species anchored in Europe PMC (title/abstract); **2,478** key papers |
 
 ## What is EnvTolDB?
 
@@ -27,7 +28,8 @@ with mesophilic controls for comparison.
 Every record is traceable:
 - Sequences carry UniProt accessions (verifiable at uniprot.org) + SHA-256 checksums
 - Experimental records carry DOI + source database + per-record condition details
-- Literature anchoring status is recorded per species (Europe PMC co-occurrence; 176/301 species anchored)
+- Literature anchoring status is recorded per species (Europe PMC title/abstract co-occurrence;
+  270 of the 284 environment-tolerant species anchored, plus 25 mesophilic controls)
 - All edits are audit-logged with operator identity and timestamp
 
 ## Fourteen environmental dimensions
@@ -70,6 +72,26 @@ Plus: 2,438,069 CLEAN EC predictions (NAR 2026, contrastive-learning enzyme anno
 52% at confidence ≥0.9) and 1,320 BRENDA identity annotations (metal-ion dependence,
 inhibitors, oxygen sensitivity).
 
+## Species-level literature (v3.6.2)
+
+Every non-control species was searched in Europe PMC by name — the current name plus earlier names
+that keep the epithet (taken from NCBI Taxonomy and a short manual list) — restricted to title and abstract:
+
+- **Anchoring**: papers co-mentioning the species and the environmental terms of its group
+  (e.g. `thermophil*`, `hot spring*` for thermophiles). 270 of 284 species have at least one; the ten
+  most-cited are stored per species. Where a species name itself contains a term (e.g. *psychrophilum*
+  under `psychrophil*`), the term is narrowed to word forms the name cannot match.
+- **Naming / reclassification papers**: papers that name the species in the title together with
+  sp. nov. / gen. nov. / comb. nov. (219 species). Where none exists, the five most-cited papers on
+  growth physiology are kept instead (65 species).
+- **Genus-level fallback**: for the 14 species without species-level anchoring, the number of papers
+  that name only the genus with the same terms.
+
+Tables: `species_synonyms` (names searched, with NCBI taxon id), `species_literature` (papers) and
+`species_literature_stats` (hit count and the exact query of every search). The `lit_anchored` flag was
+refreshed where it was unset or machine-derived (236 species); manually curated flags were left as they
+are, and 6 of them disagree with the automated result.
+
 ## Web interface
 
 Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
@@ -107,11 +129,12 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 | CLEAN DB | 2,438,069 EC predictions | [Yuan et al., NAR 2026](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkag1003/8916836) |
 | ProThermDB | 2,921 ΔTm | [Nikam et al., NAR 2021](https://doi.org/10.1093/nar/gkaa1070) |
 | OrganiZymeDB | 1,833 solvent Tm | [Debruyne & Pucci, NAR 2026](https://doi.org/10.1093/nar/gkag1069) |
-| Europe PMC | 135 full-text mining runs, 176 species anchored | [europepmc.org](https://europepmc.org) |
+| Europe PMC | species-level anchoring for 284 species (title/abstract), 2,478 key papers | [europepmc.org](https://europepmc.org) |
 | BacDive | measured culture optima (27 species) | [Reimer et al., NAR 2022](https://doi.org/10.1093/nar/gkab799) |
 
 ## Changelog
 
+- **v3.6.2 (2026-11-25)** — Species-level literature: Europe PMC title/abstract anchoring for all 284 non-control species (270 anchored), naming/reclassification papers (219 species), growth-physiology fallback (65), genus-level fallback (14). New tables `species_synonyms`, `species_literature`, `species_literature_stats`; literature card on every species page.
 - **v3.6.1 (2026-11-25)** — Literature table-extraction layer withdrawn (5,967 rows moved to `experiments_quarantine` in the database, with their evidence rows in `record_evidence_quarantine`): an audit found about 80% of the source papers unrelated to enzyme stability and 67% of the values outside 20–130 °C while labelled °C. Experimental layer now 967,218 records.
 - **v3.4.1 (2026-11-23)** — ThermoMutDB 2.0 import (+8,239 ddG/dTm, 250 proteins)
 - **v3.4 (2026-11-23)** — Meltome Atlas in-cell melt temperatures (+206,549); BRENDA v3 kinetics (+75,520: Km/kcat/Ki/IC50/SA); identity layer (metal/inhibitor/oxygen, 1,320); CLEAN EC predictions (2.44M); structure backfill for all four new pools (structures 146K→234K); ProThermDB 100% SIFTS-linked; 4-dimension literature extraction (salt/arsenic/magnetotactic/oligotrophic, +1,192)

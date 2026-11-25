@@ -16,11 +16,12 @@ import csv, glob, gzip, html, json, os, sqlite3, datetime
 from collections import defaultdict
 from statistics import median
 
-DB = "/public/home/sjl2/datasetdb/dataset.db"
+# ENVTOLDB_DB / ENVTOLDB_OUT let a build be rehearsed against a staged copy without touching the repo.
+DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
-OUT = "/public/home/sjl2/envtoldb_site"          # repo root = site root
+OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.6.1"
+RELEASE = "v3.6.2"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -372,8 +373,62 @@ for r in db.execute("""SELECT accession, ec, confidence FROM clean_ec
     lst = acc2params[r["accession"]]
     if len([x for x in lst if not x.startswith("EC ")]) >= 6:
         continue
-    if len([x for x in lst if x.startswith("EC ")]) < 3:
-        lst.append(f"EC {r['ec']} ({r['confidence']:.2f})")
+        if len([x for x in lst if x.startswith("EC ")]) < 3:
+            lst.append(f"EC {r['ec']} ({r['confidence']:.2f})")
+
+# 物种级文献证据 (v3.6.2): Europe PMC 标题/摘要锚定 + 命名/分类论文; 表不存在时不出卡片
+import urllib.parse as _up
+lit_stats, lit_papers, lit_names = defaultdict(dict), defaultdict(lambda: defaultdict(list)), defaultdict(list)
+try:
+    for r in db.execute("SELECT species_id, query_kind, hit_count, query FROM species_literature_stats"):
+        lit_stats[r["species_id"]][r["query_kind"]] = (r["hit_count"], r["query"])
+    for r in db.execute("""SELECT species_id, query_kind, rank, pmid, pmcid, doi, pub_year, title, journal, cited_by, is_oa
+                           FROM species_literature ORDER BY species_id, query_kind, rank"""):
+        lit_papers[r["species_id"]][r["query_kind"]].append(r)
+    for r in db.execute("SELECT species_id, name FROM species_synonyms ORDER BY species_id, rowid"):
+        lit_names[r["species_id"]].append(r["name"])
+except sqlite3.OperationalError:
+    print("species literature tables not present — literature cards skipped", flush=True)
+
+
+def lit_link(p):
+    if p["pmcid"]: return f"https://europepmc.org/article/PMC/{esc(p['pmcid'])}"
+    if p["pmid"]: return f"https://europepmc.org/abstract/MED/{esc(p['pmid'])}"
+    return f"https://doi.org/{esc(p['doi'])}" if p["doi"] else ""
+
+
+def lit_block(title, papers):
+    if not papers: return ""
+    rows = "".join(
+        f'<li><a href="{lit_link(p)}" target="_blank" rel="noopener">{esc(p["title"] or p["doi"] or p["pmid"])}</a> '
+        f'<span class="muted">({esc(p["pub_year"] or "")}{", " + esc(p["journal"]) if p["journal"] else ""}'
+        f'{", cited by " + format(p["cited_by"], ",") if p["cited_by"] is not None else ""})</span></li>'
+        for p in papers[:5])
+    return f"<li><b>{title}</b><ul>{rows}</ul></li>"
+
+
+def lit_card(sp):
+    sl, sp_ = lit_stats.get(sp["id"], {}), lit_papers.get(sp["id"], {})
+    if not sl: return ""
+    a = sl.get("anchor")
+    bits = []
+    if a:
+        bits.append(f"<b>{a[0]:,}</b> papers co-mention this species and {esc(POOL_EN.get(sp['pool'], sp['pool'])).lower()} "
+                    "terms in title/abstract")
+    if "description" in sl:
+        bits.append(f"<b>{sl['description'][0]:,}</b> naming or reclassification paper(s) name the species in the title")
+    if "genus_anchor" in sl:
+        bits.append(f"none at species level; <b>{sl['genus_anchor'][0]:,}</b> papers name only the genus "
+                    f"{esc((sp['name'].split() or [''])[0])} with the same terms")
+    if "physiology" in sl:
+        bits.append(f"<b>{sl['physiology'][0]:,}</b> papers on growth physiology")
+    search = (f' · <a href="https://europepmc.org/search?query={_up.quote(a[1])}" target="_blank" rel="noopener">'
+              "run this search in Europe PMC ↗</a>") if a else ""
+    return f"""<div class="card"><h2>Species literature (Europe PMC)</h2>
+<p style="font-size:13.5px">{' · '.join(bits)}{search}</p>
+<p class="muted">Searched names: {esc('; '.join(lit_names.get(sp['id'], [])))}. Up to ten most-cited records per search are kept in
+<code>species_literature</code>; the exact queries and hit counts are in <code>species_literature_stats</code>.</p>
+<ul style="margin-bottom:0">{lit_block('Anchoring literature', sp_.get('anchor', []))}{lit_block('Naming / reclassification papers', sp_.get('description', []))}{lit_block('Growth physiology', sp_.get('physiology', []))}{lit_block('Genus-level anchoring', sp_.get('genus_anchor', []))}</ul></div>"""
 
 count = 0
 import json as _json
@@ -424,6 +479,7 @@ evidence {esc(sp['evidence_level'] or '—')}
 <p class="muted">Provenance: {prov}{(' · last edited by ' + esc(sp['updated_by'])) if sp['updated_by'] else ''}</p>
 <p class="muted">{esc(sp['evidence_note'] or '')} {esc(sp['notes'] or '')}</p>
 <p><a class="btn" href="{gz_rel}" download>⬇ FASTA (.fasta.gz)</a></p></div>
+{lit_card(sp)}
 <div class="card"><h2>Proteins ({len(prots):,})</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
 <div data-pg-wrap>
@@ -526,7 +582,10 @@ b = f"""<div class="note">{esc(col.get('_intro_en',''))}</div>{''.join(mcards)}
 3. Filter ≥50 aa, standard amino acids; MD5 exact dedup
 4. Redundancy scope per pool (recorded): thermo = 30% cluster reps;
    salt / pH / solvent = 90% linclust reps; controls = exact dedup
-5. Literature anchoring: Europe PMC co-occurrence (species × environment terms, title/abstract)
+5. Literature anchoring (v3.6.2): Europe PMC TITLE_ABS co-occurrence of the species name
+   (current name plus NCBI-listed earlier names sharing the epithet) with pool-specific
+   environmental terms; naming/reclassification papers name the species in the title
+   together with sp. nov. / gen. nov. / comb. nov.
 6. BacDive calibration: Halophily table (NaCl → M) and optimal culture pH</pre></div>
 <div class="card"><h2 data-zh="中文协议原文（全部组）">Chinese protocol (原文)</h2>
 <details><summary data-zh='展开'>Expand</summary>
@@ -562,6 +621,11 @@ open(f"{OUT}/downloads.html", "w", encoding="utf-8").write(page("Downloads", b, 
 print("downloads ✓", flush=True)
 
 # ================= API / schema page =================
+def _n(t):
+    try: return f"{db.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]:,}"
+    except sqlite3.OperationalError: return "—"
+lit_counts = " / ".join(_n(t) for t in ("species_synonyms", "species_literature", "species_literature_stats"))
+quar_counts = " / ".join(_n(t) for t in ("experiments_quarantine", "record_evidence_quarantine"))
 b = f"""<div class="note">This GitHub Pages mirror is static. For programmatic access, download the SQLite
 database (Downloads) — every table below is a plain SQL table. A REST API also exists on the
 self-hosted instance.</div>
@@ -572,7 +636,12 @@ self-hosted instance.</div>
 <tr><td><code>experiments</code></td><td>accession, kind, value, unit, condition, mutation, wt_sha256, source, source_ref</td><td>{totals['experiments']:,}</td></tr>
 <tr><td><code>structures</code></td><td>accession, pool, n_residues, mean_plddt, frac_plddt70, salt_bridges_per_100</td><td>{totals['structures']:,}</td></tr>
 <tr><td><code>literature</code> / <code>measurements</code> / <code>import_batches</code> / <code>audit_log</code></td>
-<td>anchoring hits, BacDive-style measurements, source declarations, edit history</td><td>—</td></tr></table></div>
+<td>anchoring hits, BacDive-style measurements, source declarations, edit history</td><td>—</td></tr>
+<tr><td><code>species_synonyms</code> / <code>species_literature</code> / <code>species_literature_stats</code></td>
+<td>names searched per species; most-cited Europe PMC papers per search; hit count and exact query</td>
+<td>{lit_counts}</td></tr>
+<tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
+<td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>{quar_counts}</td></tr></table></div>
 <div class="card"><h2>Example queries</h2>
 <pre>-- proteins of one species, longest first
 sqlite3 dataset.db "SELECT accession, name, length FROM proteins p

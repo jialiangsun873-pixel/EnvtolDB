@@ -93,7 +93,10 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 3. Filter ≥50 aa, standard amino acids; MD5 exact dedup
 4. Redundancy scope per pool (recorded): thermo = 30% cluster reps;
    salt / pH / solvent = 90% linclust reps; controls = exact dedup
-5. Literature anchoring: Europe PMC co-occurrence (species × environment terms, title/abstract)
+5. Literature anchoring (v3.6.2): Europe PMC TITLE_ABS co-occurrence of the species name
+   (current name plus NCBI-listed earlier names sharing the epithet) with pool-specific
+   environmental terms; naming/reclassification papers name the species in the title
+   together with sp. nov. / gen. nov. / comb. nov.
 6. BacDive calibration: Halophily table (NaCl → M) and optimal culture pH</pre></div>
 <div class="card"><h2 data-zh="中文协议原文（全部组）">Chinese protocol (原文)</h2>
 <details><summary data-zh='展开'>Expand</summary>
@@ -102,7 +105,7 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 </details></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.6.1 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.6.2 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
