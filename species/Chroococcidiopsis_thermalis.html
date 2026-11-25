@@ -88,12 +88,12 @@ evidence —
 <div data-pg-wrap>
 <table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
 <th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT · salt-bridges/100</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
-<tbody><tr><td><a href='../protein/view.html?acc=Q9F8S5&amp;sp=Chroococcidiopsis_thermalis'><code>Q9F8S5</code></a></td><td>non-specific serine/threonine protein kinase (EC 2.7.11.1)</td><td>198</td><td>—</td><td style='font-size:12px'><span style='color:#b6bfca'>0 exp</span></td><td></td></tr></tbody></table></div>
-<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div>
+<tbody><tr><td><a href='../protein/view.html?acc=Q9F8S5&amp;sp=Chroococcidiopsis_thermalis'><code>Q9F8S5</code></a></td><td>non-specific serine/threonine protein kinase (EC 2.7.11.1)</td><td>198</td><td>—</td><td style='font-size:12px'><span style='color:#b6bfca'>0 exp</span></td><td></td></tr></tbody></table>
+<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div></div>
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.1 · built 2026-11-23 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.5.2 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
@@ -128,6 +128,8 @@ function sortTable(th){
     return c*dir;
   });
   rows.forEach(r=>tb.appendChild(r));
+  const pg = th.closest('[data-pg-wrap]');
+  if (pg) { pg.dataset.page='1'; pgProt(th,0); }
 }
 // ---- protein table pagination (50/page) ----
 function pgProt(btn, dir){

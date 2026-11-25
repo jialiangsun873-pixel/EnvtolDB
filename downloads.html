@@ -85,7 +85,7 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 <div class="card"><h2>Species tables TSV (5)</h2><table><tr><td>species_meso.tsv</td><td>2 KB</td></tr><tr><td>species_ph.tsv</td><td>2 KB</td></tr><tr><td>species_salt.tsv</td><td>8 KB</td></tr><tr><td>species_solvent.tsv</td><td>1 KB</td></tr><tr><td>species_thermo.tsv</td><td>6 KB</td></tr></table></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.1 · built 2026-11-23 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.5.2 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
@@ -120,6 +120,8 @@ function sortTable(th){
     return c*dir;
   });
   rows.forEach(r=>tb.appendChild(r));
+  const pg = th.closest('[data-pg-wrap]');
+  if (pg) { pg.dataset.page='1'; pgProt(th,0); }
 }
 // ---- protein table pagination (50/page) ----
 function pgProt(btn, dir){

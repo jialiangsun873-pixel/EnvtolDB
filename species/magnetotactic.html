@@ -77,7 +77,7 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 <div class="card"><h2>Magnetotactic — 5 organisms</h2><table><tr><th>Species</th><th>Grade</th><th>Sequences</th><th>Anchored</th></tr><tr data-sp-row><td><a href="Desulfovibrio_magneticus.html">Desulfovibrio magneticus</a></td><td>magnetotactic</td><td>4,664</td><td><span class="badge b-ok">yes</span></td></tr><tr data-sp-row><td><a href="Magnetococcus_marinus.html">Magnetococcus marinus</a></td><td>magnetotactic</td><td>3,595</td><td><span class="badge b-ok">yes</span></td></tr><tr data-sp-row><td><a href="Magnetospirillum_gryphiswaldense.html">Magnetospirillum gryphiswaldense</a></td><td>magnetotactic</td><td>7,564</td><td><span class="badge b-ok">yes</span></td></tr><tr data-sp-row><td><a href="Magnetospirillum_magnetotacticum.html">Magnetospirillum magnetotacticum</a></td><td>magnetotactic</td><td>4,123</td><td><span class="badge b-ok">yes</span></td></tr><tr data-sp-row><td><a href="Magnetovibrio_blakemorei.html">Magnetovibrio blakemorei</a></td><td>magnetotactic</td><td>3,363</td><td><span class="badge b-ok">yes</span></td></tr></table></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.1 · built 2026-11-23 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.5.2 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
@@ -112,6 +112,8 @@ function sortTable(th){
     return c*dir;
   });
   rows.forEach(r=>tb.appendChild(r));
+  const pg = th.closest('[data-pg-wrap]');
+  if (pg) { pg.dataset.page='1'; pgProt(th,0); }
 }
 // ---- protein table pagination (50/page) ----
 function pgProt(btn, dir){

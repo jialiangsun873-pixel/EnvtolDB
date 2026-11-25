@@ -77,14 +77,14 @@ footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px s
 <div class="hero">
   <h1>EnvTolDB</h1>
   <div class="tag">A curated, provenance-tracked database of proteins from environment-tolerant organisms — thermophilic, halophilic, acid/alkaliphilic, solvent-tolerant — with mesophilic controls.</div>
-  <div class="badge-line"><span class="rel">Release v3.1</span><span class="rel2">Data as of 2026-11-16</span><span class="rel2">Source: UniProtKB 2026_01</span></div>
+  <div class="badge-line"><span class="rel">Release v3.5.2</span><span class="rel2">Data as of 2026-11-25</span><span class="rel2">Source: UniProtKB 2026_01</span></div>
   <div class="srch"><input id="spq" placeholder="Search 231 species — e.g. Halobacterium, Sulfolobus, putida…" oninput="filterSpecies(this)"><button onclick="var t=document.getElementById('spq');filterSpecies(t)">Search</button></div>
   <div class="hint">Filters the species table below. Bulk/protein-level search: download the SQLite database (Downloads).</div>
   <div class="chips">
     <div class="chip"><b>309</b><span>curated organisms</span></div>
     <div class="chip"><b>921,600</b><span>UniProt protein sequences</span></div>
     <div class="chip"><b>973,185</b><span>experimental measurements</span></div>
-    <div class="chip"><b>233,922</b><span>AlphaFold structure records</span></div>
+    <div class="chip"><b>233,592</b><span>AlphaFold structure records</span></div>
   </div>
 </div>
 <div class="note" data-zh="EnvTolDB（环境耐受蛋白数据库）收录 14 个环境组、309 个物种、921600 条 UniProt 蛋白序列本体与 539,714 条实验测量（ddG/ΔTm/Tm vs pH/溶剂 Tm）。每条序列带 accession（可点开 uniprot.org 核对）与 sha256 校验和；浏览对全站登录用户开放；数据修订仅限管理员，每次写入都记录操作人。">EnvTolDB integrates 14 environmental groups, 309 curated organisms, 921600 UniProt protein sequences (each with accession and SHA-256 checksum), 539,708 experimental measurements, and Europe PMC literature-anchoring evidence. Browsing is open to everyone; data edits are restricted to administrators and fully audit-logged.</div>
@@ -163,7 +163,7 @@ Europe PMC co-occurrence search. Human verification flags require written eviden
 <p style="font-size:13.5px">If you use EnvTolDB in your research, please cite the EnvProGen manuscript (in preparation) and the underlying sources: UniProtKB, BacDive, OrganiZymeDB, FireProtDB, ProThermDB, Europe PMC.</p></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.1 · built 2026-11-23 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.5.2 · built 2026-11-25 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>
@@ -198,6 +198,8 @@ function sortTable(th){
     return c*dir;
   });
   rows.forEach(r=>tb.appendChild(r));
+  const pg = th.closest('[data-pg-wrap]');
+  if (pg) { pg.dataset.page='1'; pgProt(th,0); }
 }
 // ---- protein table pagination (50/page) ----
 function pgProt(btn, dir){

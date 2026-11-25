@@ -20,12 +20,14 @@ DB = "/public/home/sjl2/datasetdb/dataset.db"
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = "/public/home/sjl2/envtoldb_site"          # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.1"
+RELEASE = "v3.5.2"
+UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
 db = sqlite3.connect(DB, timeout=60)
 db.row_factory = sqlite3.Row
 db.execute("PRAGMA busy_timeout=60000")
+DATA_AS_OF = db.execute("SELECT MAX(substr(ts, 1, 10)) FROM import_batches").fetchone()[0] or NOW
 
 POOLS = {p["key"]: p for p in cfg["pools"]}
 POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphilic", "metal": "Metal-resistant", "endolithic": "Endolithic", "xerophilic": "Xerophilic", "cold": "Cold-adapted", "piezo": "Piezophilic", "rad": "Radiation-resistant",
@@ -143,6 +145,8 @@ function sortTable(th){
     return c*dir;
   });
   rows.forEach(r=>tb.appendChild(r));
+  const pg = th.closest('[data-pg-wrap]');
+  if (pg) { pg.dataset.page='1'; pgProt(th,0); }
 }
 // ---- protein table pagination (50/page) ----
 function pgProt(btn, dir){
@@ -269,7 +273,7 @@ Browse →</a>""" for k in POOLS)
 body = f"""<div class="hero">
   <h1>EnvTolDB</h1>
   <div class="tag">A curated, provenance-tracked database of proteins from environment-tolerant organisms — thermophilic, halophilic, acid/alkaliphilic, solvent-tolerant — with mesophilic controls.</div>
-  <div class="badge-line"><span class="rel">Release {esc(RELEASE)}</span><span class="rel2">Data as of 2026-11-16</span><span class="rel2">Source: UniProtKB 2026_01</span></div>
+  <div class="badge-line"><span class="rel">Release {esc(RELEASE)}</span><span class="rel2">Data as of {esc(DATA_AS_OF)}</span><span class="rel2">Source: UniProtKB {esc(UNIPROT_RELEASE)}</span></div>
   <div class="srch"><input id="spq" placeholder="Search 231 species — e.g. Halobacterium, Sulfolobus, putida…" oninput="filterSpecies(this)"><button onclick="var t=document.getElementById('spq');filterSpecies(t)">Search</button></div>
   <div class="hint">Filters the species table below. Bulk/protein-level search: download the SQLite database (Downloads).</div>
   <div class="chips">
@@ -425,8 +429,8 @@ evidence {esc(sp['evidence_level'] or '—')}
 <div data-pg-wrap>
 <table><thead><tr><th onclick="sortTable(this)">Accession</th><th onclick="sortTable(this)">Protein</th>
 <th onclick="sortTable(this)">Length ▾</th><th onclick="sortTable(this)">mean pLDDT · salt-bridges/100</th><th onclick="sortTable(this)">Experimental parameters</th><th onclick="sortTable(this)">Verified</th></tr></thead>
-<tbody>{''.join(trs)}</tbody></table></div>
-<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div>
+<tbody>{''.join(trs)}</tbody></table>
+<div style="margin:10px 0"><button onclick="pgProt(this,-1)">‹ prev</button> <span class="pgstat"></span> <button onclick="pgProt(this,1)">next ›</button></div></div>
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>"""
         open(f"{OUT}/species/{slug}.html", "w", encoding="utf-8").write(page(sp["name"], b, "species-detail", crumb=True, subdir=True))
         count += 1
