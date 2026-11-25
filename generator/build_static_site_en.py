@@ -20,7 +20,7 @@ DB = "/public/home/sjl2/datasetdb/dataset.db"
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = "/public/home/sjl2/envtoldb_site"          # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.5.2"
+RELEASE = "v3.6.1"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -480,22 +480,22 @@ KIND_EN = {"ddG": "ΔΔG of folding (kcal/mol)", "dTm_protherm": "ΔTm of single
            "brenda_ic50": "IC50 inhibitor concentration (µM/mM)",
            "thermomut_ddg": "ΔΔG of mutation (kcal/mol, ThermoMutDB)",
            "thermomut_dtm": "ΔTm of mutation (°C, ThermoMutDB)",
-           "salt_tab_tab": "salt stability table value", "arsenic_tab_tab": "arsenic stability table value",
-           "magnetotactic_tab_tab": "magnetotactic stability table value",
-           "oligotrophic_tab_tab": "oligotrophic stability table value",
            "des_k_inact": "k_inact in DES (DES literature)",
            "des_t_half": "t½ in DES (min, DES literature)"}
 krows = "".join(f"<tr><td><span class='badge'>{esc(r[0])}</span> {KIND_EN.get(r[0],'')}</td>"
                 f"<td>{r[1]:,}</td><td>{r[2] or 0:,}</td><td>{r[3]}</td>"
                 f"<td>{esc(KIND_EN.get(r[0], ''))}</td></tr>" for r in kinds)
 des_n = db.execute("SELECT COUNT(*) FROM experiments WHERE kind LIKE 'des_%'").fetchone()[0]
-b = f"""<div class="note">Experimental layer: {stats_all if False else totals['experiments']:,} records from four sources
-(OrganiZymeDB, FireProtDB, ProThermDB-L4, pH–Tm compilation). Linked rows carry a UniProt accession;
+b = f"""<div class="note">Experimental layer: {stats_all if False else totals['experiments']:,} records from curated source databases
+(FireProtDB, Meltome Atlas, BRENDA, ThermoMutDB, ProThermDB, OrganiZymeDB, pH–Tm compilation). Linked rows carry a UniProt accession;
 unlinked rows retain the source wild-type hash for provenance.</div>
 <div class="card"><h2>By kind</h2><table><tr><th>kind</th><th>records</th><th>linked</th><th>mean value</th></tr>{krows}</table>
 <p class="muted">Full per-record browsing: download the SQLite database. Layer totals:
-533,071 (FireProtDB) + 206,549 (Meltome Atlas) + 212,538 (BRENDA stability + kinetics) + 8,239 (ThermoMutDB)
-+ 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,833 (OrganiZymeDB) + 5,967 (literature table mining) + 164 (DES) ≈ 973,000.</p></div>
+533,071 (FireProtDB) + 206,549 (Meltome Atlas) + 212,558 (BRENDA stability + kinetics) + 8,239 (ThermoMutDB)
++ 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,833 (OrganiZymeDB) + 164 (DES literature) = 967,218.</p>
+<p class="muted">The literature table-extraction layer (5,967 rows) was withdrawn in v3.6.1: an audit found most source papers
+unrelated to enzyme stability and most values not usable as the stability measure they were labelled with. The rows are kept in
+<code>experiments_quarantine</code> in the database pending re-curation and are no longer counted or served.</p></div>
 <div class="card"><h2>Deep-eutectic-solvent (DES) subset</h2>
 <p style="font-size:13.5px">{des_n} records from 3 dehydrogenases (ADH-A, Lk-ADH, GDH) across 11 ChCl/betaine-based
 DES systems (water 10–50 wt %, 30 °C incubation): <code>des_k_inact</code> (82) and <code>des_t_half</code> (82).

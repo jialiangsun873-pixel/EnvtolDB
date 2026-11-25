@@ -9,7 +9,7 @@
 |---|---:|
 | **Species** | **301** across 14 environmental dimensions |
 | **Protein sequences** | **892,811** (UniProt, SHA-256 checksummed) |
-| **Experimental measurements** | **964,946** (ddG / ΔTm / Tm / t½ / pH & temp optima / kinetics / in-cell melt temps) |
+| **Experimental measurements** | **967,218** (ddG / ΔTm / Tm / t½ / pH & temp optima / kinetics / in-cell melt temps) |
 | **CLEAN EC annotations** | **2,438,069** (AI-predicted EC numbers, 4,941 unique EC, 52% at confidence ≥0.9) |
 | **AlphaFold structure records** | **233,922** (pLDDT / salt-bridge density; all four new pools backfilled) |
 | **BRENDA enzyme parameters** | **212,538** (stability + Km / kcat / Ki / IC50 / specific activity; 67% linked) |
@@ -64,7 +64,6 @@ All four 2026 pools (cold/pH/piezo/rad) now carry AlphaFold structure backfills.
 | ProThermDB | 2,921 | ΔTm (100% SIFTS accession-linked) |
 | pH-Tm compilation | 1,883 | Curated pH-stability pairs |
 | OrganiZymeDB | 1,833 | Solvent Tm for enzymes |
-| Literature table extraction | 5,967 | Stability tables mined from OA full text across 11 dimensions |
 | DES literature (Radović 2024) | 164 | Deep eutectic solvent stability |
 
 Plus: 2,438,069 CLEAN EC predictions (NAR 2026, contrastive-learning enzyme annotation,
@@ -113,6 +112,7 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 
 ## Changelog
 
+- **v3.6.1 (2026-11-25)** — Literature table-extraction layer withdrawn (5,967 rows moved to `experiments_quarantine` in the database, with their evidence rows in `record_evidence_quarantine`): an audit found about 80% of the source papers unrelated to enzyme stability and 67% of the values outside 20–130 °C while labelled °C. Experimental layer now 967,218 records.
 - **v3.4.1 (2026-11-23)** — ThermoMutDB 2.0 import (+8,239 ddG/dTm, 250 proteins)
 - **v3.4 (2026-11-23)** — Meltome Atlas in-cell melt temperatures (+206,549); BRENDA v3 kinetics (+75,520: Km/kcat/Ki/IC50/SA); identity layer (metal/inhibitor/oxygen, 1,320); CLEAN EC predictions (2.44M); structure backfill for all four new pools (structures 146K→234K); ProThermDB 100% SIFTS-linked; 4-dimension literature extraction (salt/arsenic/magnetotactic/oligotrophic, +1,192)
 - **v3.3 (2026-11-21)** — arsenic (7), magnetotactic (5), oligotrophic (6) pools; BRENDA→UniProt 67%
