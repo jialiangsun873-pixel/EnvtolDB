@@ -21,7 +21,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.6.2"
+RELEASE = "v3.6.3"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -356,12 +356,11 @@ KIND_SHORT = {"brenda_ts": "Tstab", "brenda_to": "Topt", "brenda_tr": "Trange",
               "brenda_ki": "Ki", "brenda_ic50": "IC50",
               "meltome_tm": "Tm_cell", "thermomut_ddg": "ddG", "thermomut_dtm": "dTm",
               "ddG": "ddG_fire", "dTm_protherm": "dTm_prot", "Tm_vs_pH": "Tm@pH",
-              "dTm_solvent": "dTm_solv", "Tm_aqueous": "Tm_aq", "Tm_solvent": "Tm_solv",
-              "des_k_inact": "k_inact", "des_t_half": "t½"}
+              "dTm_solvent": "dTm_solv", "Tm_aqueous": "Tm_aq", "Tm_solvent": "Tm_solv"}
 acc2params = defaultdict(list)
 for r in db.execute("""SELECT accession, kind, value, unit FROM experiments
   WHERE accession IS NOT NULL AND value IS NOT NULL
-  AND (kind LIKE 'brenda_%' OR kind IN ('meltome_tm','thermomut_ddg','thermomut_dtm','ddG','dTm_protherm','Tm_vs_pH','dTm_solvent','Tm_aqueous','Tm_solvent','des_k_inact','des_t_half'))
+  AND (kind LIKE 'brenda_%' OR kind IN ('meltome_tm','thermomut_ddg','thermomut_dtm','ddG','dTm_protherm','Tm_vs_pH','dTm_solvent','Tm_aqueous','Tm_solvent'))
   ORDER BY accession"""):
     short = KIND_SHORT.get(r["kind"], r["kind"])
     if len(acc2params[r["accession"]]) < 6:
@@ -535,27 +534,21 @@ KIND_EN = {"ddG": "ΔΔG of folding (kcal/mol)", "dTm_protherm": "ΔTm of single
            "brenda_ki": "Ki inhibition constant (µM/mM)",
            "brenda_ic50": "IC50 inhibitor concentration (µM/mM)",
            "thermomut_ddg": "ΔΔG of mutation (kcal/mol, ThermoMutDB)",
-           "thermomut_dtm": "ΔTm of mutation (°C, ThermoMutDB)",
-           "des_k_inact": "k_inact in DES (DES literature)",
-           "des_t_half": "t½ in DES (min, DES literature)"}
+           "thermomut_dtm": "ΔTm of mutation (°C, ThermoMutDB)"}
 krows = "".join(f"<tr><td><span class='badge'>{esc(r[0])}</span> {KIND_EN.get(r[0],'')}</td>"
                 f"<td>{r[1]:,}</td><td>{r[2] or 0:,}</td><td>{r[3]}</td>"
                 f"<td>{esc(KIND_EN.get(r[0], ''))}</td></tr>" for r in kinds)
-des_n = db.execute("SELECT COUNT(*) FROM experiments WHERE kind LIKE 'des_%'").fetchone()[0]
 b = f"""<div class="note">Experimental layer: {stats_all if False else totals['experiments']:,} records from curated source databases
 (FireProtDB, Meltome Atlas, BRENDA, ThermoMutDB, ProThermDB, OrganiZymeDB, pH–Tm compilation). Linked rows carry a UniProt accession;
 unlinked rows retain the source wild-type hash for provenance.</div>
 <div class="card"><h2>By kind</h2><table><tr><th>kind</th><th>records</th><th>linked</th><th>mean value</th></tr>{krows}</table>
 <p class="muted">Full per-record browsing: download the SQLite database. Layer totals:
 533,071 (FireProtDB) + 206,549 (Meltome Atlas) + 212,558 (BRENDA stability + kinetics) + 8,239 (ThermoMutDB)
-+ 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,833 (OrganiZymeDB) + 164 (DES literature) = 967,218.</p>
-<p class="muted">The literature table-extraction layer (5,967 rows) was withdrawn in v3.6.1: an audit found most source papers
-unrelated to enzyme stability and most values not usable as the stability measure they were labelled with. The rows are kept in
-<code>experiments_quarantine</code> in the database pending re-curation and are no longer counted or served.</p></div>
-<div class="card"><h2>Deep-eutectic-solvent (DES) subset</h2>
-<p style="font-size:13.5px">{des_n} records from 3 dehydrogenases (ADH-A, Lk-ADH, GDH) across 11 ChCl/betaine-based
-DES systems (water 10–50 wt %, 30 °C incubation): <code>des_k_inact</code> (82) and <code>des_t_half</code> (82).
-53 records carry UniProt accessions; the GDH arm is <code>needs_review</code> pending plasmid-level identification.</p></div>"""
++ 2,921 (ProTherm-L4) + 1,883 (pH–Tm) + 1,833 (OrganiZymeDB) = 967,054.</p>
+<p class="muted">Two literature-derived layers were withdrawn and are no longer counted or served; their rows are kept in
+<code>experiments_quarantine</code> in the database pending re-curation. The table-extraction layer (5,967 rows, v3.6.1): an audit
+found most source papers unrelated to enzyme stability and most values not usable as the stability measure they were labelled with.
+The DES stability layer (164 rows, v3.6.3) came from a single paper and is withdrawn pending re-curation.</p></div>"""
 open(f"{OUT}/experiments.html", "w", encoding="utf-8").write(page("Experiments", b, "experiments"))
 
 # ================= methods =================

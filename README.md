@@ -9,7 +9,7 @@
 |---|---:|
 | **Species** | **301** across 14 environmental dimensions |
 | **Protein sequences** | **892,811** (UniProt, SHA-256 checksummed) |
-| **Experimental measurements** | **967,218** (ddG / ΔTm / Tm / t½ / pH & temp optima / kinetics / in-cell melt temps) |
+| **Experimental measurements** | **967,054** (ddG / ΔTm / Tm / t½ / pH & temp optima / kinetics / in-cell melt temps) |
 | **CLEAN EC annotations** | **2,438,069** (AI-predicted EC numbers, 4,941 unique EC, 52% at confidence ≥0.9) |
 | **AlphaFold structure records** | **233,922** (pLDDT / salt-bridge density; all four new pools backfilled) |
 | **BRENDA enzyme parameters** | **212,538** (stability + Km / kcat / Ki / IC50 / specific activity; 67% linked) |
@@ -66,7 +66,9 @@ All four 2026 pools (cold/pH/piezo/rad) now carry AlphaFold structure backfills.
 | ProThermDB | 2,921 | ΔTm (100% SIFTS accession-linked) |
 | pH-Tm compilation | 1,883 | Curated pH-stability pairs |
 | OrganiZymeDB | 1,833 | Solvent Tm for enzymes |
-| DES literature (Radović 2024) | 164 | Deep eutectic solvent stability |
+
+Two literature-derived layers are no longer served and are kept in `experiments_quarantine` pending re-curation:
+the table-extraction layer (5,967 rows, withdrawn v3.6.1) and the DES stability layer (164 rows, withdrawn v3.6.3).
 
 Plus: 2,438,069 CLEAN EC predictions (NAR 2026, contrastive-learning enzyme annotation,
 52% at confidence ≥0.9) and 1,320 BRENDA identity annotations (metal-ion dependence,
@@ -134,6 +136,7 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 
 ## Changelog
 
+- **v3.6.3 (2026-11-26)** — DES stability layer (164 rows, single literature source) withdrawn and moved to `experiments_quarantine`. Experimental layer now 967,054 records.
 - **v3.6.2 (2026-11-25)** — Species-level literature: Europe PMC title/abstract anchoring for all 284 non-control species (270 anchored), naming/reclassification papers (219 species), growth-physiology fallback (65), genus-level fallback (14). New tables `species_synonyms`, `species_literature`, `species_literature_stats`; literature card on every species page.
 - **v3.6.1 (2026-11-25)** — Literature table-extraction layer withdrawn (5,967 rows moved to `experiments_quarantine` in the database, with their evidence rows in `record_evidence_quarantine`): an audit found about 80% of the source papers unrelated to enzyme stability and 67% of the values outside 20–130 °C while labelled °C. Experimental layer now 967,218 records.
 - **v3.4.1 (2026-11-23)** — ThermoMutDB 2.0 import (+8,239 ddG/dTm, 250 proteins)
