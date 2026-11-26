@@ -21,7 +21,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.6.3"
+RELEASE = "v3.7.0"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -254,6 +254,21 @@ totals = {
     "structures": db.execute("SELECT COUNT(*) FROM structures").fetchone()[0],
 }
 
+# ================= gene mapping (v3.7.0): NCBI IPG + EBI coordinates + verified CDS =================
+ipg = {}
+gene_status_count = defaultdict(int)
+for r in db.execute("SELECT accession, mapping_status, nucleotide, start, stop, strand, gene_name, cds_validation_status FROM gene_mapping_status WHERE mapping_status IN ('CDS_VERIFIED','COORDINATES_ONLY','MAPPED_CDS_UNVERIFIED')"):
+    gene_status_count[r["mapping_status"]] += 1
+    ipg[r["accession"]] = [r["mapping_status"], r["nucleotide"], r["start"], r["stop"], r["strand"], r["gene_name"], r["cds_validation_status"], None]
+for r in db.execute("SELECT accession, sequence_length FROM gene_sequences"):
+    if r["accession"] in ipg:
+        ipg[r["accession"]][7] = r["sequence_length"]
+print(f"gene mapping loaded: {len(ipg):,} ({dict(gene_status_count)}), CDS lengths: {sum(1 for v in ipg.values() if v[7]):,}", flush=True)
+sp_cds = defaultdict(int)
+for r in db.execute("SELECT species_id, COUNT(*) c FROM gene_sequences GROUP BY species_id"):
+    sp_cds[r["species_id"]] = r["c"]
+print(f"per-species CDS coverage: {len(sp_cds)} species", flush=True)
+
 # ================= index =================
 notice_en = cfg["site"].get("notice_en", "").format(n_pools=len(POOLS), n_species=totals["species"], n_proteins=totals["proteins"])
 notice_zh = cfg["site"].get("notice", "").format(n_pools=len(POOLS), n_species=totals["species"], n_proteins=totals["proteins"])
@@ -311,10 +326,11 @@ body = f"""<div class="card"><h2 data-zh="全部物种">All curated species ({to
 <table><thead><tr>
  <th onclick="sortTable(this)">Species</th><th onclick="sortTable(this)">Group</th>
  <th onclick="sortTable(this)">Grade</th><th onclick="sortTable(this)">Sequences</th>
- <th onclick="sortTable(this)">Anchored</th><th onclick="sortTable(this)">Evidence level</th></tr></thead>
+ <th onclick="sortTable(this)">CDS verified</th><th onclick="sortTable(this)">Anchored</th><th onclick="sortTable(this)">Evidence level</th></tr></thead>
 <tbody>{''.join(f'<tr data-sp-row><td><a href="{slugify(r["name"])}.html">{esc(r["name"])}</a></td>'
     f'<td>{POOL_EN.get(r["pool"], esc(r["pool"]))}</td><td>{esc(r["grade"] or "—")}</td>'
     f'<td>{(r["n_seqs"] or 0):,}</td>'
+    f'<td>{sp_cds.get(r["id"], 0):,}</td>'
     f'<td>{ANCH_OK if r["lit_anchored"] else ANCH_NO}</td>'
     f'<td>{esc(r["evidence_level"] or "—")}</td></tr>' for r in all_species)}</tbody></table></div>"""
 open(f"{OUT}/species/index.html", "w", encoding="utf-8").write(page("Species", body, "species"))
@@ -326,23 +342,15 @@ for pool in POOLS:
     trs = "".join(
         f'<tr data-sp-row><td><a href="{slugify(r["name"])}.html">{esc(r["name"])}</a></td>'
         f'<td>{esc(r["grade"] or "—")}</td><td>{(r["n_seqs"] or 0):,}</td>'
+        f'<td>{sp_cds.get(r["id"], 0):,}</td>'
         f'<td>{ANCH_OK if r["lit_anchored"] else ANCH_NO}</td></tr>' for r in items)
     en = POOLS.get(pool, {}).get("en") or (cfg["collection"]["pools"][list(POOL_EN).index(pool)].get("en") if False else {})
     b = f'<div class="card"><h2>{esc(POOL_EN.get(pool, pool))} — {len(items)} organisms</h2><table>' \
-        '<tr><th>Species</th><th>Grade</th><th>Sequences</th><th>Anchored</th></tr>' + trs + '</table></div>'
+        '<tr><th>Species</th><th>Grade</th><th>Sequences</th><th>CDS verified</th><th>Anchored</th></tr>' + trs + '</table></div>'
     open(f"{OUT}/species/{pool}.html", "w", encoding="utf-8").write(page(POOL_EN.get(pool, pool), b, "species"))
 print("pool pages ✓", flush=True)
 
 # ================= per-species pages =================
-ipg = {}
-try:
-    for line in open("/public/home/sjl2/datasetdb/gene_seqs/ipg_map.tsv"):
-        p_ = line.rstrip("\n").split("\t")
-        if len(p_) >= 5 and p_[1] != "MISS" and p_[0] not in ipg:
-            ipg[p_[0]] = (p_[1], p_[2], p_[3], p_[4])
-except FileNotFoundError:
-    pass
-print(f"IPG 坐标可用: {len(ipg):,}", flush=True)
 acc2struct = {}
 for r in db.execute("SELECT accession, mean_plddt, salt_bridges_per_100, n_residues, frac_plddt70 FROM structures"):
     acc2struct[r["accession"]] = (r["mean_plddt"], r["salt_bridges_per_100"], r["n_residues"], r["frac_plddt70"])
@@ -619,6 +627,7 @@ def _n(t):
     except sqlite3.OperationalError: return "—"
 lit_counts = " / ".join(_n(t) for t in ("species_synonyms", "species_literature", "species_literature_stats"))
 quar_counts = " / ".join(_n(t) for t in ("experiments_quarantine", "record_evidence_quarantine"))
+gene_counts = " / ".join(_n(t) for t in ("gene_coordinates", "gene_sequences", "gene_mapping_status"))
 b = f"""<div class="note">This GitHub Pages mirror is static. For programmatic access, download the SQLite
 database (Downloads) — every table below is a plain SQL table. A REST API also exists on the
 self-hosted instance.</div>
@@ -633,6 +642,9 @@ self-hosted instance.</div>
 <tr><td><code>species_synonyms</code> / <code>species_literature</code> / <code>species_literature_stats</code></td>
 <td>names searched per species; most-cited Europe PMC papers per search; hit count and exact query</td>
 <td>{lit_counts}</td></tr>
+<tr><td><code>gene_coordinates</code> / <code>gene_sequences</code> / <code>gene_mapping_status</code></td>
+<td>genomic coordinates (NCBI IPG + EBI), verified CDS sequences, per-protein mapping status</td>
+<td>{gene_counts}</td></tr>
 <tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
 <td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>{quar_counts}</td></tr></table></div>
 <div class="card"><h2>Example queries</h2>
@@ -647,7 +659,11 @@ sqlite3 dataset.db "SELECT accession, value, condition, source_ref FROM experime
 
 -- proteins with structure and high salt-bridge density
 sqlite3 dataset.db "SELECT accession, mean_plddt, salt_bridges_per_100 FROM structures
-  WHERE salt_bridges_per_100 > 6 ORDER BY 3 DESC"</pre></div>
+  WHERE salt_bridges_per_100 > 6 ORDER BY 3 DESC"
+
+-- gene coordinates + mapping status for one protein
+sqlite3 dataset.db "SELECT accession, nucleotide, start, stop, strand, mapping_status
+  FROM gene_mapping_status WHERE accession='P42920'"</pre></div>
 <div class="card"><h2>Self-hosted REST API (on the internal instance)</h2>
 <table><tr><th>Method</th><th>Path</th><th>Description</th></tr>
 <tr><td>GET</td><td><code>/api/dataset/stats</code></td><td>totals per layer and per pool</td></tr>

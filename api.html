@@ -88,6 +88,9 @@ self-hosted instance.</div>
 <tr><td><code>species_synonyms</code> / <code>species_literature</code> / <code>species_literature_stats</code></td>
 <td>names searched per species; most-cited Europe PMC papers per search; hit count and exact query</td>
 <td>420 / 2,478 / 660</td></tr>
+<tr><td><code>gene_coordinates</code> / <code>gene_sequences</code> / <code>gene_mapping_status</code></td>
+<td>genomic coordinates (NCBI IPG + EBI), verified CDS sequences, per-protein mapping status</td>
+<td>352,298 / 405,221 / 921,600</td></tr>
 <tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
 <td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>6,131 / 6,131</td></tr></table></div>
 <div class="card"><h2>Example queries</h2>
@@ -102,7 +105,11 @@ sqlite3 dataset.db "SELECT accession, value, condition, source_ref FROM experime
 
 -- proteins with structure and high salt-bridge density
 sqlite3 dataset.db "SELECT accession, mean_plddt, salt_bridges_per_100 FROM structures
-  WHERE salt_bridges_per_100 > 6 ORDER BY 3 DESC"</pre></div>
+  WHERE salt_bridges_per_100 > 6 ORDER BY 3 DESC"
+
+-- gene coordinates + mapping status for one protein
+sqlite3 dataset.db "SELECT accession, nucleotide, start, stop, strand, mapping_status
+  FROM gene_mapping_status WHERE accession='P42920'"</pre></div>
 <div class="card"><h2>Self-hosted REST API (on the internal instance)</h2>
 <table><tr><th>Method</th><th>Path</th><th>Description</th></tr>
 <tr><td>GET</td><td><code>/api/dataset/stats</code></td><td>totals per layer and per pool</td></tr>
@@ -114,7 +121,7 @@ sqlite3 dataset.db "SELECT accession, mean_plddt, salt_bridges_per_100 FROM stru
 <p style="font-size:13.5px">If you use EnvTolDB in your research, please cite the EnvProGen manuscript (in preparation) and the underlying sources: UniProtKB, BacDive, OrganiZymeDB, FireProtDB, ProThermDB, Europe PMC.</p></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.6.3 · built 2026-11-26 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.7.0 · built 2026-11-26 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>

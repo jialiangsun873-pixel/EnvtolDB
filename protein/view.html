@@ -78,12 +78,18 @@ fetch('../species/data/' + SP + '.json').then(r => {
   }
 
   if (d.ipg) {
-    h += '<div class="card"><h2>Gene (CDS coordinates)</h2><p><code>' + d.ipg[0] + '</code> ' + d.ipg[1] + '–' + d.ipg[2] +
-         ' (' + (d.ipg[3] === '+' ? '+' : '−') + ' strand) · <a href="https://www.ncbi.nlm.nih.gov/nuccore/' + d.ipg[0] +
-         '?report=fasta&from=' + d.ipg[1] + '&to=' + d.ipg[2] + '&strand=2" target="_blank">CDS FASTA at NCBI</a> · ' +
-         '<span class="muted">gene-sequence layer collecting (IPG pipeline)</span></p></div>';
+    var g = d.ipg;
+    h += '<div class="card"><h2>Gene (genomic coordinates & CDS)</h2><p><code>' + g[0] + '</code> ' + g[1] + '–' + g[2] +
+         ' (' + (g[3] === '-' ? '−' : '+') + ' strand)' +
+         (g[5] ? ' · gene <i>' + g[5] + '</i>' : '') +
+         (g[7] ? ' · CDS ' + Number(g[7]).toLocaleString('en-US') + ' bp' : '') +
+         ' · <code>' + g[4] + '</code>' +
+         ' · <a href="https://www.ncbi.nlm.nih.gov/nuccore/' + g[0] +
+         '?report=fasta&from=' + g[1] + '&to=' + g[2] + '&strand=' + (g[3] === '-' ? 1 : 2) + '" target="_blank">CDS FASTA at NCBI</a>' +
+         (g[4] === 'CDS_VERIFIED' ? ' · <span class="muted">CDS extracted from the genome and translation-verified in EnvTolDB</span>' : '') +
+         '</p></div>';
   } else {
-    h += '<div class="card"><h2>Gene</h2><p class="muted">Genome mapping in progress (NCBI IPG pipeline; no RefSeq CDS mapping for this protein yet).</p></div>';
+    h += '<div class="card"><h2>Gene</h2><p class="muted">No genomic coordinates mapped for this protein in the current NCBI IPG + EBI pass — 55.4% of the 921,600-protein set has no RefSeq CDS anchoring yet.</p></div>';
   }
 
   h += '<div class="card"><h2>Structure (AlphaFold predicted model)</h2>' +
