@@ -21,7 +21,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.7.0"
+RELEASE = "v3.7.1"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -485,7 +485,7 @@ evidence {esc(sp['evidence_level'] or '—')}
 {('· BacDive optimum ' + esc(sp['bacdive_value']) + ' ' + esc(sp['bacdive_unit'])) if sp['bacdive_value'] is not None else ''}</p>
 <p class="muted">Provenance: {prov}{(' · last edited by ' + esc(sp['updated_by'])) if sp['updated_by'] else ''}</p>
 <p class="muted">{esc(sp['evidence_note'] or '')} {esc(sp['notes'] or '')}</p>
-<p><a class="btn" href="{gz_rel}" download>⬇ FASTA (.fasta.gz)</a></p></div>
+<p><a class="btn" href="{gz_rel}" download>⬇ FASTA (.fasta.gz)</a>{(' <a class="btn" href="downloads/fasta_cds/' + slug + '.cds.fasta.gz" download>⬇ CDS FASTA (.fasta.gz)</a>') if sp_cds.get(sp['id']) else ''}</p></div>
 {lit_card(sp)}
 <div class="card"><h2>Proteins ({len(prots):,})</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
@@ -596,6 +596,29 @@ b = f"""<div class="note">{esc(col.get('_intro_en',''))}</div>{''.join(mcards)}
 open(f"{OUT}/methods.html", "w", encoding="utf-8").write(page("Methods", b, "methods"))
 print("methods ✓", flush=True)
 
+# ================= per-species CDS FASTA downloads (v3.7.1) =================
+import gzip as _gzip
+os.makedirs(f"{OUT}/downloads/fasta_cds", exist_ok=True)
+sid2slug = {}
+for _pool in POOLS:
+    for _sp in sp_by_pool.get(_pool, []):
+        sid2slug[_sp["id"]] = slugify(_sp["name"])
+_cur_sid, _fh = None, None
+_n_files = 0
+for r in db.execute("SELECT species_id, accession, nucleotide, start, stop, strand, sequence FROM gene_sequences ORDER BY species_id, accession"):
+    if r["species_id"] != _cur_sid:
+        if _fh: _fh.close()
+        _cur_sid, _fh = r["species_id"], None
+        _slug = sid2slug.get(r["species_id"])
+        if _slug:
+            _fh = _gzip.open(f"{OUT}/downloads/fasta_cds/{_slug}.cds.fasta.gz", "wt", compresslevel=9)
+            _n_files += 1
+    if _fh:
+        _seq = r["sequence"] or ""
+        _fh.write(">%s %s:%s-%s(%s) cds_len=%d\n%s\n" % (r["accession"], r["nucleotide"], r["start"], r["stop"], r["strand"], len(_seq), _seq))
+if _fh: _fh.close()
+print(f"CDS FASTA: {_n_files} species files, {sum(os.path.getsize(f'{OUT}/downloads/fasta_cds/{x}') for x in os.listdir(f'{OUT}/downloads/fasta_cds'))/1e6:.1f} MB gz", flush=True)
+
 # ================= downloads =================
 import hashlib
 files = []
@@ -606,6 +629,8 @@ for root, _, fs in os.walk(f"{OUT}/downloads"):
         files.append((rel.replace(os.sep, "/"), os.path.getsize(fp)))
 fa_files = [f for f in files if f[0].startswith("downloads/fasta/")]
 tsv_files = [f for f in files if f[0].startswith("downloads/tsv/")]
+cds_files = [f for f in files if f[0].startswith("downloads/fasta_cds/")]
+crows = "".join(f"<tr><td>{esc(os.path.basename(f[0]).replace('.cds.fasta.gz',''))}</td><td><a href='{esc(f[0])}' download>{esc(f[0])}</a></td><td>{f[1]/1e6:.2f} MB</td></tr>" for f in cds_files)
 frows = "".join(f"<tr><td>{esc(os.path.basename(f[0]).replace('.fasta.gz',''))}</td>"
                 f"<td><a href='{esc(f[0])}' download>{esc(f[0])}</a></td><td>{f[1]/1e6:.2f} MB</td></tr>" for f in fa_files)
 trows = "".join(f"<tr><td><a href='{esc(f[0])}' download>{esc(os.path.basename(f[0]))}</a></td><td>{f[1]/1024:.1f} KB</td></tr>" for f in tsv_files)
@@ -617,6 +642,8 @@ b = f"""<div class="note">Everything below is generated from the EnvTolDB SQLite
 (gzip; uncompress → <code>sqlite3 dataset.db</code>. Schema and example queries on the <a href="api.html">API page</a>.)</p></div>
 <div class="card"><h2>Per-species FASTA ({len(fa_files)} files, {sum(f[1] for f in fa_files)/1e6:.0f} MB total)</h2>
 <table><tr><th>Species</th><th>File</th><th>Size</th></tr>{frows}</table></div>
+<div class="card"><h2>Per-species CDS FASTA ({len(cds_files)} files, {sum(f[1] for f in cds_files)/1e6:.0f} MB total)</h2>
+<table><tr><th>Species</th><th>File</th><th>Size</th></tr>{crows}</table></div>
 <div class="card"><h2>Species tables TSV ({len(tsv_files)})</h2><table>{''.join(f"<tr><td>{esc(os.path.basename(f[0]))}</td><td>{f[1]/1024:.0f} KB</td></tr>" for f in tsv_files)}</table></div>"""
 open(f"{OUT}/downloads.html", "w", encoding="utf-8").write(page("Downloads", b, "downloads"))
 print("downloads ✓", flush=True)
