@@ -15,6 +15,7 @@
 | **BRENDA enzyme parameters** | **212,538** (stability + Km / kcat / Ki / IC50 / specific activity; 67% linked) |
 | **Identity annotations** | **1,320** (metal-ion dependence / inhibitors / oxygen sensitivity) |
 | **Species literature (v3.6.2)** | **270 / 284** non-control species anchored in Europe PMC (title/abstract); **2,478** key papers |
+| **Growth conditions from the literature (v3.8.0)** | **488** reviewed statements (growth temperature / pH / NaCl) for **153** species, each with its source sentence |
 
 ## What is EnvTolDB?
 
@@ -94,6 +95,29 @@ Tables: `species_synonyms` (names searched, with NCBI taxon id), `species_litera
 refreshed where it was unset or machine-derived (236 species); manually curated flags were left as they
 are, and 6 of them disagree with the automated result.
 
+## Growth conditions from the literature (v3.8.0)
+
+Growth temperature, pH and NaCl ranges and optima were read from the abstracts of the papers stored for
+each species:
+
+- **Parsing**: a rule-based parser selects sentences that speak about growth and state a temperature, a
+  pH or a NaCl level, and reads the growth range, the optimum and the limits from each one together with
+  the sentence itself.
+- **Review**: every statement was then reviewed sentence by sentence against its source sentence by an AI
+  agent (ZCode), not by a human curator. 488 statements for 153 of the 284 environment-tolerant species
+  were confirmed (52 species after correcting the parsed values); 73 candidate papers were rejected,
+  mostly naming papers that describe another species and only mention this one, or values that are
+  experimental conditions rather than growth conditions. Only confirmed statements are served, each with
+  its source sentence and PMID.
+- **Audit**: an automated check verifies that every stored sentence occurs verbatim in its paper's
+  abstract, that the paper names the species, and that range, optimum and limits of one trait do not
+  contradict each other.
+
+Table: `species_literature_phenotypes`. Coverage by group: thermophilic 64 of 87, halophilic 51 of 86,
+acid/alkaliphilic 13 of 26, cold-adapted 12 of 30, other groups 13; 66 species have all three traits, 36 two
+and 51 one, because their abstracts state only those. Values are as the paper states them; NaCl given in
+% (w/v), g/l or mM is also stored in mol/l.
+
 ## Web interface
 
 Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
@@ -136,6 +160,7 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 
 ## Changelog
 
+- **v3.8.0 (2026-11-26)** — Growth conditions from the literature: 488 reviewed statements (growth temperature / pH / NaCl range, optimum and limits) for 153 species, read from paper abstracts, reviewed sentence by sentence and audited; new table `species_literature_phenotypes`; growth-conditions card on species pages.
 - **v3.6.3 (2026-11-26)** — DES stability layer (164 rows, single literature source) withdrawn and moved to `experiments_quarantine`. Experimental layer now 967,054 records.
 - **v3.6.2 (2026-11-25)** — Species-level literature: Europe PMC title/abstract anchoring for all 284 non-control species (270 anchored), naming/reclassification papers (219 species), growth-physiology fallback (65), genus-level fallback (14). New tables `species_synonyms`, `species_literature`, `species_literature_stats`; literature card on every species page.
 - **v3.6.1 (2026-11-25)** — Literature table-extraction layer withdrawn (5,967 rows moved to `experiments_quarantine` in the database, with their evidence rows in `record_evidence_quarantine`): an audit found about 80% of the source papers unrelated to enzyme stability and 67% of the values outside 20–130 °C while labelled °C. Experimental layer now 967,218 records.

@@ -16,19 +16,21 @@ import csv, glob, gzip, html, json, os, sqlite3, datetime
 from collections import defaultdict
 from statistics import median
 
+from build_afp_site import build_site as build_afp_site
+
 # ENVTOLDB_DB / ENVTOLDB_OUT let a build be rehearsed against a staged copy without touching the repo.
 DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.7.1"
+RELEASE = "v3.8.0"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
 db = sqlite3.connect(DB, timeout=60)
 db.row_factory = sqlite3.Row
 db.execute("PRAGMA busy_timeout=60000")
-DATA_AS_OF = db.execute("SELECT MAX(substr(ts, 1, 10)) FROM import_batches").fetchone()[0] or NOW
+DATA_AS_OF = db.execute("SELECT MAX(substr(ts, 1, 10)) FROM import_batches WHERE kind IS NULL OR kind != 'afp_ibp'").fetchone()[0] or NOW
 
 POOLS = {p["key"]: p for p in cfg["pools"]}
 POOL_EN = {"thermo": "Thermophilic", "salt": "Halophilic", "ph": "Acid/Alkaliphilic", "metal": "Metal-resistant", "endolithic": "Endolithic", "xerophilic": "Xerophilic", "cold": "Cold-adapted", "piezo": "Piezophilic", "rad": "Radiation-resistant",
@@ -50,69 +52,25 @@ def slugify(name): return name.replace(" ", "_").replace("/", "_")
 
 # ---------------- shared chrome ----------------
 CSS = """
-:root{--ink:#13233b;--soft:#43597a;--faint:#7285a0;--line:#d9e4f0;--bg:#f5f8fc;--card:#fff;
- --accent:#1668dc;--accent-ink:#0d4bb5;--ok:#17805f;--ok-bg:#e4f4ee;--no:#c4424f;--no-bg:#fdeef0;
- --radius:8px;--shadow:0 1px 3px rgba(15,40,80,.08)}
-*{box-sizing:border-box}
-body{font-family:Inter,-apple-system,'Segoe UI',Roboto,'Microsoft YaHei',sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;color:var(--ink)}
-.brand svg{width:26px;height:26px;color:var(--accent)}
-.brand small{display:block;font-weight:400;font-size:11px;color:var(--faint);margin-top:-2px}
-nav{display:flex;gap:2px;flex-wrap:wrap}
-nav a{padding:5px 11px;border-radius:6px;color:var(--soft);font-size:13.5px}
-nav a:hover{background:#eef3f9;color:var(--ink);text-decoration:none}
-nav a.on{background:#e7f0fb;color:var(--accent-ink);font-weight:600}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.langbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--soft)}
-.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
-.gh:hover{color:var(--ink)}
-main{max-width:1140px;margin:0 auto;padding:26px 18px 70px}
-.hero{background:linear-gradient(180deg,#eef4fb,#f8fbff);border:1px solid var(--line);border-radius:var(--radius);padding:34px 34px 26px;margin-bottom:22px}
-.hero h1{font-size:30px;margin:0 0 4px;letter-spacing:-.3px}
-.hero .tag{font-size:15px;color:var(--soft);margin-bottom:16px}
-.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.rel{background:var(--accent);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600}
-.rel2{background:#fff;border:1px solid var(--line);color:var(--soft);font-size:12px;padding:3px 10px;border-radius:12px}
-.srch{display:flex;gap:8px;max-width:560px}
-.srch input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid #b9cbe2;border-radius:8px}
-.srch input:focus{outline:2px solid #9cc3e5;border-color:var(--accent)}
-.srch button{padding:10px 20px;font-size:14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
-.hint{font-size:12px;color:var(--faint);margin-top:6px}
-.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
-.chip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-width:150px}
-.chip b{font-size:21px;display:block}
-.chip span{font-size:11.5px;color:var(--faint)}
-h2.sec{font-size:19px;margin:26px 0 12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
-.pcard b{font-size:15px}.pcard .n{font-size:24px;font-weight:700;display:block;margin:2px 0}
-.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:8px}
-table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-th{background:#eef3f9;text-align:left;padding:8px 10px;font-weight:600;white-space:nowrap;cursor:pointer;user-select:none}
-th:hover{background:#e2ecf6}
-td{padding:6px 10px;border-bottom:1px solid #ecf2f8}
-tr:hover td{background:#f4f8fd}
-.badge{display:inline-block;padding:1px 9px;border-radius:11px;font-size:11.5px;white-space:nowrap}
-.b-ok{background:var(--ok-bg);color:#146a50}.b-no{background:#fdeef0;color:#c4424f}
-.b-grade{background:#e7f0fb;color:var(--accent-ink)}
-.bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle}
-.bar-neg{background:#e58a93}.bar-pos{background:#7bbf9e}
-.muted{color:var(--faint);font-size:12.5px}
-.note{background:#e4f4ee;border:1px solid #bfe3d6;color:#146a50;padding:9px 14px;border-radius:6px;margin-bottom:16px;font-size:13.5px}
-.err{background:#fdeef0;border:1px solid #f3c6cb;color:#c4424f;padding:8px 14px;border-radius:6px;margin-bottom:14px;font-size:13px}
-code{font-family:ui-monospace,'JetBrains Mono',monospace;font-size:12px;background:#eef3f9;padding:1px 5px;border-radius:3px}
-pre{background:#eef3f9;padding:12px;border-radius:6px;font-size:12.5px;overflow:auto;max-height:360px}
-input,button{font-size:13.5px;padding:7px 11px;border:1px solid #b9cbe2;border-radius:6px;background:#fff;color:var(--ink);font-family:inherit}
-button{background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
-button:hover{background:var(--accent-ink)}
-details{border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;background:#fff}
-summary{cursor:pointer;font-weight:600;font-size:13.5px}
-.crumb{font-size:12.5px;color:var(--faint);margin-bottom:14px}
-.crumb a{color:var(--faint)}
-footer{max-width:1140px;margin:30px auto 50px;padding:16px 18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+:root{color-scheme:light dark;--ink:#1d1d1f;--soft:#48484a;--faint:#6e6e73;--line:rgba(60,60,67,.13);--bg:#f5f5f7;--card:rgba(255,255,255,.74);--header:rgba(249,249,251,.76);--accent:#007aff;--accent-ink:#0066cc;--ok:#248a3d;--ok-bg:rgba(52,199,89,.14);--no:#ff3b30;--no-bg:rgba(255,59,48,.12);--warn:#9a6200;--warn-bg:rgba(255,159,10,.15);--radius:24px;--shadow:0 18px 50px rgba(28,38,60,.10),0 2px 8px rgba(28,38,60,.05);--shadow-soft:0 8px 24px rgba(28,38,60,.08);--glass:blur(24px) saturate(180%)}
+@media(prefers-color-scheme:dark){:root{--ink:#f5f5f7;--soft:#d1d1d6;--faint:#98989d;--line:rgba(255,255,255,.11);--bg:#111114;--card:rgba(44,44,46,.74);--header:rgba(28,28,30,.78);--accent:#0a84ff;--accent-ink:#409cff;--ok:#30d158;--ok-bg:rgba(48,209,88,.15);--no:#ff453a;--no-bg:rgba(255,69,58,.14);--warn:#ffd60a;--warn-bg:rgba(255,214,10,.13);--shadow:0 22px 60px rgba(0,0,0,.34),0 2px 10px rgba(0,0,0,.22);--shadow-soft:0 10px 30px rgba(0,0,0,.26)}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}html{background:var(--bg)}body{position:relative;isolation:isolate;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 8% 2%,rgba(0,122,255,.13),transparent 30%),radial-gradient(circle at 94% 12%,rgba(52,199,89,.09),transparent 28%),radial-gradient(circle at 50% 100%,rgba(255,159,10,.06),transparent 34%)}::selection{background:rgba(0,122,255,.24)}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}button,input{font:inherit}button{touch-action:manipulation}a,button,input,summary{-webkit-tap-highlight-color:transparent}:focus-visible{outline:3px solid rgba(0,122,255,.34);outline-offset:3px}
+header{position:sticky;top:0;z-index:50;background:var(--header);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}.brand svg{width:27px;height:27px;color:var(--accent)}.brand small{display:block;font-weight:500;font-size:10.5px;color:var(--faint);margin-top:-2px;letter-spacing:.01em}
+nav{display:flex;gap:3px;flex-wrap:wrap;padding:4px;border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:0 6px 20px rgba(28,38,60,.06);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}nav a{padding:7px 12px;border-radius:13px;color:var(--soft);font-size:13px;font-weight:550;line-height:1.2;min-height:34px;display:inline-flex;align-items:center}nav a:hover{background:rgba(120,120,128,.10);color:var(--ink);text-decoration:none}nav a.on{background:rgba(0,122,255,.13);color:var(--accent);font-weight:650}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:9px}.langbtn{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:7px 11px;font-size:12.5px;cursor:pointer;color:var(--soft);min-height:36px;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}.langbtn:hover{color:var(--ink);background:rgba(120,120,128,.12)}.gh{font-size:12.5px;color:var(--soft);border:1px solid var(--line);background:var(--card);border-radius:13px;padding:7px 11px;min-height:36px;display:inline-flex;align-items:center}.gh:hover{color:var(--ink);text-decoration:none;background:rgba(120,120,128,.12)}
+main{max-width:1180px;margin:0 auto;padding:30px 20px 76px}main>*{animation:iosReveal .58s cubic-bezier(.2,.75,.25,1) both}main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}main>*:nth-child(4){animation-delay:.15s}main>*:nth-child(5){animation-delay:.2s}main>*:nth-child(n+6){animation-delay:.24s}@keyframes iosReveal{from{opacity:0;transform:translateY(12px) scale(.992)}to{opacity:1;transform:none}}
+.hero{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.90),rgba(238,244,255,.76));border:1px solid rgba(255,255,255,.82);border-radius:32px;padding:38px 38px 30px;margin-bottom:24px;box-shadow:var(--shadow)}@media(prefers-color-scheme:dark){.hero{background:linear-gradient(145deg,rgba(44,44,46,.92),rgba(22,36,55,.82));border-color:var(--line)}}.hero::before,.hero::after{content:"";position:absolute;z-index:-1;border-radius:999px;filter:blur(8px);opacity:.72}.hero::before{width:260px;height:260px;right:-70px;top:-110px;background:radial-gradient(circle,rgba(0,122,255,.24),transparent 68%)}.hero::after{width:220px;height:220px;left:36%;bottom:-160px;background:radial-gradient(circle,rgba(52,199,89,.17),transparent 68%)}.hero>*{position:relative;z-index:1}.hero h1{font-size:34px;line-height:1.12;margin:0 0 7px;letter-spacing:-.045em;font-weight:720}.hero .tag{font-size:15.5px;color:var(--soft);margin-bottom:18px;max-width:850px}.badge-line{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.rel{background:var(--accent);color:#fff;font-size:12px;padding:5px 12px;border-radius:999px;font-weight:650;box-shadow:0 6px 16px rgba(0,122,255,.22)}.rel2{background:var(--card);border:1px solid var(--line);color:var(--soft);font-size:12px;padding:5px 12px;border-radius:999px;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}
+.srch{display:flex;gap:9px;max-width:590px}.srch input{flex:1;padding:12px 16px;font-size:14px;border:1px solid var(--line);border-radius:15px;background:var(--card);color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.28);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}.srch input:focus{outline:none;border-color:rgba(0,122,255,.55);box-shadow:0 0 0 4px rgba(0,122,255,.12)}.srch button{padding:11px 20px;font-size:14px;border-radius:15px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:650;box-shadow:0 8px 20px rgba(0,122,255,.20)}.srch button:hover{background:var(--accent-ink)}.srch button:active{transform:scale(.97)}.hint{font-size:12px;color:var(--faint);margin-top:8px}
+.chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:13px 17px;min-width:154px;box-shadow:var(--shadow-soft);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}.chip b{font-size:23px;line-height:1.15;display:block;letter-spacing:-.035em}.chip span{font-size:11.5px;color:var(--faint)}
+h2.sec{font-size:20px;letter-spacing:-.025em;margin:30px 0 14px}h2{font-size:19px;margin:0 0 13px;letter-spacing:-.02em}h3{font-size:15px;margin:20px 0 7px;letter-spacing:-.01em}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:21px 22px;margin-bottom:18px;box-shadow:var(--shadow-soft);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.pcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px 19px;box-shadow:var(--shadow-soft);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}.pcard b{font-size:15px;letter-spacing:-.01em}.pcard .n{font-size:26px;font-weight:720;letter-spacing:-.04em;display:block;margin:3px 0}.pcard .m{font-size:12px;color:var(--faint);display:block;margin-bottom:9px}
+table{border-collapse:separate;border-spacing:0;width:100%;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;font-size:13px;box-shadow:0 8px 26px rgba(28,38,60,.05);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}th{background:rgba(120,120,128,.08);text-align:left;padding:11px 13px;font-weight:650;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid var(--line)}th:hover{background:rgba(120,120,128,.13)}td{padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:hover td,tr:hover td{background:rgba(0,122,255,.045)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;line-height:1.35;white-space:nowrap;background:rgba(0,122,255,.11);color:var(--accent)}.b-ok,.badge.ok{background:var(--ok-bg);color:var(--ok)}.b-no,.badge.bad{background:var(--no-bg);color:var(--no)}.badge.warn,.b-grade{background:var(--warn-bg);color:var(--warn)}.bar{height:10px;border-radius:999px;display:inline-block;vertical-align:middle}.bar-neg{background:var(--no)}.bar-pos{background:var(--ok)}.muted{color:var(--faint);font-size:12.5px}.note{background:rgba(0,122,255,.085);border:1px solid rgba(0,122,255,.16);color:var(--accent-ink);padding:12px 16px;border-radius:18px;margin-bottom:18px;font-size:13.5px;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}.warnbox{background:var(--warn-bg);border:1px solid rgba(255,159,10,.20);border-radius:18px;padding:12px 15px;margin:14px 0;color:var(--warn)}.err{background:var(--no-bg);border:1px solid rgba(255,59,48,.18);color:var(--no);padding:10px 15px;border-radius:16px;margin-bottom:14px;font-size:13px}
+code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;background:rgba(120,120,128,.11);padding:2px 6px;border-radius:6px}pre,.seq{font:12px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:rgba(120,120,128,.09);border:1px solid var(--line);padding:14px;border-radius:18px;overflow:auto;max-height:380px}.seq{word-break:break-all}input,button{font-size:13.5px;padding:9px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font-family:inherit}input{width:340px;max-width:100%}input:focus{outline:none;border-color:rgba(0,122,255,.5);box-shadow:0 0 0 4px rgba(0,122,255,.10)}button{background:var(--accent);color:#fff;border-color:transparent;cursor:pointer;font-weight:650}button:hover{background:var(--accent-ink)}button:active{transform:scale(.98)}.btn{display:inline-flex;align-items:center;padding:10px 16px;border-radius:14px;background:var(--accent);color:#fff;font-weight:650}.btn:hover{background:var(--accent-ink);text-decoration:none}
+details{border:1px solid var(--line);border-radius:18px;padding:12px 16px;margin:10px 0;background:var(--card)}summary{cursor:pointer;font-weight:650;font-size:13.5px}.kv{display:grid;grid-template-columns:150px 1fr;gap:8px 16px}.kv dt{color:var(--faint)}.kv dd{margin:0}.crumb{font-size:12.5px;color:var(--faint);margin-bottom:16px}.crumb a{color:var(--faint)}footer{max-width:1180px;margin:28px auto 52px;padding:18px 20px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+@media(hover:hover) and (pointer:fine){.card:hover,.pcard:hover{transform:translateY(-3px);box-shadow:0 22px 54px rgba(28,38,60,.13);border-color:rgba(0,122,255,.18)}.chip:hover{transform:translateY(-2px)}}
+@media(max-width:760px){header{padding:10px 14px;gap:10px}.brand{width:calc(100% - 120px)}nav{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;border-radius:16px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav a{white-space:nowrap}.hdr-right{margin-left:auto}.gh{display:none}main{padding:22px 14px 60px}.hero{padding:26px 22px 22px;border-radius:26px}.hero h1{font-size:29px}.hero .tag{font-size:14.5px}.srch{flex-direction:column}.srch button{width:100%}.chips{gap:9px}.chip{min-width:calc(50% - 5px);padding:12px 14px}.card{padding:17px 16px;border-radius:21px}.grid{grid-template-columns:1fr}table{display:block;overflow-x:auto;border-radius:18px}.kv{grid-template-columns:1fr;gap:3px}.kv dd{margin-bottom:9px}footer{margin:20px 14px 40px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 """
 
 JS = """
@@ -192,19 +150,20 @@ LOGO = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 def page(title, body, active="", crumb="", subdir=False):
     pre = "../" if subdir else ""
     items = [("index.html", "Overview", "总览"), ("species/index.html", "Species", "物种"),
-             ("solvents.html", "Solvents", "溶剂统计"), ("experiments.html", "Experiments", "实验参数"),
-             ("methods.html", "Methods", "采集方法"), ("downloads.html", "Downloads", "下载"),
-             ("api.html", "API", "API")]
+             ("afp/index.html", "AFP/IBP", "抗冻/冰结合"), ("solvents.html", "Solvents", "溶剂统计"),
+             ("experiments.html", "Experiments", "实验参数"), ("methods.html", "Methods", "采集方法"),
+             ("downloads.html", "Downloads", "下载"), ("api.html", "API", "API")]
     nav = "".join(
         f'<a href="{pre}{h}" class="{"on" if k==active else ""}" data-zh="{zh}">{t}</a>'
         for h, t, k, zh in [(h, t, k, zh) for (h, t, k, zh) in
                             [(i[0], i[1], i[2], i[3]) for i in
                              [("index.html","Overview","","总览"),("species/index.html","Species","","物种"),
-                              ("solvents.html","Solvents","","溶剂统计"),("experiments.html","Experiments","","实验参数"),
-                              ("methods.html","Methods","","采集方法"),("downloads.html","Downloads","","下载"),
-                              ("api.html","API","","API")]]])
+                              ("afp/index.html","AFP/IBP","","抗冻/冰结合"),("solvents.html","Solvents","","溶剂统计"),
+                              ("experiments.html","Experiments","","实验参数"),("methods.html","Methods","","采集方法"),
+                              ("downloads.html","Downloads","","下载"),("api.html","API","","API")]]])
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f5f7">
 <title>{esc(title)} · EnvTolDB</title>
 <meta name="description" content="EnvTolDB — environment-tolerant proteome database: 301 organisms, 892,811 UniProt proteins, 973,185 experimental measurements, 2.44M EC annotations.">
 <style>{CSS}</style></head><body>
@@ -253,6 +212,16 @@ totals = {
     "experiments": db.execute("SELECT COUNT(*) FROM experiments WHERE value IS NOT NULL").fetchone()[0],
     "structures": db.execute("SELECT COUNT(*) FROM structures").fetchone()[0],
 }
+afp_present = db.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='afp_ibp_proteins'").fetchone()[0]
+afp_counts = None
+if afp_present:
+    afp_counts = {
+        "taxa": db.execute("SELECT COUNT(*) FROM afp_ibp_species WHERE inclusion_status='included'").fetchone()[0],
+        "species": db.execute("SELECT COUNT(*) FROM afp_ibp_species").fetchone()[0],
+        "proteins": db.execute("SELECT COUNT(*) FROM afp_ibp_proteins").fetchone()[0],
+        "evidence": db.execute("SELECT COUNT(*) FROM afp_ibp_evidence").fetchone()[0],
+        "quarantine": db.execute("SELECT COUNT(*) FROM afp_ibp_quarantine").fetchone()[0],
+    }
 
 # ================= gene mapping (v3.7.0): NCBI IPG + EBI coordinates + verified CDS =================
 ipg = {}
@@ -272,6 +241,29 @@ print(f"per-species CDS coverage: {len(sp_cds)} species", flush=True)
 # ================= index =================
 notice_en = cfg["site"].get("notice_en", "").format(n_pools=len(POOLS), n_species=totals["species"], n_proteins=totals["proteins"])
 notice_zh = cfg["site"].get("notice", "").format(n_pools=len(POOLS), n_species=totals["species"], n_proteins=totals["proteins"])
+afp_entry = ""
+afp_methods = ""
+afp_downloads = ""
+afp_schema = ""
+if afp_counts:
+    afp_schema = f"""<tr><td><code>afp_ibp_species</code> / <code>afp_ibp_proteins</code> / <code>afp_ibp_evidence</code> / <code>afp_ibp_quarantine</code></td>
+<td>independent AFP/IBP identities, functions, evidence classes, limitations and review exclusions; no core-pool membership</td>
+<td>{afp_counts['species']} / {afp_counts['proteins']} / {afp_counts['evidence']} / {afp_counts['quarantine']}</td></tr>"""
+    afp_downloads = """<div class="card"><h2>Independent AFP / IBP subset</h2>
+<p style="font-size:13.5px"><a href="afp/downloads/afp_ibp_proteins.fasta" download>Protein FASTA</a> ·
+<a href="afp/downloads/afp_ibp_proteins.tsv" download>Protein TSV</a> ·
+<a href="afp/downloads/afp_ibp.json" download>Complete subset JSON</a>. The JSON includes species decisions,
+evidence rows and quarantined records; sequence SHA-256 values are included for integrity checks.</p></div>"""
+    afp_methods = """<div class="card"><h2>Independent AFP / IBP subset</h2>
+<p style="font-size:13.5px">AFP/IBP records are curated in separate tables and are not assigned to the 14 core pools.
+Evidence classes distinguish native protein characterization, reviewed annotation, direct recombinant activity,
+primary-literature function, transcript/homology prediction and database-only annotation. Quarantined identity
+conflicts and keyword false positives are retained for audit but excluded from protein counts.</p>
+<p><a href="afp/methods.html">AFP/IBP evidence guide →</a></p></div>"""
+    afp_entry = f"""<div class="card"><h2 data-zh="独立抗冻/冰结合蛋白子集">Independent AFP / IBP subset</h2>
+<p style="font-size:13.5px">{afp_counts['taxa']} included taxa · {afp_counts['proteins']} accession-level proteins · {afp_counts['evidence']} evidence rows.
+Functions, activity types, limitations, sequences and primary-literature links are curated separately; these records do not alter the 14 core environmental pools.</p>
+<p><a href="afp/index.html">Browse AFP/IBP functions &amp; evidence →</a></p></div>"""
 
 sp_rows = "".join(
     f'<tr data-sp-row><td><a href="species/{slugify(r["name"])}.html">{esc(r["name"])}</a></td>'
@@ -300,6 +292,7 @@ body = f"""<div class="hero">
   </div>
 </div>
 <div class="note" data-zh="{esc(notice_zh)}">{esc(notice_en)}</div>
+{afp_entry}
 <h2 class="sec" data-zh="按环境组浏览">Browse by environmental group</h2>
 <div class="grid">{pool_cards}</div>
 <h2 class="sec" data-zh="全部物种">All species</h2>
@@ -333,7 +326,7 @@ body = f"""<div class="card"><h2 data-zh="全部物种">All curated species ({to
     f'<td>{sp_cds.get(r["id"], 0):,}</td>'
     f'<td>{ANCH_OK if r["lit_anchored"] else ANCH_NO}</td>'
     f'<td>{esc(r["evidence_level"] or "—")}</td></tr>' for r in all_species)}</tbody></table></div>"""
-open(f"{OUT}/species/index.html", "w", encoding="utf-8").write(page("Species", body, "species"))
+open(f"{OUT}/species/index.html", "w", encoding="utf-8").write(page("Species", body, "species", subdir=True))
 print("species index ✓", flush=True)
 
 # ================= pool pages =================
@@ -347,7 +340,7 @@ for pool in POOLS:
     en = POOLS.get(pool, {}).get("en") or (cfg["collection"]["pools"][list(POOL_EN).index(pool)].get("en") if False else {})
     b = f'<div class="card"><h2>{esc(POOL_EN.get(pool, pool))} — {len(items)} organisms</h2><table>' \
         '<tr><th>Species</th><th>Grade</th><th>Sequences</th><th>CDS verified</th><th>Anchored</th></tr>' + trs + '</table></div>'
-    open(f"{OUT}/species/{pool}.html", "w", encoding="utf-8").write(page(POOL_EN.get(pool, pool), b, "species"))
+    open(f"{OUT}/species/{pool}.html", "w", encoding="utf-8").write(page(POOL_EN.get(pool, pool), b, "species", subdir=True))
 print("pool pages ✓", flush=True)
 
 # ================= per-species pages =================
@@ -386,6 +379,7 @@ for r in db.execute("""SELECT accession, ec, confidence FROM clean_ec
 # 物种级文献证据 (v3.6.2): Europe PMC 标题/摘要锚定 + 命名/分类论文; 表不存在时不出卡片
 import urllib.parse as _up
 lit_stats, lit_papers, lit_names = defaultdict(dict), defaultdict(lambda: defaultdict(list)), defaultdict(list)
+lit_phen = defaultdict(list)
 try:
     for r in db.execute("SELECT species_id, query_kind, hit_count, query FROM species_literature_stats"):
         lit_stats[r["species_id"]][r["query_kind"]] = (r["hit_count"], r["query"])
@@ -394,7 +388,13 @@ try:
         lit_papers[r["species_id"]][r["query_kind"]].append(r)
     for r in db.execute("SELECT species_id, name FROM species_synonyms ORDER BY species_id, rowid"):
         lit_names[r["species_id"]].append(r["name"])
+    for r in db.execute("""SELECT species_id, trait, relation, value_min, value_max, unit, value_text, nacl_molar_min,
+                           nacl_molar_max, quote, pmid, doi, pub_year, review_note FROM species_literature_phenotypes
+                           WHERE review_status='agent_confirmed' ORDER BY species_id, trait, quote, relation"""):
+        lit_phen[r["species_id"]].append(r)
+    phen_n, phen_sp = db.execute("SELECT COUNT(*), COUNT(DISTINCT species_id) FROM species_literature_phenotypes").fetchone()
 except sqlite3.OperationalError:
+    phen_n, phen_sp = 0, 0
     print("species literature tables not present — literature cards skipped", flush=True)
 
 
@@ -436,6 +436,62 @@ def lit_card(sp):
 <p class="muted">Searched names: {esc('; '.join(lit_names.get(sp['id'], [])))}. Up to ten most-cited records per search are kept in
 <code>species_literature</code>; the exact queries and hit counts are in <code>species_literature_stats</code>.</p>
 <ul style="margin-bottom:0">{lit_block('Anchoring literature', sp_.get('anchor', []))}{lit_block('Naming / reclassification papers', sp_.get('description', []))}{lit_block('Growth physiology', sp_.get('physiology', []))}{lit_block('Genus-level anchoring', sp_.get('genus_anchor', []))}</ul></div>"""
+
+
+def phen_text(r):
+    """The value as the paper states it: a range when min and max differ."""
+    if r["value_text"]:
+        return r["value_text"]
+    return f'{r["value_min"]:g}' if r["value_min"] == r["value_max"] else f'{r["value_min"]:g}–{r["value_max"]:g}'
+
+
+def phen_cell(rows, kind):
+    if not rows:
+        return "—"
+    r = rows[0]
+    v = phen_text(r)
+    if kind == "range" and r["value_min"] == r["value_max"]:
+        v = "at " + v                      # a single-point statement ("capable of growth at 45 °C")
+    s = v + ("" if r["trait"] == "temperature" else " " + r["unit"])
+    if r["trait"] == "salt_tolerance" and r["unit"] != "M" and r["nacl_molar_min"] is not None:
+        lo, hi = r["nacl_molar_min"], r["nacl_molar_max"]
+        s += " <span class='muted'>(≈ {} M)</span>".format(f"{lo:.2g}" if abs(hi - lo) < 1e-9 else f"{lo:.2g}–{hi:.2g}")
+    return s
+
+
+def phen_card(sp):
+    """Growth conditions (temperature / pH / NaCl) read from the literature and checked sentence by sentence."""
+    recs = lit_phen.get(sp["id"], [])
+    if not recs:
+        return ""
+    rows = []
+    for trait, label in (("temperature", "Temperature"), ("ph", "pH"), ("salt_tolerance", "NaCl")):
+        mine = [r for r in recs if r["trait"] == trait]
+        if not mine:
+            continue
+        by = {k: [r for r in mine if r["relation"] == k] for k in ("growth", "optimum", "minimum", "maximum")}
+        limits = "; ".join(x for x in ("≥ " + phen_text(by["minimum"][0]) if by["minimum"] else "",
+                                      "≤ " + phen_text(by["maximum"][0]) if by["maximum"] else "") if x)
+        rows.append(f"<tr><td>{label}</td><td>{phen_cell(by['growth'], 'range')}</td><td>{phen_cell(by['optimum'], 'opt')}"
+                    f"<td>{limits or '—'}</td></tr>")
+    sources, seen = [], set()
+    for r in recs:
+        key = (r["quote"], r["pmid"])
+        if key in seen or not r["quote"] or r["quote"] == "see paper":
+            continue
+        seen.add(key)
+        link = (f"https://europepmc.org/abstract/MED/{esc(r['pmid'])}" if r["pmid"] else
+                f"https://doi.org/{esc(r['doi'])}" if r["doi"] else "")
+        ref = f"<a href='{link}' target='_blank' rel='noopener'>PMID {esc(r['pmid'])}</a>" if r["pmid"] else esc(r["doi"] or "")
+        sources.append(f"<li>{esc(r['quote'])} <span class='muted'>— {ref} ({esc(r['pub_year'] or '')})</span></li>")
+    notes = " · ".join(dict.fromkeys(r["review_note"] for r in recs if r["review_note"]))
+    return f"""<div class="card"><h2>Growth conditions reported in the literature</h2>
+<p style="font-size:13.5px">Read from the abstracts of this species' papers and checked sentence by sentence against the source
+sentence; values are shown as the paper states them.</p>
+<table><tr><th></th><th>Growth range</th><th>Optimum</th><th>Limits</th></tr>{''.join(rows)}</table>
+<p class="muted" style="margin-bottom:4px">Source sentences:</p>
+<ul style="margin-bottom:0">{''.join(sources)}</ul>
+<p class="muted">{esc(notes)}</p></div>"""
 
 count = 0
 import json as _json
@@ -487,6 +543,7 @@ evidence {esc(sp['evidence_level'] or '—')}
 <p class="muted">{esc(sp['evidence_note'] or '')} {esc(sp['notes'] or '')}</p>
 <p><a class="btn" href="{gz_rel}" download>⬇ FASTA (.fasta.gz)</a>{(' <a class="btn" href="downloads/fasta_cds/' + slug + '.cds.fasta.gz" download>⬇ CDS FASTA (.fasta.gz)</a>') if sp_cds.get(sp['id']) else ''}</p></div>
 {lit_card(sp)}
+{phen_card(sp)}
 <div class="card"><h2>Proteins ({len(prots):,})</h2>
 <input placeholder="Filter proteins…" oninput="filterSpecies(this)" style="width:300px;margin-bottom:10px">
 <div data-pg-wrap>
@@ -588,11 +645,24 @@ b = f"""<div class="note">{esc(col.get('_intro_en',''))}</div>{''.join(mcards)}
    environmental terms; naming/reclassification papers name the species in the title
    together with sp. nov. / gen. nov. / comb. nov.
 6. BacDive calibration: Halophily table (NaCl → M) and optimal culture pH</pre></div>
+<div class="card"><h2>Growth conditions from the literature (v3.8.0)</h2>
+<p style="font-size:13.5px">Growth temperature, pH and NaCl ranges and optima are read from the abstracts of the papers stored for each
+species (naming and reclassification papers, growth-physiology papers, anchoring literature). A rule-based parser selects
+sentences that speak about growth and state one of the three, and reads the growth range, the optimum and the limits from
+each sentence together with the sentence itself.</p>
+<p style="font-size:13.5px">Every statement was then reviewed sentence by sentence against its source sentence by an AI agent (ZCode), not by a
+human curator: {phen_n:,} statements for {phen_sp} of the 284 environment-tolerant species were confirmed (52 species after
+correcting the parsed values) and 73 candidate papers were rejected, mostly naming papers that describe another species and
+only mention this one. Only confirmed statements are served; each keeps its source sentence and PMID.</p>
+<p style="font-size:13.5px">An automated audit checks that every stored sentence occurs verbatim in its paper's abstract, that the paper names the
+species, and that range, optimum and limits of one trait do not contradict each other. Values are shown as the paper states
+them; NaCl given in % (w/v), g/l or mM is also stored in mol/l.</p></div>
 <div class="card"><h2 data-zh="中文协议原文（全部组）">Chinese protocol (原文)</h2>
 <details><summary data-zh='展开'>Expand</summary>
 <pre>{esc(col.get('_intro',''))}</pre>
 {''.join(f"<p style='font-size:13px'><b>{esc(p.get('title',''))}</b><br>{esc(p.get('criteria',''))}</p>" for p in col.get('pools', []))}
-</details></div>"""
+</details></div>
+{afp_methods}"""
 open(f"{OUT}/methods.html", "w", encoding="utf-8").write(page("Methods", b, "methods"))
 print("methods ✓", flush=True)
 
@@ -644,7 +714,8 @@ b = f"""<div class="note">Everything below is generated from the EnvTolDB SQLite
 <table><tr><th>Species</th><th>File</th><th>Size</th></tr>{frows}</table></div>
 <div class="card"><h2>Per-species CDS FASTA ({len(cds_files)} files, {sum(f[1] for f in cds_files)/1e6:.0f} MB total)</h2>
 <table><tr><th>Species</th><th>File</th><th>Size</th></tr>{crows}</table></div>
-<div class="card"><h2>Species tables TSV ({len(tsv_files)})</h2><table>{''.join(f"<tr><td>{esc(os.path.basename(f[0]))}</td><td>{f[1]/1024:.0f} KB</td></tr>" for f in tsv_files)}</table></div>"""
+<div class="card"><h2>Species tables TSV ({len(tsv_files)})</h2><table>{''.join(f"<tr><td>{esc(os.path.basename(f[0]))}</td><td>{f[1]/1024:.0f} KB</td></tr>" for f in tsv_files)}</table></div>
+{afp_downloads}"""
 open(f"{OUT}/downloads.html", "w", encoding="utf-8").write(page("Downloads", b, "downloads"))
 print("downloads ✓", flush=True)
 
@@ -672,8 +743,12 @@ self-hosted instance.</div>
 <tr><td><code>gene_coordinates</code> / <code>gene_sequences</code> / <code>gene_mapping_status</code></td>
 <td>genomic coordinates (NCBI IPG + EBI), verified CDS sequences, per-protein mapping status</td>
 <td>{gene_counts}</td></tr>
+<tr><td><code>species_literature_phenotypes</code></td>
+<td>growth temperature / pH / NaCl range, optimum and limits read from paper abstracts and reviewed sentence by sentence; value, unit, sentence, PMID</td>
+<td>{_n("species_literature_phenotypes")}</td></tr>
 <tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
-<td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>{quar_counts}</td></tr></table></div>
+<td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>{quar_counts}</td></tr>
+{afp_schema}</table></div>
 <div class="card"><h2>Example queries</h2>
 <pre>-- proteins of one species, longest first
 sqlite3 dataset.db "SELECT accession, name, length FROM proteins p
@@ -732,6 +807,8 @@ jobs:
         uses: actions/deploy-pages@v4
 """
 open(f"{OUT}/.github/workflows/deploy.yml", "w").write(wf)
+if afp_present:
+    print("AFP/IBP subset", json.dumps(build_afp_site(DB, OUT)), flush=True)
 db.close()
 total = sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(OUT) for f in fs)
 nfiles = sum(len(fs) for _, _, fs in os.walk(OUT))
