@@ -23,7 +23,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.8.0"
+RELEASE = "v3.8.1"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
