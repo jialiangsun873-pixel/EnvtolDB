@@ -23,7 +23,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.8.1"
+RELEASE = "v3.8.2"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -282,7 +282,7 @@ body = f"""<div class="hero">
   <h1>EnvTolDB</h1>
   <div class="tag">A curated, provenance-tracked database of proteins from environment-tolerant organisms — thermophilic, halophilic, acid/alkaliphilic, solvent-tolerant — with mesophilic controls.</div>
   <div class="badge-line"><span class="rel">Release {esc(RELEASE)}</span><span class="rel2">Data as of {esc(DATA_AS_OF)}</span><span class="rel2">Source: UniProtKB {esc(UNIPROT_RELEASE)}</span></div>
-  <div class="srch"><input id="spq" placeholder="Search 231 species — e.g. Halobacterium, Sulfolobus, putida…" oninput="filterSpecies(this)"><button onclick="var t=document.getElementById('spq');filterSpecies(t)">Search</button></div>
+  <div class="srch"><input id="spq" placeholder="Search {len(all_species)} species — e.g. Halobacterium, Sulfolobus, putida…" oninput="filterSpecies(this)"><button onclick="var t=document.getElementById('spq');filterSpecies(t)">Search</button></div>
   <div class="hint">Filters the species table below. Bulk/protein-level search: download the SQLite database (Downloads).</div>
   <div class="chips">
     <div class="chip"><b>{totals['species']}</b><span>curated organisms</span></div>
@@ -554,7 +554,7 @@ evidence {esc(sp['evidence_level'] or '—')}
 <p class="muted">Click headers to sort. pLDDT and salt-bridge metrics from AlphaFold DB v2.0 records where available.</p></div>"""
         open(f"{OUT}/species/{slug}.html", "w", encoding="utf-8").write(page(sp["name"], b, "species-detail", crumb=True, subdir=True))
         count += 1
-        if count % 40 == 0: print(f"  {count}/231", flush=True)
+        if count % 40 == 0: print(f"  {count}/{len(all_species)}", flush=True)
 print(f"species pages ✓ ({count})", flush=True)
 
 # ================= solvents =================
