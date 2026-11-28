@@ -23,7 +23,7 @@ DB = os.environ.get("ENVTOLDB_DB", "/public/home/sjl2/datasetdb/dataset.db")
 CFG = "/public/home/sjl2/datasetdb/config.json"
 OUT = os.environ.get("ENVTOLDB_OUT", "/public/home/sjl2/envtoldb_site")   # repo root = site root
 NOW = datetime.datetime.now().strftime("%Y-%m-%d")
-RELEASE = "v3.8.2"
+RELEASE = "v3.9.0"
 UNIPROT_RELEASE = "2026_01"
 
 cfg = json.load(open(CFG, encoding="utf-8"))
@@ -493,6 +493,25 @@ sentence; values are shown as the paper states them.</p>
 <ul style="margin-bottom:0">{''.join(sources)}</ul>
 <p class="muted">{esc(notes)}</p></div>"""
 
+# UniProt 蛋白注释与 eggNOG (v3.9.0): JSON 里只放精简摘要, 全量在 SQLite
+acc2ann, acc2egg = {}, {}
+try:
+    for r in db.execute("""SELECT accession, entry_name, gene_names, keywords, interpro, go_ids,
+                           subcellular, signal_peptide, transmem, disordered, pdb_xrefs, n_pmids
+                           FROM protein_annotations"""):
+        acc2ann[r[0]] = {"en": (r[1] or "")[:140], "gn": (r[2] or "")[:140],
+                         "kw": "; ".join((r[3] or "").split(";")[:6]),
+                         "ipr": "; ".join((r[4] or "").split(";")[:6]),
+                         "go": "; ".join((r[5] or "").split("; ")[:6]),
+                         "sub": (r[6] or "")[:120], "sig": (r[7] or "")[:120],
+                         "tm": (r[8] or "")[:220], "idr": (r[9] or "")[:300],
+                         "pdb": r[10] or "", "npm": r[11] or 0}
+    for r in db.execute("SELECT accession, ogs, cog_categories, og_description FROM protein_eggnog"):
+        acc2egg[r[0]] = {"og": (r[1] or "").split(",")[:4], "cog": r[2] or "", "desc": (r[3] or "")[:220]}
+    print("annotations available: %d UniProt, %d eggNOG" % (len(acc2ann), len(acc2egg)), flush=True)
+except sqlite3.OperationalError:
+    print("annotation tables not present — JSON without UniProt/eggNOG summaries", flush=True)
+
 count = 0
 import json as _json
 for pool, items in sp_by_pool.items():
@@ -515,6 +534,12 @@ for pool, items in sp_by_pool.items():
                     "SELECT kind, value, unit, condition, source, source_ref FROM experiments WHERE accession=? AND value IS NOT NULL", (acc,)) ],
                 "ipg": ipg.get(acc),
             }
+            a = acc2ann.get(acc)
+            if a:
+                data[acc]["ann"] = a
+            g = acc2egg.get(acc)
+            if g:
+                data[acc]["egg"] = g
         os.makedirs(f"{OUT}/species/data", exist_ok=True)
         with open(f"{OUT}/species/data/{slug}.json", "w", encoding="utf-8") as f:
             _json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
@@ -746,6 +771,12 @@ self-hosted instance.</div>
 <tr><td><code>species_literature_phenotypes</code></td>
 <td>growth temperature / pH / NaCl range, optimum and limits read from paper abstracts and reviewed sentence by sentence; value, unit, sentence, PMID</td>
 <td>{_n("species_literature_phenotypes")}</td></tr>
+<tr><td><code>protein_annotations</code></td>
+<td>UniProt protein annotations: entry name, gene names, signal peptide, transmembrane, GO, subcellular location, keywords, InterPro, Pfam, PDB xrefs, cofactors, active/binding sites, MobiDB-lite disordered regions, literature PMIDs</td>
+<td>{_n("protein_annotations")}</td></tr>
+<tr><td><code>protein_eggnog</code></td>
+<td>eggNOG v5.0 orthology: OG list, COG category, OG description (2020-04 UniProt mapping)</td>
+<td>{_n("protein_eggnog")}</td></tr>
 <tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
 <td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>{quar_counts}</td></tr>
 {afp_schema}</table></div>

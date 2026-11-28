@@ -51,6 +51,12 @@ self-hosted instance.</div>
 <tr><td><code>species_literature_phenotypes</code></td>
 <td>growth temperature / pH / NaCl range, optimum and limits read from paper abstracts and reviewed sentence by sentence; value, unit, sentence, PMID</td>
 <td>488</td></tr>
+<tr><td><code>protein_annotations</code></td>
+<td>UniProt protein annotations: entry name, gene names, signal peptide, transmembrane, GO, subcellular location, keywords, InterPro, Pfam, PDB xrefs, cofactors, active/binding sites, MobiDB-lite disordered regions, literature PMIDs</td>
+<td>700,737</td></tr>
+<tr><td><code>protein_eggnog</code></td>
+<td>eggNOG v5.0 orthology: OG list, COG category, OG description (2020-04 UniProt mapping)</td>
+<td>337,251</td></tr>
 <tr><td><code>experiments_quarantine</code> / <code>record_evidence_quarantine</code></td>
 <td>withdrawn records with their evidence rows — not counted or served; original ids kept</td><td>6,131 / 6,131</td></tr>
 <tr><td><code>afp_ibp_species</code> / <code>afp_ibp_proteins</code> / <code>afp_ibp_evidence</code> / <code>afp_ibp_quarantine</code></td>
@@ -84,7 +90,7 @@ sqlite3 dataset.db "SELECT accession, nucleotide, start, stop, strand, mapping_s
 <p style="font-size:13.5px">If you use EnvTolDB in your research, please cite the EnvProGen manuscript (in preparation) and the underlying sources: UniProtKB, BacDive, OrganiZymeDB, FireProtDB, ProThermDB, Europe PMC.</p></div>
 </main>
 <footer>
-  <b>EnvTolDB</b> v3.8.2 · built 2026-11-28 · MIT (code) / CC-BY 4.0 (data) ·
+  <b>EnvTolDB</b> v3.9.0 · built 2026-11-28 · MIT (code) / CC-BY 4.0 (data) ·
   <a href="https://github.com/jialiangsun873-pixel/EnvtolDB" target="_blank" rel="noopener">GitHub</a> ·
   <span data-zh="引用：EnvProGen 论文（撰写中）；数据来源 UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC。">Citation: EnvProGen manuscript (in preparation); sources UniProtKB · BacDive · OrganiZymeDB · FireProtDB · ProThermDB · Europe PMC.</span>
 </footer>

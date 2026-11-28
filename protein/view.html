@@ -87,6 +87,35 @@ fetch('../species/data/' + SP + '.json').then(r => {
     h += '</table></div>';
   }
 
+  if (d.ann) {
+    var a = d.ann;
+    h += '<div class="card"><h2>UniProt annotations</h2><p style="font-size:13.5px">' +
+         'entry <code>' + esc(a.en || '') + '</code>' +
+         (a.gn ? ' · genes <i>' + esc(a.gn) + '</i>' : '') +
+         ' · <b>' + a.npm + '</b> publication' + (a.npm === 1 ? '' : 's') +
+         (a.pdb ? ' · PDB: ' + esc(a.pdb) : '') + '</p>' +
+         '<table>' +
+         (a.kw ? '<tr><th>Keywords</th><td>' + esc(a.kw) + '</td></tr>' : '') +
+         (a.ipr ? '<tr><th>InterPro</th><td>' + esc(a.ipr) + '</td></tr>' : '') +
+         (a.go ? '<tr><th>Gene Ontology</th><td>' + esc(a.go) + '</td></tr>' : '') +
+         (a.sub ? '<tr><th>Subcellular</th><td>' + esc(a.sub) + '</td></tr>' : '') +
+         (a.sig ? '<tr><th>Signal peptide</th><td>' + esc(a.sig) + '</td></tr>' : '') +
+         (a.tm ? '<tr><th>Transmembrane</th><td>' + esc(a.tm) + '</td></tr>' : '') +
+         (a.idr ? '<tr><th>Disordered (MobiDB-lite)</th><td>' + esc(a.idr) + '</td></tr>' : '') +
+         '</table><p class="muted">From the UniProt 2026-11-28 pull; the full column set lives in ' +
+         '<code>protein_annotations</code> in the SQLite database. ' + a.npm +
+         ' PubMed reference' + (a.npm === 1 ? '' : 's') + ' cite this protein.</p></div>';
+  }
+
+  if (d.egg) {
+    var g = d.egg;
+    h += '<div class="card"><h2>eggNOG orthology</h2><p style="font-size:13.5px">' +
+         (g.cog ? 'COG categories: <b>' + esc(g.cog) + '</b> · ' : '') +
+         'OGs: ' + g.og.map(function(o) { return '<code>' + esc(o) + '</code>'; }).join(', ') + '</p>' +
+         (g.desc ? '<p style="font-size:13.5px">' + esc(g.desc) + '</p>' : '') +
+         '<p class="muted">eggNOG v5.0 — the UniProt-accession mapping was built on the 2020-04 release, so accessions created later may be missing. Full table: <code>protein_eggnog</code>.</p></div>';
+  }
+
   if (d.ipg) {
     var g = d.ipg;
     h += '<div class="card"><h2>Gene (genomic coordinates & CDS)</h2><p><code>' + g[0] + '</code> ' + g[1] + '–' + g[2] +

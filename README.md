@@ -16,6 +16,8 @@
 | **Identity annotations** | **1,320** (metal-ion dependence / inhibitors / oxygen sensitivity) |
 | **Species literature (v3.6.2)** | **270 / 284** non-control species anchored in Europe PMC (title/abstract); **2,478** key papers |
 | **Growth conditions from the literature (v3.8.0)** | **488** reviewed statements (growth temperature / pH / NaCl) for **153** species, each with its source sentence |
+| **UniProt protein annotations (v3.9.0)** | **700,737** proteins: entry name, genes, GO, InterPro/Pfam, signal peptide, transmembrane, subcellular location, MobiDB-lite IDR, **literature PMIDs (304,256 proteins)**, PDB xrefs |
+| **eggNOG orthology (v3.9.0)** | **337,251** proteins with OG links, COG categories and OG descriptions (v5.0, 2020-04 UniProt mapping) |
 
 ## What is EnvTolDB?
 
@@ -95,6 +97,23 @@ Tables: `species_synonyms` (names searched, with NCBI taxon id), `species_litera
 refreshed where it was unset or machine-derived (236 species); manually curated flags were left as they
 are, and 6 of them disagree with the automated result.
 
+## Protein-level annotations and orthology (v3.9.0)
+
+Two new per-protein tables round out the protein layer:
+
+- **`protein_annotations`** (700,737 proteins) — pulled from UniProt in one pass over the 301
+  organism subtrees: entry name, gene names, signal peptides, transmembrane helices, GO terms,
+  subcellular location, UniProt keywords, InterPro and Pfam domains, cofactors, active and binding
+  sites, **MobiDB-lite disordered regions** (UniProt's own IDR annotation) and **the PMIDs of papers
+  that cite each protein** (304,256 proteins have at least one). Literature coverage differs sharply
+  by group — most mesophilic-control proteins are cited, while most cold-adapted TrEMBL entries are not.
+- **`protein_eggnog`** (337,251 proteins) — eggNOG v5.0 OG links with COG category and OG description.
+  The official UniProt mapping was built on the 2020-04 release: coverage is ~94% for metal / salt /
+  solvent proteins but drops for accessions created later.
+
+Species `taxon_id` was backfilled for 101 species (empty values only) from the NCBI Taxonomy matching
+done for the species-literature step. Protein pages show an UniProt-annotation card and an eggNOG card.
+
 ## Growth conditions from the literature (v3.8.0)
 
 Growth temperature, pH and NaCl ranges and optima were read from the abstracts of the papers stored for
@@ -160,6 +179,7 @@ Visit the [live site](https://jialiangsun873-pixel.github.io/EnvtolDB/) for:
 
 ## Changelog
 
+- **v3.9.0 (2026-11-28)** — Protein-level annotations: UniProt pull for all 301 organism subtrees (entry name, genes, GO, InterPro/Pfam, signal peptide, transmembrane, subcellular location, MobiDB-lite IDR, literature PMIDs, PDB xrefs) into `protein_annotations` (700,737 proteins); eggNOG v5.0 orthology into `protein_eggnog` (337,251); species taxon_id backfilled for 101 species; annotation and orthology cards on protein pages.
 - **v3.8.0 (2026-11-26)** — Growth conditions from the literature: 488 reviewed statements (growth temperature / pH / NaCl range, optimum and limits) for 153 species, read from paper abstracts, reviewed sentence by sentence and audited; new table `species_literature_phenotypes`; growth-conditions card on species pages.
 - **v3.6.3 (2026-11-26)** — DES stability layer (164 rows, single literature source) withdrawn and moved to `experiments_quarantine`. Experimental layer now 967,054 records.
 - **v3.6.2 (2026-11-25)** — Species-level literature: Europe PMC title/abstract anchoring for all 284 non-control species (270 anchored), naming/reclassification papers (219 species), growth-physiology fallback (65), genus-level fallback (14). New tables `species_synonyms`, `species_literature`, `species_literature_stats`; literature card on every species page.
